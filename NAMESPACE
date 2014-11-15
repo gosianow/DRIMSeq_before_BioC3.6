@@ -1,0 +1,5 @@
+useDynLib(DM)
+exportPattern("^[[:alpha:]]+")
+
+importFrom(edgeR, movingAverageByCol, maximizeInterpolant)
+importFrom(Rcpp, evalCpp)
