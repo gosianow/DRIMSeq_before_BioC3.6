@@ -8,7 +8,8 @@
 # y <- y[["g1"]]; gamma0 <- 1000;  mode = "obs"; epsilon=1e-05; maxIte = 1000; verbose = TRUE; plot = FALSE
 
 
-dmOneGeneGroup <- function(y, gamma0, mode = "constrOptim2", epsilon = 1e-05, maxIte = 1000, verbose = FALSE, plot = FALSE){
+dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose = FALSE, plot = FALSE){
+  
   # NULL for filtered genes or genes with one exon
   if(dim(y)[1] <= 1) return(NULL)
   
@@ -132,7 +133,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = "constrOptim2", epsilon = 1e-05, ma
          
          FisherScoring={
            # k-1 parameters for Fisher scoring
-           piInitOrg <- piInit <- colSums(y)/sum(y)
+           piInitOrg <- piInit <- rowSums(y)/sum(y)
            piMAX <- piH <- piInit[-k]
            lik1 <- 0
            likMAX <- lik2 <- dmLogLikkm1(piH, gamma0, y)
@@ -195,15 +196,12 @@ dmOneGeneGroup <- function(y, gamma0, mode = "constrOptim2", epsilon = 1e-05, ma
                likMAX  <- lik2
                piMAX <- piH
              }
-             
-             
+                         
              if(plot)
                points(piH, lik2, pch="|")
              if(verbose) cat("lik2:", lik2, fill = T)
              ite <- ite + 1
-           }
-           
-           
+           }         
            
            if(ite > maxIte){
              piH <- piMAX
