@@ -8,7 +8,7 @@
 # dge <- dgeDM; group=NULL; dispersion=NULL; mode="constrOptim2G"; epsilon = 1e-05; maxIte = 1000; verbose=FALSE; mcCores = 20
 
 
-dmFit <- function(dge, group=NULL, dispersion=c("commonDispersion", "tagwiseDispersion")[2], mode="constrOptim2G", epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
+dmFit <- function(dge, group=NULL, dispersion=c("commonDispersion", "tagwiseDispersion")[2], mode=c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
   
   y <- dge$counts
   genes <-  names(y)

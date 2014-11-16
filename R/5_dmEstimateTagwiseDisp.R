@@ -1,20 +1,22 @@
 ##############################################################################
 # calculate tagwise dispersions 
-# dmEstimateTagwiseDisp, dmSQTLEstimateTagwiseDisp
 ##############################################################################
 
-# group=NULL; adjust = TRUE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; interval = c(0, 1e+5); tol = 1e-00; mcCores=20; verbose=FALSE; modeDisp=c("optimize", "optim", "constrOptim")[2]; initDisp = 10; initWeirMoM = TRUE
+# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[2]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-6, 6); trend = c("none", "commonDispersion", "trendedDispersion")[1]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
 
 
-dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "constrOptim2G", epsilon = 1e-05, maxIte = 1000, interval = c(0, 1e+5), tol = 1e-00, mcCores=20, verbose=FALSE, modeDisp=c("optimize", "optim", "constrOptim")[1], initDisp = 10, initWeirMoM = FALSE){
+dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "constrOptim2G", epsilon = 1e-05, maxIte = 1000, modeDisp=c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = FALSE, gridLength=11, gridRange=c(-6, 6), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf=10, span=0.3, mcCores=20, verbose=FALSE){
+  
   
   y <- dge$counts
   genes <- names(y)
+  ngenes <- length(y)
   
   if(is.null(group)) group <- dge$samples$group
   group <- as.factor(group)
   ngroups <- nlevels(group)
   lgroups <- levels(group)
+  nlibs <- length(group)
   
   igroups <- list()
   for(gr in 1:ngroups){
@@ -24,14 +26,18 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "const
   }
   
   
+  ### calculate mean expression of genes 
+  meanExpr <- unlist(mclapply(seq(ngenes), function(g){ sum(y[[g]]) / nlibs },  mc.cores=mcCores))
+   
+  names(meanExpr) <- genes
+  dge$meanExpr <- meanExpr
   
   ### Find optimized dispersion
   switch(modeDisp, 
          
          optimize={
            
-           
-           outList <- mclapply(seq(length(y)), function(g){
+           outList <- mclapply(seq(ngenes), function(g){
              # g = 1
              #     print(g)
              
@@ -53,13 +59,11 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "const
            
          },
          
+         
          optim={
            
-           
-           outList <- mclapply(seq(length(y)), function(g){
+      outList <- mclapply(seq(ngenes), function(g){
              # g = 12
-#              print(g)
-             
 
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = initDisp, y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
@@ -89,14 +93,14 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "const
            
            dge$tagwiseDispersion <- out[,"out"]
            dge$initDispersion <- out[,"init"]
-           
-           
-           
+                  
          },
+
+
+
          constrOptim={
-           
-           
-           outList <- mclapply(seq(length(y)), function(g){
+                    
+           outList <- mclapply(seq(ngenes), function(g){
              # g = 1
              #     print(g)
              
@@ -127,8 +131,81 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = "const
            dge$initDispersion <- out[,"init"]
            
            
-         })
+         },
+      
+      
+          grid={
+        
+            ### genrate spline dispersion
+            splinePts <- seq(from = gridRange[1], to = gridRange[2], length = gridLength)
+            splineDisp <- dge$commonDispersion * 2^splinePts
+            
+            ### calculate the likelihood for each gene at the spline dispersion points
+            
+            loglik0L <- mclapply(seq(length(y)), function(g){
+              # g = 1
+              
+              ll <- numeric(gridLength)
+              
+              for(i in seq(gridLength)){
+                # i = 1 
+                out <- dmAdjustedProfileLikTG(gamma0 = splineDisp[i], y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)
+                if(is.null(out))
+                  return(NULL)
+                
+                ll[i] <- out
+                
+              }
+              
+              return(ll)
+              
+            }, mc.cores = mcCores)
+            
+            names(loglik0L) <- genes
+            
+            loglik0 <- do.call(rbind, loglik0L)
+            
+            ngenes2 <- nrow(loglik0)
+            genes2 <- rownames(loglik0)
+            loglik <- loglik0 
+            
+            if(trend != "none"){
   
+              switch(trend, 
+                     commonDispersion={
+
+                       moderation <- matrix(colMeans(loglik0), ngenes2, gridLength, byrow=TRUE)
+                       
+                     },
+                     
+                     trendedDispersion={
+                       
+                       o <- order(meanExpr[genes2])
+                       oo <- order(o)
+                       width <- floor(span * ngenes2)
+                       
+                       moderation <- edgeR::movingAverageByCol(loglik0[o,], width=width)[oo,]
+                       
+                     })
+              
+              
+              priorN <- priorDf/(nlibs - ngroups) ### analogy to edgeR
+              
+              loglik <- loglik0 + priorN * moderation
+              
+            }
+              
+
+            out <- edgeR::maximizeInterpolant(splinePts, loglik)
+              
+            names(out) <- genes2
+            
+            dge$tagwiseDispersion <- rep(NA, ngenes)
+            names(dge$tagwiseDispersion) <- genes
+            dge$tagwiseDispersion[genes2] <- dge$commonDispersion * 2^out
+  
+        
+      })
   
   
   cat("** Tagwise dispersion: ", head(dge$tagwiseDispersion), "... \n")
