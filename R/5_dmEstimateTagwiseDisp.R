@@ -2,10 +2,10 @@
 # calculate tagwise dispersions 
 ##############################################################################
 
-# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[2]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-6, 6); trend = c("none", "commonDispersion", "trendedDispersion")[1]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
+# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-5, 5); trend = c("none", "commonDispersion", "trendedDispersion")[2]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
 
 
-dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp=c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = FALSE, gridLength=11, gridRange=c(-6, 6), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf=10, span=0.3, mcCores=20, verbose=FALSE){
+dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp = c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = TRUE, gridLength = 15, gridRange = c(-7, 7), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf = 10, span = 0.3, mcCores = 20, verbose = FALSE, plot = FALSE){
   
   
   y <- dge$counts
@@ -188,11 +188,22 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = c("con
                        
                      })
               
+              rownames(moderation) <- rownames(loglik0)
               
               priorN <- priorDf/(nlibs - ngroups) ### analogy to edgeR
               
-#               loglik <- loglik0 + priorN * moderation ### like in edgeR estimateTagwiseDisp
-              loglik <- (loglik0 + priorN * moderation)/(1 + priorN) ### like in edgeR dispCoxReidInterpolateTagwise
+              loglik <- loglik0 + priorN * moderation ### like in edgeR estimateTagwiseDisp
+#               loglik <- (loglik0 + priorN * moderation)/(1 + priorN) ### like in edgeR dispCoxReidInterpolateTagwise
+
+if(plot){
+  
+  dge$plotSplineDisp <- splineDisp
+  dge$plotLoglik0 <- loglik0
+  dge$plotModeration <- moderation
+  dge$plotPriorN <- priorN
+  dge$plotLoglik <- loglik
+  
+}
               
             }
               
@@ -201,6 +212,10 @@ dmEstimateTagwiseDisp <- function(dge, group=NULL, adjust = FALSE, mode = c("con
               
             names(out) <- genes2
             
+if(plot){
+  dge$plotOutDisp <- dge$commonDispersion * 2^out
+}
+
             dge$tagwiseDispersion <- rep(NA, ngenes)
             names(dge$tagwiseDispersion) <- genes
             dge$tagwiseDispersion[genes2] <- dge$commonDispersion * 2^out

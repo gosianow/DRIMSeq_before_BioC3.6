@@ -1,7 +1,7 @@
 Package: DM
 Type: Package
 Title: What the package does (short line)
-Version: 0.1.1
+Version: 0.1.2
 Date: 2014-11-14
 Author: Malgorzata Nowicka, Mark Robinson
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
