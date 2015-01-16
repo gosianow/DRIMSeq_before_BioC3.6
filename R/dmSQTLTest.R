@@ -18,11 +18,12 @@ dmSQTLTest <- function(dgeSQTL, mode="constrOptim2G", epsilon = 1e-05, maxIte = 
   print(proc.time())
   
   cat("Calculating LR \n")
-  LRT <- mclapply(dgeSQTL$SNPs$SNP_id, function(snp){
-    # snp = "snp_19_502623"
+  LRT <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){
+    # snp = 1
+		snp <- dgeSQTL$SNPs$SNP_id[snp]
 #     if(verbose) 
-      cat("testing SNP: ", snp, fill = TRUE)
-    
+      # cat("testing SNP: ", snp, fill = TRUE)
+		
     if(is.null(fit.null[[snp]]) || is.null(fit.full[[snp]])) 
       return(data.frame(LR=NA, df=NA, PValue=NA, LLfull=NA, LLnull=NA))
     
@@ -46,7 +47,7 @@ dmSQTLTest <- function(dgeSQTL, mode="constrOptim2G", epsilon = 1e-05, maxIte = 
   }, mc.cores=mcCores)
   
 print(proc.time())
-  save(fit.null, LRT, file="LRT.RData")
+# save(fit.null, LRT, file="LRT.RData")
   
   LRT <- do.call(rbind, LRT)
   FDR <- p.adjust(LRT$PValue, method="BH")

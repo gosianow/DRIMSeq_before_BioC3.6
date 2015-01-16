@@ -3,7 +3,7 @@
 # dmEstimateCommonDisp, dmSQTLEstimateCommonDisp
 ##############################################################################
 
-dmSQTLEstimateCommonDisp <- function(dgeSQTL, adjust = FALSE, subset=Inf, mode = "constrOptim2", epsilon = 1e-05, maxIte = 1000, interval = c(0, 1e+5), tol = 1e-00, mcCores=20, verbose=FALSE){
+dmSQTLEstimateCommonDisp <- function(dgeSQTL, adjust = TRUE, subset=Inf, mode = "constrOptim2", epsilon = 1e-05, maxIte = 1000, interval = c(0, 1e+4), tol = 1e-00, mcCores=10, verbose=FALSE){
   
   dgeSQTLorg <- dgeSQTL
 

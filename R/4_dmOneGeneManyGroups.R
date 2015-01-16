@@ -15,6 +15,7 @@ dmOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, mode = "co
   
   for(gr in 1:ngroups){
     # gr=2
+    # cat(gr, fill = TRUE)
     
     fitGr <- dmOneGeneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose=verbose)
     
