@@ -5,24 +5,27 @@
 #######################################################
 
 
+# dispersion = c("commonDispersion", "tagwiseDispersion")[2]; mode="constrOptim2G"; epsilon = 1e-05; maxIte = 1000; verbose=FALSE; mcCores = 1
 
 
-dmSQTLTest <- function(dgeSQTL, mode="constrOptim2G", epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
+
+dmSQTLTest <- function(dgeSQTL, dispersion = c("commonDispersion", "tagwiseDispersion")[1] , mode="constrOptim2G", epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
   
   fit.full <- dgeSQTL$fit
 
   ## fit null model
   cat("Fitting null model \n")
-  print(proc.time())
-  fit.null <- dmSQTLFit(dgeSQTL=dgeSQTL, model = "null", dispersion = dgeSQTL$dispersion, mode=mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose, mcCores = mcCores)$fit
-  print(proc.time())
+
+  dgeSQTL.null <- dmSQTLFit(dgeSQTL, model = "null", dispersion = dispersion, mode=mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose, mcCores = mcCores)
+  
+  fit.null <- dgeSQTL.null$fit
   
   cat("Calculating LR \n")
   LRT <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){
     # snp = 1
-		snp <- dgeSQTL$SNPs$SNP_id[snp]
+			
 #     if(verbose) 
-      # cat("testing SNP: ", snp, fill = TRUE)
+      # cat("testing SNP: ", paste0(dgeSQTL$SNPs[snp, c("SNP_id", "gene_id")], collapse = "-"), fill = TRUE)
 		
     if(is.null(fit.null[[snp]]) || is.null(fit.full[[snp]])) 
       return(data.frame(LR=NA, df=NA, PValue=NA, LLfull=NA, LLnull=NA))
@@ -36,7 +39,8 @@ dmSQTLTest <- function(dgeSQTL, mode="constrOptim2G", epsilon = 1e-05, maxIte = 
     DFnull <- fit.null[[snp]]$df
     DFfull <- sum(fit.full[[snp]]$df)
     
-    df <- DFfull - DFnull
+    # df <- DFfull - DFnull
+		df <- DFnull * (length(fit.full[[snp]]$df) - 1)
     
     pValue <- pchisq(LR, df = df , lower.tail = FALSE)
     
@@ -46,7 +50,6 @@ dmSQTLTest <- function(dgeSQTL, mode="constrOptim2G", epsilon = 1e-05, maxIte = 
     
   }, mc.cores=mcCores)
   
-print(proc.time())
 # save(fit.null, LRT, file="LRT.RData")
   
   LRT <- do.call(rbind, LRT)

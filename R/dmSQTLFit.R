@@ -38,6 +38,9 @@ dmSQTLFit <- function(dgeSQTL, model="full", dispersion=c("commonDispersion", "t
              # snp = 1
              # cat("SNP:", dgeSQTL$SNPs$SNP_id[snp], fill = TRUE)
 
+						 if(is.na(gamma0[snp]))
+							 return(NULL)
+
              NAs <- !is.na(dgeSQTL$genotypes[snp,]) & !is.na(y[[dgeSQTL$SNPs[snp, "gene_id"]]][1, ])
              
              y.g <- y[[dgeSQTL$SNPs[snp, "gene_id"]]][, NAs]
@@ -69,7 +72,12 @@ dmSQTLFit <- function(dgeSQTL, model="full", dispersion=c("commonDispersion", "t
          null={
            
            fit <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){  
-             
+						 
+             # cat("SNP:", dgeSQTL$SNPs$SNP_id[snp], fill = TRUE)
+						 
+						 if(is.na(gamma0[snp]))
+							 return(NULL)
+						 
              NAs <- !is.na(dgeSQTL$genotypes[snp,]) & !is.na(y[[dgeSQTL$SNPs[snp, "gene_id"]]][1, ])
              
              y.g <- y[[dgeSQTL$SNPs[snp, "gene_id"]]][, NAs]

@@ -2,7 +2,7 @@
 # calculate tagwise dispersions 
 ##############################################################################
 
-# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-5, 5); trend = c("none", "commonDispersion", "trendedDispersion")[2]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
+# adjust = TRUE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-01;  initDisp = 10; initWeirMoM = FALSE; gridLength=13; gridRange=c(-6, 6); trend = c("none", "commonDispersion", "trendedDispersion")[2]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
 
 
 dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp = c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = TRUE, gridLength = 15, gridRange = c(-7, 7), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf = 10, span = 0.3, mcCores = 20, verbose = FALSE, plot = FALSE){
@@ -11,7 +11,7 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
   y <- dgeSQTL$counts
   genes <- names(y)
   ngenes <- length(y)
-  
+
  
   ### calculate mean expression of genes 
   meanExpr <- unlist(mclapply(seq(ngenes), function(g){ sum(y[[g]][,!is.na(y[[g]][1,])]) /  sum(!is.na(y[[g]][1,])) },  mc.cores=mcCores)) 
@@ -19,6 +19,10 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
   dgeSQTL$meanExpr <- meanExpr
   
 	
+	### because we estimate disp per SNP-gene
+  genes <- apply(dgeSQTL$SNPs[, c("SNP_id", "gene_id")], MARGIN = 1, paste0, collapse = "-")
+ ngenes <- length(genes)
+ 
 	
   ### Find optimized dispersion
   switch(modeDisp, 
@@ -181,7 +185,7 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
             ### calculate the likelihood for each gene at the spline dispersion points
             
             loglik0L <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){
-             # snp = 1
+             # snp = 36540
              # print(snp)
 						 
 				     NAs <- !is.na(dgeSQTL$genotypes[snp,]) & !is.na(y[[dgeSQTL$SNPs[snp, "gene_id"]]][1, ])
@@ -217,7 +221,8 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
               
             }, mc.cores = mcCores)
             
-            names(loglik0L) <- dgeSQTL$SNPs$SNP_id
+						
+            names(loglik0L) <- genes
             
             loglik0 <- do.call(rbind, loglik0L)
             
@@ -244,7 +249,7 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
                        
                      })
               
-              rownames(moderation) <- rownames(loglik0)
+              rownames(moderation) <- genes2
               nlibs <- ncol(dgeSQTL$genotypes)
 							ngroups <- 3
               priorN <- priorDf/(nlibs - ngroups) ### analogy to edgeR
@@ -274,7 +279,7 @@ if(plot){
 }
 
             dgeSQTL$tagwiseDispersion <- rep(NA, nrow(dgeSQTL$SNPs))
-            names(dgeSQTL$tagwiseDispersion) <- dgeSQTL$SNPs$SNP_id
+            names(dgeSQTL$tagwiseDispersion) <- genes
             dgeSQTL$tagwiseDispersion[genes2] <- dgeSQTL$commonDispersion * 2^out
   
         
