@@ -24,13 +24,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
     igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
     
   }
-  
-  
-  ### calculate mean expression of genes 
-  meanExpr <- unlist(mclapply(seq(ngenes), function(g){ sum(y[[g]]) / nlibs },  mc.cores=mcCores))
-   
-  names(meanExpr) <- genes
-  dge$meanExpr <- meanExpr
+ 
   
   ### Find optimized dispersion
   switch(modeDisp, 
@@ -150,7 +144,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
               for(i in seq(gridLength)){
                 # i = 1 
                 out <- dmAdjustedProfileLikTG(gamma0 = splineDisp[i], y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)
-                if(is.null(out))
+                if(is.null(out) || out == -1e+20)
                   return(NULL)
                 
                 ll[i] <- out
@@ -215,8 +209,8 @@ if(plot){
 if(plot){
   dge$plotOutDisp <- dge$commonDispersion * 2^out
 }
-
-            dge$tagwiseDispersion <- rep(NA, ngenes)
+#### set common dispersion for genes that tagwise disp could not be calculated 
+            dge$tagwiseDispersion <- rep(dge$commonDispersion, ngenes)
             names(dge$tagwiseDispersion) <- genes
             dge$tagwiseDispersion[genes2] <- dge$commonDispersion * 2^out
   
