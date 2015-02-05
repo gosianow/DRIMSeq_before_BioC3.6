@@ -37,7 +37,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = interval[1] + (1-(sqrt(5) - 1)/2)*(interval[2]-interval[1]) , y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(NA) 
+               return(dge$commonDispersion) 
              
              out <- optimize(f = dmAdjustedProfileLikTG, interval = interval,
                              y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose,
@@ -61,7 +61,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
 
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = initDisp, y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(NA) 
+               return(dge$commonDispersion) 
              
              
              if(initWeirMoM)
@@ -100,7 +100,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = initDisp, y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(NA) 
+               return(dge$commonDispersion) 
              
              ui <- 1
              ci <- 0 + epsilon
