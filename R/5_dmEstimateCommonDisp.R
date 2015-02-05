@@ -3,7 +3,7 @@
 # dmEstimateCommonDisp, dmSQTLEstimateCommonDisp
 ##############################################################################
 
-# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; interval = c(0, 1e+5); tol = 1e-00; mcCores=20; verbose=FALSE
+# group=NULL; adjust = FALSE; subset=100; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; interval = c(0, 1e+5); tol = 1e-00; mcCores=20; verbose=FALSE
 
 
 dmEstimateCommonDisp <- function(dge, group=NULL, adjust = TRUE, subset=Inf, mode = "constrOptim2G", epsilon = 1e-05, maxIte = 1000, interval = c(0, 1e+5), tol = 1e-00, mcCores=20, verbose=FALSE){
@@ -23,8 +23,7 @@ dmEstimateCommonDisp <- function(dge, group=NULL, adjust = TRUE, subset=Inf, mod
   
   ### use genes with high gene expression 
   if(subset != Inf){
-    
-		if(subset >= 1){		    
+    	    
 # 		  ## take random genes
 # 		  allGenes <- unique(as.character(dge$genes$gene_id))
 # 		  nGenes <- length(allGenes)
@@ -33,17 +32,16 @@ dmEstimateCommonDisp <- function(dge, group=NULL, adjust = TRUE, subset=Inf, mod
       
 		  minExpr <- subset
 		  cat("* Min expression: ", minExpr, "\n")
-		  dge <- dge[dge$meanExpr > minExpr, ]
-      
-	}else{
-		minExpr <- quantile(dge$meanExpr, probs = 1 - subset)
-		cat("* Min expression: ", minExpr, "\n")
-		dge <- dge[dge$meanExpr > minExpr, ]
-	}
+		  keep <- names(which(dge$meanExpr > minExpr))
+			dge$counts <- dge$counts[keep]
+			dge$genes <- dge$genes[dge$genes$gene_id %in% keep, ]
+			
 
     dge$genes$gene_id <- factor(as.character(dge$genes$gene_id)) # otherwise number of levels stays as before subsetting      
     
   }
+	
+	
 
   out <- optimize(f = dmAdjustedProfileLik, interval = interval,
                   dge = dge, group = group, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, mcCores = mcCores, verbose = verbose,
