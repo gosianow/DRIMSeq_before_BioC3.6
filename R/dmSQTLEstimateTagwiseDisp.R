@@ -251,7 +251,7 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjust = TRUE, mode = c("constrOp
               
               rownames(moderation) <- genes2
               nlibs <- ncol(dgeSQTL$genotypes)
-							ngroups <- 3
+							ngroups <- 2
               priorN <- priorDf/(nlibs - ngroups) ### analogy to edgeR
               
               loglik <- loglik0 + priorN * moderation ### like in edgeR estimateTagwiseDisp

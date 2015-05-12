@@ -30,10 +30,12 @@ dmTest <- function(dge, mode="constrOptim2G", epsilon = 1e-05, maxIte = 1000, ve
       LR <-  2*(LLfull - LLnull)
       
       DFnull <- fit.null[[g]]$df
-      DFfull <- sum(fit.full[[g]]$df)
+      # DFfull <- sum(fit.full[[g]]$df)
       
-      df <- DFfull - DFnull
-      
+      # df <- DFfull - DFnull
+      df <- DFnull * (length(fit.full[[g]]$df) - 1) # (k-1) * nr of groups
+			
+			
       pValue <- pchisq(LR, df = df , lower.tail = FALSE)
       
       return(data.frame(LR=LR, df=df, PValue=pValue, LLfull=LLfull, LLnull=LLnull))

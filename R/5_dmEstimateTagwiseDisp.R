@@ -2,7 +2,7 @@
 # calculate tagwise dispersions 
 ##############################################################################
 
-# group=NULL; adjust = FALSE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-5, 5); trend = c("none", "commonDispersion", "trendedDispersion")[2]; priorDf=10; span=0.3; mcCores=20; verbose=FALSE
+# group=NULL; adjust = TRUE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-5, 5); trend = c("none", "commonDispersion", "trendedDispersion")[1]; priorDf=10; span=0.3; mcCores=1; verbose=FALSE
 
 
 dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp = c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = TRUE, gridLength = 15, gridRange = c(-7, 7), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf = 10, span = 0.3, mcCores = 20, verbose = FALSE, plot = FALSE){
@@ -11,6 +11,14 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
   y <- dge$counts
   genes <- names(y)
   ngenes <- length(y)
+	
+	
+  ### calculate mean expression of genes 
+  meanExpr <- unlist(mclapply(seq(ngenes), function(g){ sum(y[[g]]) / ncol(y[[g]]) },  mc.cores=mcCores))  
+  names(meanExpr) <- genes
+  dge$meanExpr <- meanExpr
+	
+	
   
   if(is.null(group)) group <- dge$samples$group
   group <- as.factor(group)
@@ -37,7 +45,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = interval[1] + (1-(sqrt(5) - 1)/2)*(interval[2]-interval[1]) , y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(dge$commonDispersion) 
+               return(NA) 
              
              out <- optimize(f = dmAdjustedProfileLikTG, interval = interval,
                              y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose,
@@ -58,10 +66,12 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
            
       outList <- mclapply(seq(ngenes), function(g){
              # g = 12
-
+						 if(verbose)
+							 cat("gene", genes[g], "\n")
+						 
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = initDisp, y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(dge$commonDispersion) 
+               return(NA) 
              
              
              if(initWeirMoM)
@@ -71,8 +81,8 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              
              try( out <- optim(par = initDisp, fn = dmAdjustedProfileLikTG, gr = NULL, 
-                          y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose,
-                          method = "L-BFGS-B", lower = 0 + epsilon, upper = 1e+15, control=list(fnscale = -1)) , silent = TRUE)
+                          y = y[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose,
+                          method = "L-BFGS-B", lower = 0 + epsilon, upper = 1e+15, control = list(fnscale = -1, factr = tol)) , silent = TRUE)
              
              #              print(out$par)
              
@@ -83,10 +93,12 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
            
            
            out <- do.call(rbind, outList)
-           rownames(out) <- genes  
+           # rownames(out) <- genes  
            
            dge$tagwiseDispersion <- out[,"out"]
+					 names(dge$tagwiseDispersion) <- genes
            dge$initDispersion <- out[,"init"]
+           names(dge$initDispersion) <- genes
                   
          },
 
@@ -100,7 +112,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
              if(is.null(dmAdjustedProfileLikTG(gamma0 = initDisp, y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)))
-               return(dge$commonDispersion) 
+               return(NA) 
              
              ui <- 1
              ci <- 0 + epsilon
@@ -109,8 +121,8 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
                initDisp <- weirMoM(data = y[[g]], se=FALSE)
              
              
-             out <- constrOptim(theta = initDisp, dmAdjustedProfileLikTG, grad = NULL,
-                                ui=ui, ci=ci, control=list(fnscale = -1), 
+             out <- constrOptim(theta = initDisp, dmAdjustedProfileLikTG, grad = NULL, method = "Nelder-Mead",
+                                ui=ui, ci=ci, control=list(fnscale = -1, reltol = tol), 
                                 y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose )
              
              
@@ -119,11 +131,12 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
            }, mc.cores=mcCores )
            
            out <- do.call(rbind, outList)
-           rownames(out) <- genes  
+           # rownames(out) <- genes  
            
            dge$tagwiseDispersion <- out[,"out"]
+					 names(dge$tagwiseDispersion) <- genes
            dge$initDispersion <- out[,"init"]
-           
+           names(dge$initDispersion) <- genes
            
          },
       
@@ -142,9 +155,9 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
               ll <- numeric(gridLength)
               
               for(i in seq(gridLength)){
-                # i = 1 
+                # i = 10 
                 out <- dmAdjustedProfileLikTG(gamma0 = splineDisp[i], y = y[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)
-                if(is.null(out) || out == -1e+20)
+                if(is.null(out))
                   return(NULL)
                 
                 ll[i] <- out
@@ -159,6 +172,14 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
             
             loglik0 <- do.call(rbind, loglik0L)
             
+						if(is.null(loglik0)){
+	            dge$tagwiseDispersion <- rep(dge$commonDispersion, ngenes)
+	            names(dge$tagwiseDispersion) <- genes
+							cat("** Tagwise dispersion: ", head(dge$tagwiseDispersion), "... \n")
+							return(dge)
+						}
+						
+						
             ngenes2 <- nrow(loglik0)
             genes2 <- rownames(loglik0)
             loglik <- loglik0 
@@ -174,7 +195,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
                      
                      trendedDispersion={
                        
-                       o <- order(meanExpr[genes2])
+                       o <- order(dge$meanExpr[genes2])
                        oo <- order(o)
                        width <- floor(span * ngenes2)
                        
@@ -203,7 +224,7 @@ if(plot){
               
 
             out <- edgeR::maximizeInterpolant(splinePts, loglik)
-              
+            
             names(out) <- genes2
             
 if(plot){

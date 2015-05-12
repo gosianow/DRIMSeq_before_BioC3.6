@@ -27,7 +27,7 @@ weirMoM <- function(data, se=FALSE){
 #   else MoM.wh
   
   if(MoM.wh <= 0)
-    MoM.wh <- 0.1 # MoM.wh <- 0.005
+    MoM.wh <- 0.5 # MoM.wh <- 0.005
   
   return((1-MoM.wh)/MoM.wh)
   

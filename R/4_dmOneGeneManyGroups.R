@@ -17,7 +17,7 @@ dmOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, mode = "co
     # gr=2
     # cat(gr, fill = TRUE)
     
-    fitGr <- dmOneGeneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose=verbose)
+    fitGr <- dmOneGeneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose=FALSE)
     
     if(is.null(fitGr)) return(NULL)
     
@@ -30,6 +30,11 @@ dmOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, mode = "co
   colnames(piH) <- names(df) <- lgroups
   logLik <- sum(logLik)
   
+	if(verbose){
+		cat("gamma0", gamma0, "\n")
+		cat("logLik", logLik, "\n")
+	}
+	
   return(list(piH = piH, gamma0 = gamma0, logLik = logLik, df=df))
   
 }

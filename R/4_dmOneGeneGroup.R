@@ -56,9 +56,9 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
 
          }, 
          
-         
+         ### must have constraint for SUM pi = 1 --> sum(pi) < 1 + eps & sum(pi) > 1 - eps
          constrOptim2={ ## for k-1 parameters
-           if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
+           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            
            ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
            ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) # used to be with epsilon = 1e-5  but "initial value is not in the interior of the feasible region" because it is too big
@@ -71,8 +71,8 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            piH <- co$par
            lik1 <- co$value
            
-           if(verbose) cat("piH:",c(piH, 1-sum(piH)), fill = T)
-           if(verbose) cat("lik1:", lik1, fill = T)
+           # if(verbose) cat("piH:",c(piH, 1-sum(piH)), fill = T)
+           # if(verbose) cat("lik1:", lik1, fill = T)
            
            piH <- c(piH, 1-sum(piH))
            names(piH) <- names(piInit)
@@ -80,7 +80,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
          
          
          constrOptim2G={ ## for k-1 parameters with Gamma functions
-           if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
+           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            
            ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
            ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) # used to be with epsilon = 1e-5  but "initial value is not in the interior of the feasible region" because it is too big
@@ -94,8 +94,8 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            piH <- co$par
            lik1 <- co$value
            
-           if(verbose) cat("piH:",c(piH, 1-sum(piH)), fill = T)
-           if(verbose) cat("lik1:", lik1, fill = T)
+           # if(verbose) cat("piH:",c(piH, 1-sum(piH)), fill = T)
+           # if(verbose) cat("lik1:", lik1, fill = T)
            
            piH <- c(piH, 1-sum(piH))
            names(piH) <- names(piInit)
@@ -103,7 +103,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
          
          
          optim2={
-           if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
+           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            
            o <- optim(par = piInit[-k], fn = dmLogLikkm1, gr = dmScoreFunkm1, 
                       gamma0=gamma0, y=y,
@@ -113,12 +113,12 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            lik1 <- o$value
            piH <- c(piH, 1-sum(piH))
            names(piH) <- names(piInit)
-           if(verbose) cat("piH:", piH, fill = T)
+           # if(verbose) cat("piH:", piH, fill = T)
          }, 
          
          
          optim2NM={
-           if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
+           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            o <- optim(par = piInit[-k], fn = dmLogLikkm1, gr = NULL, 
                       gamma0=gamma0, y=y,
                       method = c("Nelder-Mead", "BFGS", "CG", "SANN")[1], control=list(fnscale = -1))
@@ -127,7 +127,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            lik1 <- o$value
            piH <- c(piH, 1-sum(piH))
            names(piH) <- names(piInit)
-           if(verbose) cat("piH:", piH, fill = T)
+           # if(verbose) cat("piH:", piH, fill = T)
          }, 
          
          
