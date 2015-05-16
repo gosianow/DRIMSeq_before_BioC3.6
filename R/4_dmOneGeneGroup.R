@@ -11,7 +11,7 @@
 dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose = FALSE, plot = FALSE){
   
   # NULL for filtered genes or genes with one exon
-  if(dim(y)[1] <= 1) return(NULL)
+  if(any(dim(y) <= 1)) return(NULL)
   
   ### y must be exons vs. samples
 
