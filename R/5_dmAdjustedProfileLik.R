@@ -14,7 +14,7 @@ dmAdjustedProfileLik <- function(gamma0, dge, group=NULL, adjust = FALSE, mode =
   
   dgeFit <- dmFit(dge, group=group, dispersion=gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose=verbose, mcCores = mcCores)
 
-  loglik <- sum(unlist(lapply(dgeFit$fit, function(g){g$logLik})) )
+  loglik <- sum(unlist(lapply(dgeFit$fit, function(g){sum(g$logLik)})) )
   
   cat("loglik:", loglik, fill = TRUE)
   

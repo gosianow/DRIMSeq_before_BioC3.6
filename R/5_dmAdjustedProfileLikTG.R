@@ -13,7 +13,7 @@ dmAdjustedProfileLikTG <- function(gamma0, y, ngroups, lgroups, igroups, adjust 
   if(is.null(f))
     return(NULL)
   
-  loglik <- f$logLik
+  loglik <- sum(f$logLik)
   
   if(!adjust)
     return(loglik)

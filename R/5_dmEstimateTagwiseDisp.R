@@ -5,7 +5,7 @@
 # group=NULL; adjust = TRUE; mode = "constrOptim2G"; epsilon = 1e-05; maxIte = 1000; modeDisp=c("optimize", "optim", "constrOptim", "grid")[4]; interval = c(0, 1e+5); tol = 1e-00;  initDisp = 10; initWeirMoM = FALSE; gridLength=11; gridRange=c(-5, 5); trend = c("none", "commonDispersion", "trendedDispersion")[1]; priorDf=10; span=0.3; mcCores=1; verbose=FALSE
 
 
-dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp = c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-00,  initDisp = 10, initWeirMoM = TRUE, gridLength = 15, gridRange = c(-7, 7), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf = 10, span = 0.3, mcCores = 20, verbose = FALSE, plot = FALSE){
+dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, modeDisp = c("optimize", "optim", "constrOptim", "grid")[2], interval = c(0, 1e+5), tol = 1e-08,  initDisp = 10, initWeirMoM = TRUE, gridLength = 15, gridRange = c(-7, 7), trend = c("none", "commonDispersion", "trendedDispersion")[1], priorDf = 10, span = 0.3, mcCores = 20, verbose = FALSE, plot = FALSE){
   
   
   y <- dge$counts

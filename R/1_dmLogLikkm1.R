@@ -26,7 +26,9 @@ dmLogLikkm1 <- function(pi, gamma0, y){
       l <- l + lij      
     }
   }
-  
+	
+	# cat("pi:", pi, fill = T)
+  # cat("fn:", l, fill = T)
   return(l)
   
 }

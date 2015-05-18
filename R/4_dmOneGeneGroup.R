@@ -9,7 +9,10 @@
 
 
 dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose = FALSE, plot = FALSE){
-  
+  # tol = sqrt(.Machine$double.eps)
+	# tol = 1e-10
+	 tol = .Machine$double.eps
+	
   # NULL for filtered genes or genes with one exon
   if(any(dim(y) <= 1)) return(NULL)
   
@@ -65,7 +68,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
            #         ci <- c(rep(0, k-1), rep(-1, k-1))
            
-           co <- constrOptim(piInit[-k], f=dmLogLikkm1, grad=dmScoreFunkm1, ui=ui, ci=ci, control=list(fnscale = -1), gamma0=gamma0, y=y )
+           co <- constrOptim(piInit[-k], f = dmLogLikkm1, grad = dmScoreFunkm1, ui = ui, ci = ci, control = list(fnscale = -1, reltol = tol), gamma0 = gamma0, y = y )
 #                co <- constrOptim(piInit[-k], f=dmLogLikkm1, grad=NULL, ui=ui, ci=ci, control=list(fnscale = -1), gamma0=gamma0, y=y )
            
            piH <- co$par
@@ -87,7 +90,7 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
            #         ci <- c(rep(0, k-1), rep(-1, k-1))
            
-           co <- constrOptim(piInit[-k], f=dmLogLikGkm1, grad=dmScoreFunGkm1, ui=ui, ci=ci, control=list(fnscale = -1), gamma0=gamma0, y=y )
+           co <- constrOptim(piInit[-k], f = dmLogLikGkm1, grad = dmScoreFunGkm1, ui = ui, ci = ci, control = list(fnscale = -1, reltol = tol), gamma0 = gamma0, y = y)
            
 #            co <- constrOptim(piInit[-k], f=dmLogLikGkm1, grad=NULL, ui=ui, ci=ci, control=list(fnscale = -1), gamma0=gamma0, y=y )
            
@@ -106,6 +109,21 @@ dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "c
            # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            
            o <- optim(par = piInit[-k], fn = dmLogLikkm1, gr = dmScoreFunkm1, 
+                      gamma0=gamma0, y=y,
+                      method = "L-BFGS-B", lower = 0 + epsilon, upper = 1 - epsilon, control=list(fnscale = -1))
+           
+           piH <- o$par
+           lik1 <- o$value
+           piH <- c(piH, 1-sum(piH))
+           names(piH) <- names(piInit)
+           # if(verbose) cat("piH:", piH, fill = T)
+         }, 
+				 
+				 
+         optim2G={
+           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
+           
+           o <- optim(par = piInit[-k], fn = dmLogLikGkm1, gr = dmScoreFunGkm1, 
                       gamma0=gamma0, y=y,
                       method = "L-BFGS-B", lower = 0 + epsilon, upper = 1 - epsilon, control=list(fnscale = -1))
            
