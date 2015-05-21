@@ -3,13 +3,14 @@
 ##############################################################################
 
 # pi <- pi[-length(pi)]
+# dmScoreFunkm1(pi, gamma0, y)
 
 dmScoreFunkm1 <- function(pi, gamma0, y){  
 
   k <- nrow(y)
   N <- ncol(y) 
   ykm1 <- y[-k, , drop=FALSE]
-  yk <- y[k, ] # as.numeric(y[k, ]) ## problem in 1:yk[j]
+  yk <- y[k, ]
 
   pik <- 1-sum(pi)
   

@@ -11,7 +11,7 @@
 dmOneGeneGroup <- function(y, gamma0, mode = c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose = FALSE, plot = FALSE){
   # tol = sqrt(.Machine$double.eps)
 	# tol = 1e-10
-	 tol = .Machine$double.eps
+	tol = .Machine$double.eps ## a bit too slow for SNPs took all night for chr5
 	
   # NULL for filtered genes or genes with one exon
   if(any(dim(y) <= 1)) return(NULL)

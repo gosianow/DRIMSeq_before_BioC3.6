@@ -8,7 +8,7 @@ dmAdjustedProfileLikTG <- function(gamma0, y, ngroups, lgroups, igroups, adjust 
   
 #   cat("gamma0",gamma0, fill = TRUE)
   
-  f <- dmOneGeneManyGroups(y=y, ngroups=ngroups, lgroups=lgroups, igroups=igroups, gamma0=gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose) ### return NULL when at least one group has not enought of data 
+  f <- dmOneGeneManyGroups(y=y, ngroups=ngroups, lgroups=lgroups, igroups=igroups, gamma0=gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose) ### return NULL when at least one group has not enough of data 
   
   if(is.null(f))
     return(NULL)
