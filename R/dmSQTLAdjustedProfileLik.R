@@ -1,33 +1,33 @@
 ##############################################################################
 # calculate profile likelihood + adjustements for common dispersion
-# dmAdjustedProfileLik, dmSQTLAdjustedProfileLik
+# returns common likelihood = sum of likelihoods from all genes
 ##############################################################################
-# returns common likelihood = sum of all gene likelihoods
+
+# adjustDisp = TRUE; modeProp = "constrOptim2G"; tolProp = 1e-12; verbose = FALSE; 
 
 
-
-dmSQTLAdjustedProfileLik <- function(gamma0, dgeSQTL, adjust = TRUE, mode = "constrOptim2G", epsilon = 1e-05, maxIte = 1000, mcCores=20, verbose = FALSE){
+dmSQTLAdjustedProfileLik <- function(gamma0, dgeSQTL, adjustDisp = TRUE, modeProp = "constrOptim2G", tolProp = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
   
   cat("Gamma in optimize:", gamma0, fill = TRUE)
   
-  dgeSQTLFit <- dmSQTLFit(dgeSQTL, model = "full", dispersion=gamma0, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose=verbose, mcCores = mcCores)
+  dgeSQTLFit <- dmSQTLFit(dgeSQTL, model = "full", dispersion = gamma0, modeProp = modeProp, tolProp = tolProp, verbose=verbose, BPPARAM = BPPARAM)
   
-  loglik <- sum(unlist(lapply(dgeSQTLFit$fit, function(g){g$logLik})) ) 
+  logLik <- sum(unlist(lapply(dgeSQTLFit$fitFull, function(g){ lapply(g, function(s){s$logLik} ) })) ) 
   
-  cat("loglik:", loglik, fill = TRUE)
+  cat("logLik:", logLik, fill = TRUE)
   
-  if(!adjust)
-    return(loglik)
+  if(!adjustDisp)
+    return(logLik)
   
   ## Cox-Reid adjustement
-  adj <- dmSQTLAdj(gamma0, dgeSQTL = dgeSQTLFit, mcCores=mcCores)
+  adj <- dmSQTLAdj(gamma0, dgeSQTL = dgeSQTLFit, BPPARAM = BPPARAM)
   
-  adjloglik <- loglik - adj
+  adjLogLik <- logLik - adj
   
-  cat("adjloglik:", adjloglik, fill = TRUE)
+  cat("adjLogLik:", adjLogLik, fill = TRUE)
   
   
-  return(adjloglik)
+  return(adjLogLik)
   
 }
 

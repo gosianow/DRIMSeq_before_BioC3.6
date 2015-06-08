@@ -82,7 +82,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
              
              try( out <- optim(par = initDisp, fn = dmAdjustedProfileLikTG, gr = NULL, 
                           y = y[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, adjust = adjust, mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose,
-                          method = "L-BFGS-B", lower = 0 + epsilon, upper = 1e+15, control = list(fnscale = -1, factr = tol)) , silent = TRUE)
+                          method = "L-BFGS-B", lower = 1e-8, upper = 1e+10, control = list(fnscale = -1, factr = tol)) , silent = TRUE)
              
              #              print(out$par)
              
@@ -115,7 +115,7 @@ dmEstimateTagwiseDisp <- function(dge, group = NULL, adjust = TRUE, mode = c("co
                return(NA) 
              
              ui <- 1
-             ci <- 0 + epsilon
+             ci <- 1e-8
              
              if(initWeirMoM)
                initDisp <- weirMoM(data = y[[g]], se=FALSE)

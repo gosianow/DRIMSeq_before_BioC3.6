@@ -1,98 +1,127 @@
 ##############################################################################
 # multiple group fitting 
-# dmFit, dmSQTLFit
 ##############################################################################
 
 
-
-
-# model="full"; dispersion=3; mode="constrOptim2G"; epsilon = 1e-05; maxIte = 1000; verbose=FALSE; mcCores = 1
-
-
-dmSQTLFit <- function(dgeSQTL, model="full", dispersion=c("commonDispersion", "tagwiseDispersion")[1], mode=c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 10){
-  
-  y <- dgeSQTL$counts
+dmSQTLFit <- function(dgeSQTL, model = c("full", "null")[1], dispersion = c("commonDispersion", "tagwiseDispersion")[1], modeProp=c("constrOptim2", "constrOptim2G", "FisherScoring")[2], tolProp = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
   if(is.character(dispersion)){
     switch(dispersion, 
-           commonDispersion = { dgeSQTL$dispersion <- rep(dgeSQTL$commonDispersion, nrow(dgeSQTL$SNPs)) },
-           tagwiseDispersion = { dgeSQTL$dispersion <- dgeSQTL$tagwiseDispersion } )
+           commonDispersion = { 
+             gamma0 <- dgeSQTL$genotypes
+             gamma0 <- lapply(gamma0, function(g){
+               disp <- rep(dgeSQTL$commonDispersion, nrow(g))
+               names(disp) <- rownames(g)
+               return(disp)
+             })
+           },
+           tagwiseDispersion = { gamma0 <- dgeSQTL$tagwiseDispersion } )
     
   } else {
     
     if(length(dispersion == 1)){
-      dgeSQTL$dispersion <- rep(dispersion, nrow(dgeSQTL$SNPs))
+      gamma0 <- dgeSQTL$genotypes
+      gamma0 <- lapply(gamma0, function(g){
+        disp <- rep(dispersion, nrow(g))
+        names(disp) <- rownames(g)
+        return(disp)
+      })
     } else {
-      dgeSQTL$dispersion <- dispersion
+      gamma0 <- dispersion
     }
     
   }
   
-  gamma0 <- dgeSQTL$dispersion
-  
-  
+	geneList <- names(dgeSQTL$counts)
+	
   switch(model, 
          full={
-                   
-           fit <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){  
-             # snp = 1
-             # cat("SNP:", dgeSQTL$SNPs$SNP_id[snp], fill = TRUE)
-
-						 if(is.na(gamma0[snp]))
-							 return(NULL)
-
-             NAs <- !is.na(dgeSQTL$genotypes[snp,]) & !is.na(y[[dgeSQTL$SNPs[snp, "gene_id"]]][1, ])
+           
+           fit <- bplapply(geneList, function(g){
+             # g = geneList[1]; y = dgeSQTL$counts[[g]]; snps = dgeSQTL$genotypes[[g]]
              
-             y.g <- y[[dgeSQTL$SNPs[snp, "gene_id"]]][, NAs]
+             y = dgeSQTL$counts[[g]]
+             snps = dgeSQTL$genotypes[[g]]
+             # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
-             group <- dgeSQTL$genotypes[snp, NAs]
-             group <- as.factor(group)
-             ngroups <- nlevels(group)
-             lgroups <- levels(group)
+             f <- list()
              
-             igroups <- list()
-             for(gr in 1:ngroups){
-               # gr=2
-               igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
+             for(i in 1:nrow(snps)){
+               # i = 1
+               if(is.na(gamma0[[g]][i]))
+                 f[[i]] <- NULL
+               
+               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+               yg <- y[, !NAs]             
+               group <- snps[i, !NAs]
+               group <- factor(group)
+               ngroups <- nlevels(group)
+               lgroups <- levels(group)
+               nlibs <- length(group)
+               
+               igroups <- list()
+               for(gr in 1:ngroups){
+                 # gr=2
+                 igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
+                 
+               }
+              
+               
+               f[[i]] <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)  
                
              }
-             
-          
-             
-             f <- dmOneGeneManyGroups(y = y.g, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[snp], mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)  
-             
+             names(f) <- rownames(snps)
              
              return(f)
-           }, mc.cores=mcCores)
+           }, BPPARAM = BPPARAM)
            
-           names(fit) <- dgeSQTL$SNPs$SNP_id
+           names(fit) <- geneList
+           dgeSQTL$fitFull <- fit
            
          }, 
-
+         
          null={
            
-           fit <- mclapply(seq(nrow(dgeSQTL$SNPs)), function(snp){  
-						 
-             # cat("SNP:", dgeSQTL$SNPs$SNP_id[snp], fill = TRUE)
-						 
-						 if(is.na(gamma0[snp]))
-							 return(NULL)
-						 
-             NAs <- !is.na(dgeSQTL$genotypes[snp,]) & !is.na(y[[dgeSQTL$SNPs[snp, "gene_id"]]][1, ])
+           fit <- bplapply(geneList, function(g){
+             # g = geneList[1]; y = dgeSQTL$counts[[g]]; snps = dgeSQTL$genotypes[[g]]
              
-             y.g <- y[[dgeSQTL$SNPs[snp, "gene_id"]]][, NAs]
+             y = dgeSQTL$counts[[g]]
+             snps = dgeSQTL$genotypes[[g]]
+             # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
-             f <- dmOneGeneGroup(y = y.g, gamma0 = gamma0[snp], mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)  
+						 groupg <- factor(rep("Null", ncol(y)))
+             ngroups <- 1
+             lgroups <- "Null"	 
+						 
+             f <- list()
+             
+             for(i in 1:nrow(snps)){
+               # i = 1
+               if(is.na(gamma0[[g]][i]))
+                 f[[i]] <- NULL
+               
+               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+               yg <- y[, !NAs]             
+               group <- groupg[!NAs]
+               nlibs <- sum(!NAs)              
+               igroups <- list(Null = 1:nlibs)
 
+               f[[i]] <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)
+               
+             }
+             names(f) <- rownames(snps)
+             
              return(f)
-           }, mc.cores=mcCores)
+           }, BPPARAM = BPPARAM)
            
-           names(fit) <- dgeSQTL$SNPs$SNP_id
+           names(fit) <- geneList
+           
+           dgeSQTL$fitNull <- fit
            
          })
   
-  dgeSQTL$fit <- fit
-
   return(dgeSQTL)
   
 }
