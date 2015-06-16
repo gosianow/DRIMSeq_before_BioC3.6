@@ -5,6 +5,7 @@
 
 # adjustDisp = TRUE; modeProp = "constrOptim2G"; tolProp = 1e-12; verbose = FALSE; 
 
+# model = "full"; dispersion = gamma0
 
 dmSQTLAdjustedProfileLik <- function(gamma0, dgeSQTL, adjustDisp = TRUE, modeProp = "constrOptim2G", tolProp = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
   
@@ -12,7 +13,7 @@ dmSQTLAdjustedProfileLik <- function(gamma0, dgeSQTL, adjustDisp = TRUE, modePro
   
   dgeSQTLFit <- dmSQTLFit(dgeSQTL, model = "full", dispersion = gamma0, modeProp = modeProp, tolProp = tolProp, verbose=verbose, BPPARAM = BPPARAM)
   
-  logLik <- sum(unlist(lapply(dgeSQTLFit$fitFull, function(g){ lapply(g, function(s){s$logLik} ) })) ) 
+  logLik <- sum(unlist( lapply(dgeSQTLFit$fitFull, function(g){lapply(g, function(s){sum(s$logLik)})}) )) 
   
   cat("logLik:", logLik, fill = TRUE)
   
@@ -30,5 +31,6 @@ dmSQTLAdjustedProfileLik <- function(gamma0, dgeSQTL, adjustDisp = TRUE, modePro
   return(adjLogLik)
   
 }
+
 
 

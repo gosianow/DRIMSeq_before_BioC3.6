@@ -4,12 +4,11 @@
 
 # dge = dgeFit
 
-dmAdj <- function(gamma0, dge, group=NULL, mcCores=20){
+dmAdj <- function(gamma0, dge, BPPARAM = MulticoreParam(workers=1)){
   
-  y <- dge$counts
-  
-  if(is.null(group)) group <- dge$samples$group
-  group <- as.factor(group)
+  geneList <- names(dge$counts)
+	
+  group <- factor(dge$samples$group)
   ngroups <- nlevels(group)
   lgroups <- levels(group)
   
@@ -20,16 +19,17 @@ dmAdj <- function(gamma0, dge, group=NULL, mcCores=20){
     
   }
   
-  adj <- mclapply(seq(length(y)), function(g){  
-    # g = 1084
+  adj <- bplapply(geneList, function(g){  
+    # g = 
 
-    if(is.null(dge$fit[[g]])) return(NULL)
-    
-    a <- dmAdjCROneGeneManyGroups(y = y[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, piH = dge$fit[[g]]$piH) 
+    if(is.null(dge$fitFull[[g]])) 
+			return(NULL)
+
+    a <- dmAdjCROneGeneManyGroups(y = dge$counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, piH = dge$fitFull[[g]]$piH) 
     
     return(a)
     
-  }, mc.cores=mcCores)
+  }, BPPARAM = BPPARAM)
   
   adj <- unlist(adj)
   adj <- sum(adj[adj != Inf]) ## some genes have adj = Inf so skipp them

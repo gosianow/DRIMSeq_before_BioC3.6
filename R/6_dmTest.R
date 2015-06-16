@@ -1,59 +1,62 @@
-
 #######################################################
 #  group testing
-# dmTest, dmSQTLTest
 #######################################################
+# dge = dgeDM; dispersion = c("commonDispersion", "tagwiseDispersion")[2]; modeProp="constrOptim2G"; tolProp = 1e-12; verbose=FALSE
 
-
-# dge = dgeDM; mode="constrOptim2"; epsilon = 1e-05; maxIte = 1000; verbose=FALSE; mcCores=20
-
-dmTest <- function(dge, mode="constrOptim2G", epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
+dmTest <- function(dge, dispersion = c("commonDispersion", "tagwiseDispersion")[1] , modeProp="constrOptim2G", tolProp = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
-  fit.full <- dge$fit
-  group <- as.factor(rep(1, length(dge$samples$group)))
-  dge$genes$gene_id <- as.factor(dge$genes$gene_id)
-  
+  # fitFull <- dge$fitFull
+	
   ## fit null model
-  fit.null <- dmFit(dge=dge, group=group, dispersion=dge$dispersion, mode=mode, epsilon = epsilon, maxIte = maxIte, verbose= verbose, mcCores = mcCores)$fit
+	cat("Fitting null model.. \n")
+	
+   time <- system.time(dge <- dmFit(dge = dge, model = "null", dispersion = dispersion, modeProp = modeProp, tolProp = tolProp, verbose = verbose, BPPARAM = BPPARAM))
+	 
+	 cat("Took ", time["elapsed"], " seconds.\n")
+	# fitNull <- dge$fitNull
+	
+  ## calculate LR
+  cat("Calculating LR.. \n")
   
-  LRT <- mclapply(unique(levels(dge$genes$gene_id)), function(g){
-    # g = "g1"
-    if(verbose) cat("testing gene: ",g, fill = TRUE)
+  geneList <- names(dge$counts)
+	
+  time <- system.time(LRList <- bplapply(geneList, function(g){
+    # g = geneList[1]
+    if(verbose) cat("testing gene: ", g, fill = TRUE)
     
-    if(is.null(fit.null[[g]]) || is.null(fit.full[[g]])) 
-      return(data.frame(LR=NA, df=NA, PValue=NA, LLfull=NA, LLnull=NA))
-    
-      LLnull <- fit.null[[g]]$logLik
+    if(is.null(dge$fitNull[[g]]) || is.null(dge$fitFull[[g]])) 
+    return(rep(NA, 6))
+		
+      LLnull <- dge$fitNull[[g]]$logLik
 
-       LLfull <- sum(fit.full[[g]]$logLik)
+      LLfull <- sum(dge$fitFull[[g]]$logLik)
 
       LR <-  2*(LLfull - LLnull)
-      
-      DFnull <- fit.null[[g]]$df
-      # DFfull <- sum(fit.full[[g]]$df)
-      
-      # df <- DFfull - DFnull
-      df <- DFnull * (length(fit.full[[g]]$df) - 1) # (k-1) * nr of groups
 			
+      nrGroups <- length(dge$fitFull[[g]]$df)
+			
+      # df <- DFfull - DFnull
+      df <- dge$fitNull[[g]]$df * (nrGroups - 1) # (k-1) * nr of groups
 			
       pValue <- pchisq(LR, df = df , lower.tail = FALSE)
       
-      return(data.frame(LR=LR, df=df, PValue=pValue, LLfull=LLfull, LLnull=LLnull))
-    
-  }, mc.cores=mcCores)
+    return(c(LLfull, LLnull, nrGroups, df, LR, pValue))
+  }, BPPARAM = BPPARAM))
   
+	cat("Took ", time["elapsed"], " seconds.\n")
+	cat("Generating table with results.. \n")
+	
+  LR <- do.call(rbind, LRList)
+	colnames(LR) <- c("LLfull", "LLnull", "nrGroups", "df", "LR", "pValue")
+  FDR <-  p.adjust(LR[, "pValue"], method="BH")
   
-  LRT <- do.call(rbind, LRT)
-  FDR <- p.adjust(LRT$PValue, method="BH")
-  o <- order(LRT$PValue)
+	table <- data.frame(geneID = geneList, LR, FDR, stringsAsFactors = FALSE)
+	
+	o <- order(table[, "pValue"])
+	
+  dge$table <- table[o,]
   
-  table <- data.frame(GeneID=unique(levels(dge$genes$gene_id)), LR=LRT$LR, df=LRT$df, LLfull=LRT$LLfull, LLnull=LRT$LLnull , PValue=LRT$PValue, FDR=FDR)[o,]
-  
-  fit <- dge
-  fit$fit.null <- fit.null
-  fit$table <- table
-  
-  return(fit)
+  return(dge)
   
   
 }

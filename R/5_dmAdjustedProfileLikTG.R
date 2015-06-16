@@ -11,10 +11,10 @@ dmAdjustedProfileLikTG <- function(gamma0, y, ngroups, lgroups, igroups, adjustD
   if(is.null(f))
     return(NULL)
   
-  loglik <- sum(f$logLik)
+  logLik <- sum(f$logLik)
   
   if(!adjustDisp)
-    return(loglik)
+    return(logLik)
   
   adj <- dmAdjCROneGeneManyGroups(y = y, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, piH = f$piH) 
   
@@ -22,17 +22,17 @@ dmAdjustedProfileLikTG <- function(gamma0, y, ngroups, lgroups, igroups, adjustD
 		cat("adj", adj, "\n")
 	
   if(adj == Inf)
-    return(loglik) ### can not return NULL or NA because optim can not handle it
+    return(logLik) ### can not return NULL or NA because optim can not handle it
   
-  adjloglik <- loglik - adj
+  adjLogLik <- logLik - adj
 	
 #   cat("loglik",loglik, fill = TRUE)
 #   cat("adjloglik",adjloglik, fill = TRUE)
 
 if(verbose)
-	cat("adjloglik", adjloglik, "\n")
+	cat("adjLogLik", adjLogLik, "\n")
   
-  return(adjloglik)
+  return(adjLogLik)
   
 }
 

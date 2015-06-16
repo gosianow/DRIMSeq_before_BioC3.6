@@ -1,10 +1,13 @@
 ##############################################################################
 # multiple group fitting 
 ##############################################################################
-
+# model = c("full", "null")[1]; dispersion = c("commonDispersion", "tagwiseDispersion")[2]; modeProp=c("constrOptim2", "constrOptim2G", "FisherScoring")[2]; tolProp = 1e-12; verbose=FALSE
 
 dmSQTLFit <- function(dgeSQTL, model = c("full", "null")[1], dispersion = c("commonDispersion", "tagwiseDispersion")[1], modeProp=c("constrOptim2", "constrOptim2G", "FisherScoring")[2], tolProp = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
+	if(model == "full")
+		cat("Fitting full model.. \n")
+	
   if(is.character(dispersion)){
     switch(dispersion, 
            commonDispersion = { 
@@ -34,44 +37,48 @@ dmSQTLFit <- function(dgeSQTL, model = c("full", "null")[1], dispersion = c("com
   
 	geneList <- names(dgeSQTL$counts)
 	
-  switch(model, 
+  time <- system.time(switch(model, 
          full={
            
            fit <- bplapply(geneList, function(g){
-             # g = geneList[1]; y = dgeSQTL$counts[[g]]; snps = dgeSQTL$genotypes[[g]]
+             # g = "ENSG00000163348.3"; y = dgeSQTL$counts[[g]]; snps = dgeSQTL$genotypes[[g]]
              
              y = dgeSQTL$counts[[g]]
              snps = dgeSQTL$genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
-             
-             f <- list()
-             
-             for(i in 1:nrow(snps)){
-               # i = 1
+                        
+             f <- lapply(rownames(snps), function(i){
+               # i = rownames(snps)[3]
+							 
                if(is.na(gamma0[[g]][i]))
-                 f[[i]] <- NULL
-               
-               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-               yg <- y[, !NAs]             
-               group <- snps[i, !NAs]
-               group <- factor(group)
-               ngroups <- nlevels(group)
-               lgroups <- levels(group)
-               nlibs <- length(group)
-               
-               igroups <- list()
-               for(gr in 1:ngroups){
-                 # gr=2
-                 igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
-                 
-               }
+               	                 return(NULL)
               
                
-               f[[i]] <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)  
+	               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+	               yg <- y[, !NAs]             
+	               group <- snps[i, !NAs]
+	               group <- factor(group)
+	               ngroups <- nlevels(group)
+	               lgroups <- levels(group)
+	               nlibs <- length(group)
                
-             }
-             names(f) <- rownames(snps)
+	               igroups <- list()
+	               for(gr in 1:ngroups){
+	                 # gr=2
+	                 igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
+                 
+	               }
+								 # yg[, igroups[[1]]]
+               
+	               ff <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+	                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)  
+								
+																							 return(ff)
+               
+							 
+             })
+						 
+             	names(f) <- rownames(snps)
              
              return(f)
            }, BPPARAM = BPPARAM)
@@ -94,24 +101,29 @@ dmSQTLFit <- function(dgeSQTL, model = c("full", "null")[1], dispersion = c("com
              ngroups <- 1
              lgroups <- "Null"	 
 						 
-             f <- list()
-             
-             for(i in 1:nrow(snps)){
-               # i = 1
+             f <- lapply(rownames(snps), function(i){
+               # i = rownames(snps)[3]
+							 
                if(is.na(gamma0[[g]][i]))
-                 f[[i]] <- NULL
+               	           return(NULL)
                
-               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-               yg <- y[, !NAs]             
-               group <- groupg[!NAs]
-               nlibs <- sum(!NAs)              
-               igroups <- list(Null = 1:nlibs)
+               
+	               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+	               yg <- y[, !NAs]             
+	               group <- groupg[!NAs]
+	               nlibs <- sum(!NAs)              
+	               igroups <- list(Null = 1:nlibs)
 
-               f[[i]] <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)
+	               ff <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+	                                             gamma0 = gamma0[[g]][i], modeProp = modeProp, tolProp = tolProp, verbose = verbose)
                
-             }
-             names(f) <- rownames(snps)
+																							 return(ff)
+            
+     
+																							 })
+																							 
+																							 names(f) <- rownames(snps)
+			
              
              return(f)
            }, BPPARAM = BPPARAM)
@@ -120,8 +132,11 @@ dmSQTLFit <- function(dgeSQTL, model = c("full", "null")[1], dispersion = c("com
            
            dgeSQTL$fitNull <- fit
            
-         })
+         }))
   
+				 if(model == "full")
+				 cat("Took ", time["elapsed"], " seconds.\n")
+	
   return(dgeSQTL)
   
 }

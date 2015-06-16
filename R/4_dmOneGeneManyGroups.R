@@ -12,7 +12,7 @@ dmOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, modeProp =
   df = rep(0, ngroups)
   
   for(gr in 1:ngroups){
-    # gr=2
+    # gr = 1
     # cat(gr, fill = TRUE)
     
     fitGr <- dmOneGeneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, modeProp = modeProp, tolProp = tolProp, verbose=verbose)

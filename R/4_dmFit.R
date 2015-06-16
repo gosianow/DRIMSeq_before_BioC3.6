@@ -1,67 +1,100 @@
-
 ##############################################################################
 # multiple group fitting 
-# dmFit, dmSQTLFit
 ##############################################################################
 
 
-# dge <- dgeDM; group=NULL; dispersion=NULL; mode="constrOptim2G"; epsilon = 1e-05; maxIte = 1000; verbose=FALSE; mcCores = 20
-
-
-dmFit <- function(dge, group=NULL, dispersion=c("commonDispersion", "tagwiseDispersion")[2], mode=c("constrOptim", "constrOptim2", "constrOptim2G", "optim2", "optim2NM", "FisherScoring")[3], epsilon = 1e-05, maxIte = 1000, verbose=FALSE, mcCores = 20){
+dmFit <- function(dge, model = c("full", "null")[1], dispersion = c("commonDispersion", "tagwiseDispersion")[1], modeProp=c("constrOptim2", "constrOptim2G", "FisherScoring")[2], tolProp = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
-  y <- dge$counts
-  genes <-  names(y)
+	if(model == "full")
+		cat("Fitting full model.. \n")
+	
+  geneList <-  names(dge$counts)
   
   
   ### dispersion / TODO: add errors in length of dispersion is not equal to length(genes)
   
   if(is.character(dispersion)){
     switch(dispersion, 
-           commonDispersion = { dge$dispersion <- rep(dge$commonDispersion, length(genes)) },
-           tagwiseDispersion = { dge$dispersion <- dge$tagwiseDispersion } )
+           commonDispersion = { gamma0 <- rep(dge$commonDispersion, length(geneList)); names(gamma0) <- geneList},
+           tagwiseDispersion = { gamma0 <- dge$tagwiseDispersion } )
     
   } else {
     
     if(length(dispersion == 1)){
-      dge$dispersion <- rep(dispersion, length(genes))
+     gamma0 <- rep(dispersion, length(geneList)); names(gamma0) <- geneList
     } else {
-      dge$dispersion <- dispersion
+     gamma0 <- dispersion
     }
       
   }
 
-  gamma0 <- dge$dispersion
+  time <- system.time(switch(model, 
+         full = {
+         	
+				  	group <- dge$samples$group
+				   group <- as.factor(group)
+				   ngroups <- nlevels(group)
+				   lgroups <- levels(group)
   
-  if(is.null(group)) group <- dge$samples$group
-  group <- as.factor(group)
-  ngroups <- nlevels(group)
-  lgroups <- levels(group)
-  
-  igroups <- list()
-  for(gr in 1:ngroups){
-    # gr=2
-    igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
+				   igroups <- list()
+				   for(gr in 1:ngroups){
+				     # gr=2
+				     igroups[[lgroups[gr]]] <- which(group == lgroups[gr])
     
-  }
+				   }
   
-  fit <- mclapply(seq(length(y)), function(g){  
-    # g = "ENSG00000135778"
-    # cat("Gene:", genes[g], fill = TRUE)
+				   fit <- bplapply(geneList, function(g){  
+				     # g = "ENSG00000135778"
+				     # cat("Gene:", genes[g], fill = TRUE)
     
-    if(is.na(gamma0[g]))
-      return(NULL)
+				     if(is.na(gamma0[g]))
+				       return(NULL)
+						 
+						 yg <- dge$counts[[g]]
+		
+				     f <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], modeProp = modeProp, tolProp = tolProp, verbose = verbose)
+		
+				     return(f)
+				   }, BPPARAM = BPPARAM)
+  
+				   names(fit) <- geneList
+  
+				   dge$fitFull <- fit
+  
+	
+         },
+					null = {
+						
+			
+				   group <- factor(rep("Null", length(dge$samples$group)))
+				   ngroups <- 1
+				   lgroups <- "Null"
+				   igroups <- list(Null = 1:length(dge$samples$group))
+  
+	
+				   fit <- bplapply(geneList, function(g){  
+				     # g = "ENSG00000135778"
+				     # cat("Gene:", genes[g], fill = TRUE)
     
-    f <- dmOneGeneManyGroups(y[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], mode = mode, epsilon = epsilon, maxIte = maxIte, verbose = verbose)  
-    
-    return(f)
-  }, mc.cores=mcCores)
+				     if(is.na(gamma0[g]))
+				       return(NULL)
+						 
+						 yg <- dge$counts[[g]]
+		
+				     f <- dmOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], modeProp = modeProp, tolProp = tolProp, verbose = verbose)
+		
+				     return(f)
+				   }, BPPARAM = BPPARAM)
   
-  names(fit) <- genes
+				   names(fit) <- geneList
   
-  
-  dge$fit <- fit
-  
+				   dge$fitNull <- fit
+						
+					}))
+ 
+ if(model == "full")
+ cat("Took ", time["elapsed"], " seconds.\n")
+ 	
   return(dge)
   
 }

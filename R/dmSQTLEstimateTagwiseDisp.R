@@ -8,11 +8,14 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjustDisp = TRUE, modeDisp = c("
   
   
   ### calculate mean expression of genes 
-  meanExpr <- unlist(bplapply(dgeSQTL$counts, function(g){ mean(colSums(g), na.rm = TRUE) }, BPPARAM = BPPARAM))	
+	cat("Calculating mean gene expression.. \n")
+  time <- system.time(meanExpr <- unlist(bplapply(dgeSQTL$counts, function(g){ mean(colSums(g), na.rm = TRUE) }, BPPARAM = BPPARAM)))
+	cat("Took ", time["elapsed"], " seconds.\n")
   dgeSQTL$meanExpr <- meanExpr
   geneList <- names(dgeSQTL$counts)
   
-  switch(modeDisp, 
+	cat("Estimating tagwise dispersion.. \n")
+  time <- system.time(switch(modeDisp, 
          
          optimize={
            
@@ -321,9 +324,9 @@ dmSQTLEstimateTagwiseDisp <- function(dgeSQTL, adjustDisp = TRUE, modeDisp = c("
            
            dgeSQTL$tagwiseDispersion <- dispAll
        
-         })
+         }))
   
-  
+  cat("Took ", time["elapsed"], " seconds.\n")
   cat("** Tagwise dispersion done! \n")
   
   return(dgeSQTL)

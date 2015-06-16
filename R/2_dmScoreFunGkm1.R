@@ -2,9 +2,10 @@
 # Score-function for k-1 parameters (pi) 
 ##############################################################################
 
-# pi <- pi[-length(pi)]
+# pi <- pi[-length(pi)]; dmScoreFunGkm1(pi, gamma0, y)
+# pi <- piInit[-k]; dmScoreFunGkm1(pi, gamma0, y)
 
-# dmScoreFunGkm1(pi, gamma0, y)
+
 
 ## Score-function -- with gamma functions -- for k-1 parameters
 dmScoreFunGkm1 <- function(pi, gamma0, y){  

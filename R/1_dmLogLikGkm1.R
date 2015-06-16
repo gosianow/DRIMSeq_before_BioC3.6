@@ -11,7 +11,7 @@ dmLogLikGkm1 <- function(pi, gamma0, y){
   S <- colSums(y)
   
   pi <- c(pi, 1 - sum(pi))
-  names(pi) <- rownames(y)
+  # names(pi) <- rownames(y)
   
   l <- sum( colSums( lgamma(y + pi * gamma0) - lgamma(pi * gamma0) ) )
   
