@@ -4,7 +4,7 @@
 
 # pi <- pi[-length(pi)]
 ## Computes the log-likelihood -- with gamma functions -- for k-1 parameters
-dmLogLikGkm1 <- function(pi, gamma0, y){
+dm_likG <- function(pi, gamma0, y){
   ## pi has length of k-1
   
   N <- ncol(y)

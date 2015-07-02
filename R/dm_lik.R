@@ -5,7 +5,7 @@
 # pi <- pi[-length(pi)]
 
 ## Computes the log-likelihood
-dmLogLikkm1 <- function(pi, gamma0, y){
+dm_lik <- function(pi, gamma0, y){
   ## pi has length of k-1
   
   k <- nrow(y)
