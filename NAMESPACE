@@ -1,5 +1,9 @@
 useDynLib(DM)
 exportPattern("^[[:alpha:]]+")
 
+exportClasses( 
+"dmDSdata"
+)
+
 importFrom(edgeR, movingAverageByCol, maximizeInterpolant)
 importFrom(Rcpp, evalCpp)
