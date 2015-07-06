@@ -3,8 +3,9 @@
 ##############################################################################
 # returns common likelihood = sum of likelihoods for all genes
 
+# disp_adjust = TRUE; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = MulticoreParam(workers=5)
 
-dmDS_profileLikCommon <- function(gamma0, data, disp_adjust = FALSE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+dmDS_profileLikCommon <- function(gamma0, data, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
   
   cat("Gamma in optimize:", gamma0, fill = TRUE)
 	

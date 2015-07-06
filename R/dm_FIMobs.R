@@ -5,7 +5,7 @@
 # pi <- pi[-length(pi)]
 
 #### Computing the inverce of observed Fisher Information Matrix
-dmInvObsFIMkm1 <- function(pi, gamma0, y, inv = TRUE){  
+dm_FIMobs <- function(pi, gamma0, y, inv = TRUE){  
   ## pi has length of k-1
 
   k <- nrow(y)

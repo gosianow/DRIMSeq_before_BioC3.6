@@ -11,7 +11,8 @@ dmDS_test <- function(fit, verbose = FALSE, BPPARAM = MulticoreParam(workers=1))
   gene_list <- names(fit$fit_full)
 	
   time <- system.time(lr_list <- bplapply(gene_list, function(g){
-    # g = gene_list[1]
+    # g = "FBgn0002121"
+    
     if(verbose) cat("Testing gene: ", g, fill = TRUE)
     
     if(is.null(fit$fit_null[[g]]) || is.null(fit$fit_full[[g]])) 

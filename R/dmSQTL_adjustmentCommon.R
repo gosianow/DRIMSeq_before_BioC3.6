@@ -5,13 +5,13 @@
 
 dmSQTL_adjustmentCommon <- function(gamma0, data, fit_full, BPPARAM = MulticoreParam(workers=1)){
   
-  gene_list <- names(data$counts)
+  gene_list <- names(data@counts)
   
   adj <- bplapply(gene_list, function(g){  
-		# g = geneList[1624]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+		# g = geneList[1624]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-		             y = data$counts[[g]]
-		             snps = data$genotypes[[g]]
+		             y = data@counts[[g]]
+		             snps = data@genotypes[[g]]
 								 
 		             adj <- rep(NA, nrow(snps))
              

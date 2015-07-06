@@ -1,11 +1,11 @@
 
 
-dmDS_plotData <- function(data, out_dir = "", info = NULL){
+dmDS_plotData <- function(data, out_dir = "./", info = NULL){
   
 
   tt <- sapply(data@counts, nrow)
   
-  pdf(paste0(out_dir, "/hist_feature_number.pdf"))
+  pdf(paste0(out_dir, "hist_feature_number.pdf"))
   
   #opar <- par()      # make a copy of current settings
   par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
@@ -41,7 +41,7 @@ dmDS_plotData <- function(data, out_dir = "", info = NULL){
     names(colors) <- c("NG", "0", 1:200)
     colors <- colors[names(tas)]
     
-    pdf(paste0(out_dir, "/hist_info_filtering.pdf"), width = 7, height = 7)
+    pdf(paste0(out_dir, "hist_info_filtering.pdf"), width = 7, height = 7)
     par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
     xx <- barplot(tas, xlab = "Number of DS features left within DS gene", ylab = "Number of DS genes", col = colors, cex.lab=1.5)
     text(x = xx, y = as.numeric(tas), label = as.numeric(tas), pos = 3)

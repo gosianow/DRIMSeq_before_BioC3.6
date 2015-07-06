@@ -52,7 +52,7 @@ pBetaBin2 <- function(x, n, a, b) {
 
   
 #### Computing the inverce of expected Fisher Information Matrix
-dmInvExpFIMkm1 <- function(pi, gamma0, y, inv = TRUE){    
+dm_FIMexp <- function(pi, gamma0, y, inv = TRUE){    
   ## pi has length of k-1
   
   k <- nrow(y)

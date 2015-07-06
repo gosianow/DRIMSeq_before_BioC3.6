@@ -5,7 +5,7 @@
 # pi <- pi[-length(pi)]
 
 ### FIM -- with gamma functions -- for k-1 parameters
-dmInvObsFIMGkm1 <- function(pi, gamma0, y, inv = TRUE){  
+dm_FIMobsG <- function(pi, gamma0, y, inv = TRUE){  
   ## pi has length of k-1
   
   k <- nrow(y)

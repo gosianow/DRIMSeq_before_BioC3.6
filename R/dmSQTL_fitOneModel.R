@@ -4,10 +4,10 @@
 
 dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
-  gene_list <- names(data$counts)
+  gene_list <- names(data@counts)
   
-  if(length(dispersion == 1)){
-    gamma0 <- lapply(data$genotypes, function(g){
+  if(length(dispersion) == 1){
+    gamma0 <- lapply(data@genotypes, function(g){
       dispersion <- rep(dispersion, nrow(g))
       names(dispersion) <- rownames(g)
       return(dispersion)
@@ -24,10 +24,10 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
            cat("Fitting full model.. \n")
            
            time <- system.time(fit <- bplapply(gene_list, function(g){
-             # g = "ENSG00000163348.3"; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = "ENSG00000163348.3"; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              f <- lapply(rownames(snps), function(i){
@@ -70,10 +70,10 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
            cat("Fitting null model.. \n")
            
            time <- system.time(fit <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              groupg <- factor(rep("null", ncol(y)))

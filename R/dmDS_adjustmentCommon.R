@@ -4,9 +4,9 @@
 
 dmDS_adjustmentCommon <- function(gamma0, data, fit_full, BPPARAM = MulticoreParam(workers=1)){
   
-  gene_list <- names(data$counts)
+  gene_list <- names(data@counts)
 	
-  group <- data$samples$group
+  group <- data@samples$group
   ngroups <- nlevels(group)
   lgroups <- levels(group)
   
@@ -18,7 +18,7 @@ dmDS_adjustmentCommon <- function(gamma0, data, fit_full, BPPARAM = MulticorePar
     if(is.null(fit_full[[g]])) 
 			return(NULL)
 
-    a <- dm_adjustmentOneGeneManyGroups(y = data$counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = fit_full[[g]]$pi) 
+    a <- dm_adjustmentOneGeneManyGroups(y = data@counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = fit_full[[g]]$pi) 
     
     return(a)
     

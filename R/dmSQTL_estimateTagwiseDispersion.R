@@ -4,7 +4,7 @@
 
 dmSQTL_estimateTagwiseDispersion <- function(data, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08,  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
   
-  gene_list <- names(data$counts)
+  gene_list <- names(data@counts)
   
 	cat("Estimating tagwise dispersion.. \n")
   time <- system.time(switch(disp_mode, 
@@ -12,10 +12,10 @@ dmSQTL_estimateTagwiseDispersion <- function(data, disp_adjust = TRUE, disp_mode
          optimize={
            
            disp_list <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              disp <- rep(0, nrow(snps))
@@ -67,10 +67,10 @@ dmSQTL_estimateTagwiseDispersion <- function(data, disp_adjust = TRUE, disp_mode
          optim={
            
            disp_list <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              disp <- rep(0, nrow(snps))
@@ -123,10 +123,10 @@ dmSQTL_estimateTagwiseDispersion <- function(data, disp_adjust = TRUE, disp_mode
          constrOptim={
            
            disp_list <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              disp <- rep(0, nrow(snps))
@@ -190,10 +190,10 @@ dmSQTL_estimateTagwiseDispersion <- function(data, disp_adjust = TRUE, disp_mode
            ### calculate the likelihood for each gene at the spline dispersion points
            
            loglik0List <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data$counts[[g]]; snps = data$genotypes[[g]]
+             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
-             y = data$counts[[g]]
-             snps = data$genotypes[[g]]
+             y = data@counts[[g]]
+             snps = data@genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              ll <- matrix(0, nrow(snps), disp_grid_length)
