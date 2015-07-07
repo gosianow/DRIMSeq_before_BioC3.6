@@ -1,7 +1,7 @@
 ### colour for the df
 # colour = table[names(mean_expression), "df"]
 
-dmDS_plotDispersion <- function(dispersion, mean_expression, out_dir = "./"){
+dmDS_plotDispersion <- function(dispersion, mean_expression, common_dispersion = NULL, out_dir = "./"){
   
   
   # pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
@@ -24,11 +24,13 @@ dmDS_plotDispersion <- function(dispersion, mean_expression, out_dir = "./"){
     xlab("Log10(mean expression)") +
     ylab("Log10(dispersion)") +
     geom_point(size = 1.5, alpha = 0.5) +
-    # geom_hline(aes(yintercept=log10(dgeDM$commonDispersion)), colour = "deeppink", linetype="dashed", size = 1)+
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top") +
     guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
     scale_colour_gradient(limits = c(1, df_quant), breaks = seq(1, df_quant, 1), low = "blue", high="red", name = "Number of features", na.value = "red")
   
+    if(!is.null(common_dispersion))
+     ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
+
   
   pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
   print(ggp2)

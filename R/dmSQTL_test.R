@@ -61,7 +61,8 @@ dmSQTL_test <- function(fit, verbose=FALSE, BPPARAM = MulticoreParam(workers=1))
   o <- order(table[, "pvalue"])  
   
 	table <- table[o,]
-  
+
+
   return(table)
   
   
