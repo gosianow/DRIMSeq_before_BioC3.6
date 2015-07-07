@@ -1,11 +1,11 @@
 
 # plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot")[2]; order = TRUE; fit = NULL; table = NULL; plot_full = ifelse(is.null(fit), FALSE, TRUE); plot_null = ifelse(is.null(fit), FALSE, TRUE); out_dir = "./"
 
-dmDS_plotFit <- function(data, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot")[2], order = TRUE, fit = NULL, table = NULL, plot_full = ifelse(is.null(fit), FALSE, TRUE), plot_null = ifelse(is.null(fit), FALSE, TRUE), out_dir = "./"){
+dmDS_plotFit <- function(data, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, fit = NULL, table = NULL, plot_full = ifelse(is.null(fit), FALSE, TRUE), plot_null = ifelse(is.null(fit), FALSE, TRUE), out_dir = "./"){
 
 
   for(i in 1:length(gene_id)){
-    # i = 1
+    # i = 4
     cat(paste0("Plot gene ", i, ": ", gene_id[i], "\n"))
     
     gene <- gene_id[i]
@@ -14,7 +14,7 @@ dmDS_plotFit <- function(data, gene_id, plot_type = c("barplot", "boxplot1", "bo
     sample_id <- data@samples$sample_id
     mean_expression_gene <- mean(colSums(counts), na.rm = TRUE)
     
-fit_full <- fit_null <- NULL
+    fit_full <- fit_null <- NULL
 
     if(is.null(fit)){      
         dispersion_gene <- NA
@@ -39,7 +39,7 @@ fit_full <- fit_null <- NULL
 
 
 
-        pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene_id), ".pdf"), width = 12, height = 7)
+        pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
         print(ggp)
         dev.off()
 
