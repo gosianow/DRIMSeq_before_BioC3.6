@@ -1,10 +1,19 @@
-colorb <- function(n) {
-  colorRampPalette(c("#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))(n)
-}
 
 colorl <- function(n){
-  colorRampPalette(c("#CDC0B0", "#66CDAA", "#838B8B", "#0000EE", "#CD3333", "#7AC5CD", "#66CD00", "#CD661D", "#6495ED", "#FFB90F", "#9A32CD", "#EE6A50", "#CAFF70", "#E9967A", "#483D8B", "#CD1076", "#00CED1", "#EE2C2C", "#1C86EE", "#EEC900", "#00CD00", "#EE6AA7", "#ADFF2F", "#0000CD", "#8470FF", "#F08080", "#3CB371", "#FF34B3", "#9ACD32", "#FFA07A", "#CD3700", "#7EC0EE", "#8B668B", "#43CD80", "#7EC0EE", "#7D26CD", "#EEEE00", "#EE5C42", "#00CD66", "#6C7B8B", "#EE82EE", "#EED8AE", "#9ACD32", "#00C5CD", "#CD3278"))(n)
+  clrs <- c("dodgerblue4", "dodgerblue1", "mediumslateblue", "lavender", "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1" ,"darkorange2", "goldenrod1", "yellow", "forestgreen", "lawngreen", "seagreen1", "darkorchid4", "darkorchid1", "deeppink3", "deeppink", "orchid1")
+  colorRampPalette(clrs)(n)
 }
+
+colorb <- function(n){
+  # clrs <- c("#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+  clrs <- c("dodgerblue3", "deepskyblue", "forestgreen", "gold", "blueviolet",  "orchid2")
+  colorRampPalette(clrs)(n)
+}
+
+# nb <- length(clrs)
+# barplot(rep(1, nb), col = colorl(nb))
+# dev.off()
+
 
 dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
 
@@ -178,34 +187,47 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
   
   if(plot_type == "ribbonplot" & !is.null(fit_full)){
 
-### Work only for two groups!!!
-
-width  <- 0.5
-prop_est_full_order <- prop_est_full[order(prop_est_full$group, prop_est_full$proportion), ]
-
-prop_est_full_ribbon <- prop_est_full_order
-prop_est_full_ribbon$cumsum <- matrix(t(aggregate(prop_est_full_order[,"proportion"], by = list(group = prop_est_full_order$group), cumsum)[, -1]), ncol = 1)
-prop_est_full_ribbon$offset <- c(width/2, -width/2)[as.numeric(prop_est_full_ribbon$group)]
+    width  <- 0.5
+    prop_est_full_order <- prop_est_full[order(prop_est_full$group, prop_est_full$proportion), ]
 
 
-ggp <- ggplot() +
-theme_bw() +
-theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
-ggtitle(main) +    
-coord_cartesian(ylim = c(-0.1, 1.1)) + 
-coord_cartesian(ylim = c(-0.1, 1.1)) +
-scale_fill_manual(name = "Features", values = colorl(length(labels))) +
-scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
-guides(fill = guide_legend(nrow = 25)) +
-xlab("Groups") +
-ylab("Proportions") +
-geom_bar(data = prop_est_full_order, aes(x = group, y = proportion, fill = feature_id), stat = "identity", width = width, position="stack") +
-geom_ribbon(data = prop_est_full_ribbon, aes(x = as.numeric(group) + offset, ymin = cumsum - proportion, ymax = cumsum, group = feature_id, fill = feature_id), alpha = 0.7) 
+    ### get ribbons!!!
+    gr <- list()
+
+    for (i in 1:(nlevels(group) - 1)){
+      # i = 2
+      prop_est_full_ribbon <- prop_est_full_order[prop_est_full_order$group %in% levels(prop_est_full_order$group )[c(i, i+1)], ]
+      prop_est_full_ribbon$group <- factor(prop_est_full_ribbon$group)
+      prop_est_full_ribbon$cumsum <- matrix(t(aggregate(prop_est_full_ribbon[,"proportion"], by = list(group = prop_est_full_ribbon$group), cumsum)[, -1]), ncol = 1)
+      prop_est_full_ribbon$offset <- c(width/2, -width/2)[as.numeric(prop_est_full_ribbon$group)]
+      prop_est_full_ribbon$xid <- i - 1
+
+      gr[[i]] <- geom_ribbon(data = prop_est_full_ribbon, aes(x = as.numeric(group) + offset + xid, ymin = cumsum - proportion, ymax = cumsum, group = feature_id, fill = feature_id), alpha = 0.3) 
+
+    }
 
 
-    # pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"))
-    # print(ggp)
-    # dev.off()
+
+    ggp <- ggplot() +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    ggtitle(main) +    
+    coord_cartesian(ylim = c(-0.1, 1.1)) + 
+    coord_cartesian(ylim = c(-0.1, 1.1)) +
+    scale_fill_manual(name = "Features", values = colorl(length(labels))) +
+    scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
+    guides(fill = guide_legend(nrow = 25)) +
+    xlab("Groups") +
+    ylab("Proportions") +
+    geom_bar(data = prop_est_full_order, aes(x = group, y = proportion, fill = feature_id), stat = "identity", width = width, position="stack") + gr
+
+
+
+    pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
+    print(ggp)
+    dev.off()
+
+
 
     return(ggp)
 
