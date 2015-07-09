@@ -9,7 +9,7 @@ dmSQTL_estimateCommonDispersion <- function(data, disp_adjust = TRUE, disp_inter
 	
 	### keep only one SNP per gene
 	genotypes <- lapply(data@genotypes, function(g){ g[1, , drop = FALSE]})  
-	data_subset <- list(counts = data@counts, genotypes = genotypes)
+	data_subset <- new("dmSQTLdata", counts = data@counts, genotypes = genotypes, samples = data@samples)
 	
   time <- system.time(optimum <- optimize(f = dmSQTL_profileLikCommon, interval = disp_interval,
                   data = data_subset, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM,

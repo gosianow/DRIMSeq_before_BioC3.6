@@ -1,11 +1,11 @@
 
-# plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot")[2]; order = TRUE; fit = NULL; table = NULL; plot_full = ifelse(is.null(fit), FALSE, TRUE); plot_null = ifelse(is.null(fit), FALSE, TRUE); out_dir = "./"
+# plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3]; order = TRUE; plot_full = TRUE; plot_null = TRUE; out_dir = "./"
 
-dmDS_plotFit <- function(data, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, fit = NULL, table = NULL, plot_full = ifelse(is.null(fit), FALSE, TRUE), plot_null = ifelse(is.null(fit), FALSE, TRUE), out_dir = "./"){
+dmDS_plotFit <- function(data, gene_id, fit = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(fit), FALSE, TRUE), plot_null = ifelse(is.null(fit), FALSE, TRUE), out_dir = "./"){
 
 
   for(i in 1:length(gene_id)){
-    # i = 4
+    # i = 1
     cat(paste0("Plot gene ", i, ": ", gene_id[i], "\n"))
     
     gene <- gene_id[i]

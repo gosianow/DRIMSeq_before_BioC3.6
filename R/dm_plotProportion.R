@@ -1,6 +1,6 @@
 
 colorl <- function(n){
-  clrs <- c("dodgerblue4", "dodgerblue1", "mediumslateblue", "lavender", "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1" ,"darkorange2", "goldenrod1", "yellow", "forestgreen", "lawngreen", "seagreen1", "darkorchid4", "darkorchid1", "deeppink3", "deeppink", "orchid1")
+  clrs <- c("dodgerblue4", "dodgerblue1", "mediumslateblue", "lavender", "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1" ,"darkorange2", "goldenrod1", "yellow", "forestgreen", "green3", "seagreen1", "darkorchid4", "darkorchid1", "deeppink3", "deeppink", "orchid1")
   colorRampPalette(clrs)(n)
 }
 
@@ -17,7 +17,7 @@ colorb <- function(n){
 
 dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
 
-  labels <- rownames(counts)
+  labels <- labels_org <- rownames(counts)
   group_counts <- table(group)
   
   prop_samp <- data.frame( feature_id = labels, prop.table(counts, 2), stringsAsFactors = FALSE) 
@@ -41,7 +41,8 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
   if(!is.null(fit_full)){
     prop_est_full <- melt(prop_est_full, id.vars = "feature_id", variable.name = "group", value.name = "proportion")
     prop_est_full$feature_id <- factor(prop_est_full$feature_id, levels = labels)
-    prop_est_full$group <- prop_est_full$group
+    prop_est_full$group <- factor(rep(levels(group), each = length(labels)), levels = levels(group))
+
   }
 
   if(!is.null(fit_null)){
@@ -57,27 +58,51 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     values <- c(colorb(nlevels(group)), "#E69F00")
     names(values) <- c(levels(group), "null")
     
+    order_prop_samp <- order(prop_samp$group, prop_samp$sample_id)
+    prop_samp$sample_id <- factor(prop_samp$sample_id, levels = unique(prop_samp$sample_id[order_prop_samp]))
+
+    width = 0.9
+
+    prop_est_full$xid <- as.numeric(prop_est_full$feature_id)
+    prop_est_full$group_prop <- prop_est_full$group
+    levels(prop_est_full$group_prop) <- group_counts/sum(group_counts)
+    prop_est_full$group_prop <- as.numeric(as.character(prop_est_full$group_prop))
+    prop_est_full$group_cumsum <- prop_est_full$group
+    levels(prop_est_full$group_cumsum) <- cumsum(group_counts)/sum(group_counts)
+    prop_est_full$group_cumsum <- as.numeric(as.character(prop_est_full$group_cumsum))
+    prop_est_full$x <- prop_est_full$xid - width/2 + prop_est_full$group_cumsum * width -prop_est_full$group_prop/2
+
+
     ggp <- ggplot() +
     theme_bw() + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title = element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
     ggtitle(main) +
-    geom_bar(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, fill = group), stat = "identity", position = position_dodge()) +
+    geom_bar(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, fill = group), stat = "identity", position = position_dodge(width = width)) +
     scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
     xlab("Features") +
     ylab("Proportions") +
     coord_cartesian(ylim = c(-0.1, 1.1))
     
-    if(!is.null(fit_full)){
-      ggp <- ggp + 
-      geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, fill = group), position = position_jitterdodge(jitter.width = 0, jitter.height = 0 ), size = 3, shape = 23)
-      
-    }
-    
     if(!is.null(fit_null)){
       ggp <- ggp +
-      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3, shape = 23) 
+      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22) 
     }
+
+    # if(!is.null(fit_full)){ ### plots points in equal distance
+    #   ggp <- ggp + 
+    #   geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, fill = group), position = position_jitterdodge(jitter.width = 0, jitter.height = 0 ), size = 3, shape = 23)  
+    # }
     
+    if(!is.null(fit_full)){
+      ggp <- ggp + 
+      geom_point(data = prop_est_full, aes(x = x, y = proportion, fill = group), size = 3, shape = 23)
+      
+    }
+
+    # pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , paste0(gene, "_", snp)), ".pdf"), width = 12, height = 7)
+    # print(ggp)
+    # dev.off()
+
     
     return(ggp)
     
@@ -101,6 +126,13 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     xlab("Features") +
     ylab("Proportions")
     
+
+    if(!is.null(fit_null)){
+      ggp <- ggp +
+      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22) +
+      guides(colour=FALSE)
+    }
+
     if(!is.null(fit_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, fill = group), position = position_jitterdodge(jitter.width = 0, jitter.height = 0), size = 3, shape = 23) +
@@ -108,11 +140,7 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
       
     }
     
-    if(!is.null(fit_null)){
-      ggp <- ggp +
-      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3, shape = 23) +
-      guides(colour=FALSE)
-    }
+
 
     
     return(ggp)
@@ -122,15 +150,17 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
   
   
   if(plot_type == "boxplot2"){
-
     ### box plots per group
+    values <- colorl(length(labels_org))
+    names(values) <- labels_org
+
     ggp <- ggplot() +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10), panel.grid.major = element_blank()) +
     geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color="white") +
     ggtitle(main) +     
     geom_boxplot(data = prop_samp, aes(x = group, y = proportion, fill = feature_id), width = 1) + 
     coord_cartesian(ylim = c(-0.1, 1.1)) +
-    scale_fill_manual(name = "Features", values = colorl(length(labels))) +
+    scale_fill_manual(name = "Features", values = values) +
     scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
     guides(fill = guide_legend(nrow = 25)) +
     xlab("Groups") +
@@ -143,6 +173,10 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
       
     }
     
+    # pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), "b.pdf"), width = 12, height = 7)
+    # print(ggp)
+    # dev.off()
+
 
     return(ggp)
     
@@ -166,19 +200,19 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ylab("Proportions")
     
     
+    if(!is.null(fit_null)){
+      ggp <- ggp +
+      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22, show_guide = FALSE) +
+      guides(colour=FALSE)
+    }
+
     if(!is.null(fit_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, group = group, fill = group ), size = 3, shape = 23) +
       guides(colour=FALSE)
       
     }
-    
-    if(!is.null(fit_null)){
-      ggp <- ggp +
-      geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3, shape = 23, show_guide = FALSE) +
-      guides(colour=FALSE)
-    }
-    
+
     
     return(ggp)
     
@@ -187,8 +221,15 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
   
   if(plot_type == "ribbonplot" & !is.null(fit_full)){
 
+    values <- colorl(length(labels_org))
+    names(values) <- labels_org
+    breaks <- labels
+
     width  <- 0.5
     prop_est_full_order <- prop_est_full[order(prop_est_full$group, prop_est_full$proportion), ]
+
+    if(order == TRUE)
+    breaks = rev(prop_est_full_order[prop_est_full_order$group == levels(prop_est_full_order$group)[1], "feature_id"])
 
 
     ### get ribbons!!!
@@ -214,7 +255,7 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ggtitle(main) +    
     coord_cartesian(ylim = c(-0.1, 1.1)) + 
     coord_cartesian(ylim = c(-0.1, 1.1)) +
-    scale_fill_manual(name = "Features", values = colorl(length(labels))) +
+    scale_fill_manual(name = "Features", values = values, breaks = breaks) +
     scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
     guides(fill = guide_legend(nrow = 25)) +
     xlab("Groups") +
@@ -223,9 +264,9 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
 
 
 
-    pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
-    print(ggp)
-    dev.off()
+    # pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
+    # print(ggp)
+    # dev.off()
 
 
 
