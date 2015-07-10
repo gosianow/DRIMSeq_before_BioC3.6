@@ -114,18 +114,32 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     values <- c(colorb(nlevels(group)), "#E69F00")
     names(values) <- c(levels(group), "null")
     
+    ### white boxplots
+    # ggp <- ggplot() +
+    # theme_bw() + 
+    # theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    # ggtitle(main) +     
+    # geom_jitter(data = prop_samp, aes(x = feature_id, y = proportion, fill = group, colour = group), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE) +
+    # geom_boxplot(data = prop_samp, aes(x = feature_id, y = proportion, colour = group), fill = "white", outlier.size = NA, alpha = 0, lwd = 0.5) +
+    # coord_cartesian(ylim = c(-0.1, 1.1))  +
+    # scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
+    # scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
+    # xlab("Features") +
+    # ylab("Proportions")
+    
+
     ggp <- ggplot() +
     theme_bw() + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
     ggtitle(main) +     
     geom_jitter(data = prop_samp, aes(x = feature_id, y = proportion, fill = group, colour = group), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE) +
-    geom_boxplot(data = prop_samp, aes(x = feature_id, y = proportion, colour = group), fill = "white", outlier.size = NA, alpha = 0, lwd = 0.5) +
+    geom_boxplot(data = prop_samp, aes(x = feature_id, y = proportion, colour = group, fill = group), outlier.size = NA, alpha = 0.2, lwd = 0.5) +
     coord_cartesian(ylim = c(-0.1, 1.1))  +
     scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
     scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
     xlab("Features") +
     ylab("Proportions")
-    
+
 
     if(!is.null(fit_null)){
       ggp <- ggp +

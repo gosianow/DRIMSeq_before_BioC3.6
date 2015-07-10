@@ -2,7 +2,7 @@ useDynLib(DM)
 exportPattern("^[[:alpha:]]+")
 
 exportClasses( 
-"dmDSdata";
+"dmDSdata",
 "dmSQTLdata"
 )
 

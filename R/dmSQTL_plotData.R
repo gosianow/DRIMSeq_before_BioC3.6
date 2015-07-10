@@ -25,7 +25,7 @@ dmSQTL_plotData <- function(data, out_dir = "./"){
   #opar <- par()      # make a copy of current settings
   par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
   
-  hist(tt, breaks = seq(0, max(tt), by = 1), col = "darkturquoise", main = paste0(length(tt), " genes \n ", sum(tt) , " SNPs "), xlab = "Number of SNPs per gene", cex.lab=1.5, cex.axis=1.5, cex.main = 1.5)
+  hist(tt, breaks = 100, col = "darkturquoise", main = paste0(length(tt), " genes \n ", sum(tt) , " SNPs "), xlab = "Number of SNPs per gene", cex.lab=1.5, cex.axis=1.5, cex.main = 1.5)
   
   # par(mar = opar$mar, mgp = opar$mgp) 
   

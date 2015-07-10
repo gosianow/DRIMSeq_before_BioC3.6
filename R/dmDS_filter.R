@@ -25,7 +25,7 @@ dmDS_filter <- function(data, min_samps_gene_expr = 3, min_gene_expr = 1, min_sa
     if(! sum(colSums(expr_cpm_gene) > min_gene_expr) >= min_samps_gene_expr )
       return(NULL)
     
-    samps2keep <- colSums(expr_cpm_gene) != 0
+    samps2keep <- colSums(expr_cpm_gene) != 0 & !is.na(expr_cpm_gene[1, ])
     
     prop <- prop.table(expr_gene[, samps2keep], 2) 
     trans2keep <- rowSums(prop > min_feature_prop) >= min_samps_feature_prop
