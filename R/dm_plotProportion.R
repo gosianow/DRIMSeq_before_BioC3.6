@@ -17,7 +17,7 @@ colorb <- function(n){
 
 dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
 
-  labels <- labels_org <- rownames(counts)
+  labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)
   
   prop_samp <- data.frame( feature_id = labels, prop.table(counts, 2), stringsAsFactors = FALSE) 
@@ -155,8 +155,9 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     names(values) <- labels_org
 
     ggp <- ggplot() +
+    theme_bw() +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10), panel.grid.major = element_blank()) +
-    geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color="white") +
+    geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
     ggtitle(main) +     
     geom_boxplot(data = prop_samp, aes(x = group, y = proportion, fill = feature_id), width = 1) + 
     coord_cartesian(ylim = c(-0.1, 1.1)) +
@@ -226,10 +227,13 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     breaks <- labels
 
     width  <- 0.5
-    prop_est_full_order <- prop_est_full[order(prop_est_full$group, prop_est_full$proportion), ]
+    prop_est_full_order <- prop_est_full[order(prop_est_full$group), ]
 
-    if(order == TRUE)
-    breaks = rev(prop_est_full_order[prop_est_full_order$group == levels(prop_est_full_order$group)[1], "feature_id"])
+    if(order == TRUE){
+      prop_est_full_order <- prop_est_full[order(prop_est_full$group, prop_est_full$proportion), ]
+      breaks = rev(prop_est_full_order[prop_est_full_order$group == levels(prop_est_full_order$group)[1], "feature_id"])
+    }
+
 
 
     ### get ribbons!!!

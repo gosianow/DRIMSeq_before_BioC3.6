@@ -10,7 +10,7 @@ dmSQTL_test <- function(fit, verbose=FALSE, BPPARAM = MulticoreParam(workers=1))
   gene_list <- names(fit$fit_full)
   
   time <- system.time(lr_list <- bplapply(gene_list, function(g){
-    # g = "ENSG00000188822.6"
+    # g = "ENSG00000000457.8"
     
     fit_full_g <- fit$fit_full[[g]]
     fit_null_g <- fit$fit_null[[g]]
@@ -23,8 +23,8 @@ dmSQTL_test <- function(fit, verbose=FALSE, BPPARAM = MulticoreParam(workers=1))
       if(is.null(fit_full_g[[i]]) || is.null(fit_null_g[[i]])) 
          next # out_test[i, ] <- NA
       
-      out_test[i, "lik_full"] <- sum(fit_full_g[[i]]$logLik)
-      out_test[i, "lik_null"] <- fit_null_g[[i]]$logLik
+      out_test[i, "lik_full"] <- sum(fit_full_g[[i]]$lik)
+      out_test[i, "lik_null"] <- fit_null_g[[i]]$lik
       out_test[i, "nr_groups"] <- length(fit_full_g[[i]]$df)
       out_test[i, "df"] <- fit_null_g[[i]]$df * ( out_test[i, "nr_groups"] - 1 )
 
@@ -62,6 +62,7 @@ dmSQTL_test <- function(fit, verbose=FALSE, BPPARAM = MulticoreParam(workers=1))
   
 	table <- table[o,]
 
+rownames(table) <- paste0(table$gene_id, ":", table$snp_id)
 
   return(table)
   

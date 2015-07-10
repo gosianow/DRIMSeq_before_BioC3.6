@@ -2,7 +2,8 @@ useDynLib(DM)
 exportPattern("^[[:alpha:]]+")
 
 exportClasses( 
-"dmDSdata"
+"dmDSdata";
+"dmSQTLdata"
 )
 
 importFrom(edgeR, movingAverageByCol, maximizeInterpolant)

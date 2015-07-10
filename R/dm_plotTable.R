@@ -1,9 +1,7 @@
 
 
-dmDS_plotTable <- function(table, out_dir = "./"){
+dm_plotTable <- function(table, out_dir = "./"){
   
-
-  tt <- sapply(data@counts, nrow)
   
   pdf(paste0(out_dir, "hist_pvalue.pdf"))
   

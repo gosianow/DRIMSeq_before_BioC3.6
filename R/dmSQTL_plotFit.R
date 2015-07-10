@@ -6,7 +6,7 @@ dmSQTL_plotFit <- function(data, gene_id, snp_id, fit = NULL, table = NULL, plot
 
   for(i in 1:length(gene_id)){
     # i = 1
-    cat(paste0("Plot ", i, ": gene ", gene_id[i], " snp ", snp_id[i], "\n"))
+    cat(paste0("Plot pair ", i, ": ", gene_id[i], ":", snp_id[i], "\n"))
     
     gene <- gene_id[i]
     snp <- snp_id[i]
@@ -33,17 +33,17 @@ dmSQTL_plotFit <- function(data, gene_id, snp_id, fit = NULL, table = NULL, plot
         }
 
 
+
         if(is.null(table)){
           main <- paste0(gene,":", snp, "\n Mean expression = ", round(mean_expression_gene), " / Dispersion = ", round(dispersion_gene, 2))
           }else{
-            main <- paste0(gene, ":", snp,"\n Mean expression = ", round(mean_expression_gene), " / Dispersion = ", round(dispersion_gene, 2), "\n LR = ", round(table[gene, "lr"], 2) , " / P-value = ", sprintf("%.02e", table[gene, "pvalue"]), " / FDR = ", sprintf("%.02e", table[gene, "adj_pvalue"]))
+            index_table <- paste0(gene, ":", snp)
+            main <- paste0(gene, ":", snp,"\n Mean expression = ", round(mean_expression_gene), " / Dispersion = ", round(dispersion_gene, 2), "\n LR = ", round(table[index_table, "lr"], 2) , " / P-value = ", sprintf("%.02e", table[index_table, "pvalue"]), " / FDR = ", sprintf("%.02e", table[index_table, "adj_pvalue"]))
 
         }
 
 
         ggp <- dm_plotProportion(counts, group, sample_id, fit_full = fit_full, fit_null = fit_null, main = main, plot_type = plot_type, order = order)
-
-        ggp <- dm_plotProportion(counts, group, sample_id, fit_full = fit_full, fit_null = fit_null, main = main, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[5], order = order)
 
 
         pdf(paste0(out_dir, "proportions_", gsub(pattern = "\\.", replacement = "_" , paste0(gene, "_", snp)), ".pdf"), width = 12, height = 7)
