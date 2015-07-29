@@ -2,21 +2,24 @@
 # calculate common dispersion 
 ##############################################################################
 
-dm_estimateMeanExpression <- function(data, BPPARAM = MulticoreParam(workers = 1)){
+dm_estimateMeanExpression <- function(counts, BPPARAM = MulticoreParam(workers = 1)){
 	
   ### calculate mean expression of genes 
-	cat("Calculating mean gene expression.. \n")
-	
-  time <- system.time(mean_expression <- do.call(rbind, (bplapply(data@counts, function(g){ 
+  cat("Calculating mean gene expression.. \n")
 
-  	c(mean(colSums(g), na.rm = TRUE), nrow(g))
+  time <- system.time(mean_expression <- unlist(bplapply(counts, function(g){ 
 
-  	}, BPPARAM = BPPARAM))))
+  	mean(colSums(g), na.rm = TRUE)
+
+  	}, BPPARAM = BPPARAM)))
+
+
+  cat("Took ", time["elapsed"], " seconds.\n")
+  cat("** Mean gene expression: ", head(mean_expression), "... \n")
   
-  colnames(mean_expression) <- c("mean_expression", "nr_features")
-	
-	cat("Took ", time["elapsed"], " seconds.\n")
-	
-	return(mean_expression)
-	
-	}
+  
+  return(mean_expression)
+
+}
+
+

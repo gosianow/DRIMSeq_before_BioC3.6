@@ -1,15 +1,13 @@
+# data must be dmDSdata object
+# min_samps_gene_expr = 3; min_gene_expr = 1; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
 
 
-
-dmDS_filter <- function(data, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
+dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   ### calculate cpm
-  x <- do.call(rbind, data@counts)
-  gene_id <- unlist(lapply(names(data@counts), function(g){rep(g, nrow(data@counts[[g]]))}))
-  expr_cpm <- edgeR::cpm(x)
-  expr_cpm_spl <- split.data.frame(expr_cpm, factor(gene_id, levels = unique(gene_id))) 
+  expr_cpm_spl <- new("MatrixList", unlistData = edgeR::cpm(counts@unlistData), partitioning = counts@partitioning)
   
-  expr_spl <- data@counts 
+  expr_spl <- counts 
   
   counts <- lapply(names(expr_spl), function(g){
     # g = "FBgn0000008"
@@ -38,7 +36,7 @@ dmDS_filter <- function(data, min_samps_gene_expr = 3, min_gene_expr = 1, min_sa
     if(!max_features == Inf){
       if(sum(trans2keep) > max_features){
         
-        tr_order <- order(apply(aggregate(t(prop[trans2keep, ]), by = list(group = data@samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
+        tr_order <- order(apply(aggregate(t(prop[trans2keep, ]), by = list(group = samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
         
         trans2keep <- trans2keep[trans2keep]
         
@@ -54,12 +52,22 @@ dmDS_filter <- function(data, min_samps_gene_expr = 3, min_gene_expr = 1, min_sa
   })
   
   names(counts) <- names(expr_spl)
-  counts2keep <- !sapply(counts, is.null)
-  counts <- counts[counts2keep]
-  
-  data_filtered <- new("dmDSdata", counts = counts, samples = data@samples)
-  
+
+  data_filtered <- new("dmDSdata", counts = MatrixList(counts), samples = samples)
+
   return(data_filtered)
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
