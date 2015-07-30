@@ -28,13 +28,11 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            
            time <- system.time(fit <- bplapply(gene_list, function(g){  
-             # g = "FBgn0000024"
+             # g = "FBgn0000008"
              # cat("Gene:", g, fill = TRUE)
-             
-             if(is.na(gamma0[g]))
-               return(NULL)
-             
+
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
+             
              
              return(f)
              
@@ -42,10 +40,12 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            names(fit) <- gene_list
            
+           pi <- MatrixList(lapply(fit, function(f) f$pi))
+           stats <- do.call(rbind, lapply(fit, function(f) f$stats))
+           
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(fit)
-           
+           return(list(pi = pi, stats = stats))
            
          },
          
@@ -62,9 +62,6 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
              # g = "ENSG00000135778"
              # cat("Gene:", g, fill = TRUE)
              
-             if(is.na(gamma0[g]))
-               return(NULL)
-             
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
              
              return(f)
@@ -73,9 +70,13 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            names(fit) <- gene_list
            
+           pi <- MatrixList(lapply(fit, function(f) f$pi))
+           stats <- do.call(rbind, lapply(fit, function(f) f$stats))
+           
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(fit)
+           return(list(pi = pi, stats = stats))
+           
            
          })
   

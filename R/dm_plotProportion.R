@@ -15,17 +15,17 @@ colorb <- function(n){
 # dev.off()
 
 
-dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
+dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
 
   labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)
   
   prop_samp <- data.frame( feature_id = labels, prop.table(counts, 2), stringsAsFactors = FALSE) 
   
-  if(!is.null(fit_full))
-  prop_est_full <- data.frame(feature_id = labels, fit_full$pi, stringsAsFactors = FALSE)
-  if(!is.null(fit_null))
-  prop_est_null <- data.frame(feature_id = labels, fit_null$pi, stringsAsFactors = FALSE)
+  if(!is.null(pi_full))
+  prop_est_full <- data.frame(feature_id = labels, pi_full, stringsAsFactors = FALSE)
+  if(!is.null(pi_null))
+  prop_est_null <- data.frame(feature_id = labels, pi_null, stringsAsFactors = FALSE)
   
   #### order transcipts by decreasing proportion 
   if(order){
@@ -38,14 +38,14 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
   prop_samp$sample_id <- factor(prop_samp$sample_id)
   prop_samp$group <- rep(group, each = length(labels))
   
-  if(!is.null(fit_full)){
+  if(!is.null(pi_full)){
     prop_est_full <- melt(prop_est_full, id.vars = "feature_id", variable.name = "group", value.name = "proportion")
     prop_est_full$feature_id <- factor(prop_est_full$feature_id, levels = labels)
     prop_est_full$group <- factor(rep(levels(group), each = length(labels)), levels = levels(group))
 
   }
 
-  if(!is.null(fit_null)){
+  if(!is.null(pi_null)){
     colnames(prop_est_null) <- c("feature_id", "proportion")
     prop_est_null$feature_id <- factor(prop_est_null$feature_id, levels = labels)
     prop_est_null$group <- factor("null")
@@ -83,17 +83,17 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ylab("Proportions") +
     coord_cartesian(ylim = c(-0.1, 1.1))
     
-    if(!is.null(fit_null)){
+    if(!is.null(pi_null)){
       ggp <- ggp +
       geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22) 
     }
 
-    # if(!is.null(fit_full)){ ### plots points in equal distance
+    # if(!is.null(pi_full)){ ### plots points in equal distance
     #   ggp <- ggp + 
     #   geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, fill = group), position = position_jitterdodge(jitter.width = 0, jitter.height = 0 ), size = 3, shape = 23)  
     # }
     
-    if(!is.null(fit_full)){
+    if(!is.null(pi_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = x, y = proportion, fill = group), size = 3, shape = 23)
       
@@ -141,13 +141,13 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ylab("Proportions")
 
 
-    if(!is.null(fit_null)){
+    if(!is.null(pi_null)){
       ggp <- ggp +
       geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22) +
       guides(colour=FALSE)
     }
 
-    if(!is.null(fit_full)){
+    if(!is.null(pi_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, fill = group), position = position_jitterdodge(jitter.width = 0, jitter.height = 0), size = 3, shape = 23) +
       guides(colour=FALSE)
@@ -182,7 +182,7 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ylab("Proportions")
     
     
-    if(!is.null(fit_full)){
+    if(!is.null(pi_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = group, y = proportion, fill = feature_id), position = position_jitterdodge(jitter.width = 0, jitter.height = 0), size = 3, shape = 23, colour = "black")
       
@@ -215,13 +215,13 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     ylab("Proportions")
     
     
-    if(!is.null(fit_null)){
+    if(!is.null(pi_null)){
       ggp <- ggp +
       geom_point(data = prop_est_null, aes(x = feature_id, y = proportion, fill = group), size = 3.5, shape = 22, show_guide = FALSE) +
       guides(colour=FALSE)
     }
 
-    if(!is.null(fit_full)){
+    if(!is.null(pi_full)){
       ggp <- ggp + 
       geom_point(data = prop_est_full, aes(x = feature_id, y = proportion, group = group, fill = group ), size = 3, shape = 23) +
       guides(colour=FALSE)
@@ -234,7 +234,7 @@ dm_plotProportion <- function(counts, group, sample_id, fit_full = NULL, fit_nul
     
   }
   
-  if(plot_type == "ribbonplot" & !is.null(fit_full)){
+  if(plot_type == "ribbonplot" & !is.null(pi_full)){
 
     values <- colorl(length(labels_org))
     names(values) <- labels_org

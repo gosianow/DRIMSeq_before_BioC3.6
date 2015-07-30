@@ -1,7 +1,7 @@
 ### colour for the df
 # colour = table[names(mean_expression), "df"]
 
-dmDS_plotDispersion <- function(dispersion, mean_expression, common_dispersion = NULL, out_dir = "./"){
+dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = NULL, out_dir = NULL){
   
   
   # pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
@@ -15,7 +15,8 @@ dmDS_plotDispersion <- function(dispersion, mean_expression, common_dispersion =
   
   
   ### plot dispersion versus mean
-  df <- data.frame(mean_expression = log10(mean_expression[, "mean_expression"] + 1), dispersion = log10(dispersion), nr_features  = mean_expression[,"nr_features"])
+  
+  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(tagwise_dispersion), nr_features = nr_features)
   
   df_quant <- quantile(na.omit(df$nr_features), probs = 0.95)
   
@@ -31,9 +32,12 @@ dmDS_plotDispersion <- function(dispersion, mean_expression, common_dispersion =
     if(!is.null(common_dispersion))
      ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
 
-  
+  if(!is.null(out_dir))
   pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
+  
   print(ggp2)
+  
+  if(!is.null(out_dir))
   dev.off()
   
   

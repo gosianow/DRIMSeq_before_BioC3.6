@@ -7,7 +7,7 @@ setClass("MatrixList", contains = "CompressedList", representation(unlistData = 
 
 MatrixList <- function(...){
   
-  listData <- list(counts)
+  listData <- list(...)
   if (length(listData) == 1L && is.list(listData[[1L]]))
     listData <- listData[[1L]]
   if (length(listData) == 0L) {
@@ -119,6 +119,7 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
   
   if (!identical(recursive, FALSE))
     stop("\"c\" method for MatrixList objects ", "does not support the 'recursive' argument")
+  
   if (missing(x))
     tls <- unname(list(...))
   else tls <- unname(list(x, ...))

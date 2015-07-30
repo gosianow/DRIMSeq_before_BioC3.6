@@ -4,12 +4,12 @@
 
 dm_profileLikTagwise <- function(gamma0, y, ngroups, lgroups, igroups, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE){
 
-  fit <- dm_fitOneGeneManyGroups(y = y, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose) ### return NULL when at least one group has not enough of data 
+  fit <- dm_fitOneGeneManyGroups(y = y, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose) ### return NA when at least one group has not enough of data 
   
-  if(is.null(fit))
-    return(NULL)
+  lik <- fit$stats["lik"]
   
-  lik <- sum(fit$lik)
+  if(is.na(lik))
+    return(NA)
   
   if(!disp_adjust)
     return(lik)
@@ -20,7 +20,7 @@ dm_profileLikTagwise <- function(gamma0, y, ngroups, lgroups, igroups, disp_adju
 		cat("adj", adj, "\n")
 	
   if(adj == Inf)
-    return(lik) ### can not return NULL or NA because optim can not handle it
+    return(NA) ### can not return NULL or NA because optim can not handle it
   
   adjLik <- lik - adj
 	

@@ -5,18 +5,24 @@
 
 dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE){
   ### y must be exons vs. samples
+  ### If something is wrong, return NULL
+  
+  kk <- nrow(y)
 	
   # NULL for filtered genes or genes with one exon
-  if(any(dim(y) <= 1)) return(NULL)
+  if(any(dim(y) <= 1)) 
+  return(list(pi = rep(NA, kk), stats = rep(NA, 2)))
   
   ### check for 0s in rows (exons)
   keep_row <- rowSums(y) > 0
-  if(sum(keep_row) < 2) return(NULL) ## must be at least two exons or transcripts
+  if(sum(keep_row) < 2) 
+  return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two exons or transcripts
   y <- y[keep_row, , drop=FALSE]
   
   ### check for 0s in cols (samples)
   keep_col <- colSums(y) > 0
-  if(sum(keep_col) < 2) return(NULL) ## must be at least two samples in a condition
+  if(sum(keep_col) < 2) 
+  return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two samples in a condition
   y <- y[, keep_col, drop=FALSE]
   
   pi_init <- rowSums(y)/sum(y)
@@ -38,9 +44,8 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            co <- constrOptim(pi_init[-k], f = dm_lik, grad = dm_score, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par
-           lik <- co$value
-           
            pi <- c(pi, 1-sum(pi))
+           lik <- co$value
 
          }, 
                  
@@ -55,9 +60,8 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            co <- constrOptim(pi_init[-k], f = dm_likG, grad = dm_scoreG, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par
-           lik <- co$value
-           
            pi <- c(pi, 1-sum(pi))
+           lik <- co$value
 
          }, 
          
@@ -164,10 +168,15 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
          }) ## End of FisherScoring
   
   
-  keep_row[keep_row] <- pi
-  pi <- keep_row
+keep_row[keep_row] <- pi
+pi <- keep_row
+names(pi) <- NULL
+names(lik) <- NULL
 
-  return(list(pi = pi, gamma0 = gamma0, lik = lik, df = k-1))
+df <- k - 1
+names(df) <- NULL
+
+return(list(pi = pi, stats = c(lik, df)))
   
   
 }

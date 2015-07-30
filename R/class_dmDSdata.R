@@ -5,6 +5,7 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   unlistData <- counts
 
   stopifnot(class(unlistData) == "matrix")
+  stopifnot(mode(unlistData) %in% "numeric")
   unlistData <- ceiling(unlistData)
   
   stopifnot( class( gene_id_counts ) %in% c("character", "factor"))

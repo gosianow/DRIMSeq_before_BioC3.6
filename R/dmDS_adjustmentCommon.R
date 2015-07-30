@@ -2,7 +2,7 @@
 # adjustements to profile likelihood for common dispersion -> sum
 ##############################################################################
 
-dmDS_adjustmentCommon <- function(gamma0, counts, samples, fit_full, BPPARAM = MulticoreParam(workers=1)){
+dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = MulticoreParam(workers=1)){
   
   gene_list <- names(counts)
 	
@@ -14,11 +14,12 @@ dmDS_adjustmentCommon <- function(gamma0, counts, samples, fit_full, BPPARAM = M
   names(igroups) <- lgroups
   
   adj <- bplapply(gene_list, function(g){  
-		
-    if(is.null(fit_full[[g]])) 
-			return(NULL)
+		# g = gene_list[1]
+    
+    if(any(is.na(pi[[g]]))) 
+			return(NA)
 
-    a <- dm_adjustmentOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = fit_full[[g]]$pi) 
+    a <- dm_adjustmentOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = pi[[g]]) 
     
     return(a)
     

@@ -10,8 +10,36 @@ setClass("dmDSdispersion",
     tagwise_dispersion = NULL))
 
 
-setMethod("show", "dmDSdispersion", function(object){
+
+show_numeric <- function(object, nhead = 2, ntail = 2){
   
+  if(!is.null(object)){
+    
+    nl <- length(object)  
+    cat(class(object), "of length", length(object), "\n")
+    
+    if(nl < (nhead + ntail + 1L)) {
+      out <- round(object, 2)
+      } else {
+        dots <- "... ..."
+        names(dots) <- "... ..."
+        out <- c(round(head(object, nhead), 2), dots , round(tail(object, ntail), 2))
+      }
+      print(out, quote = FALSE, right = TRUE)
+      
+      }else{
+        
+        print(object)
+        
+      }
+
+    }
+
+
+
+
+setMethod("show", "dmDSdispersion", function(object){
+      
   # cat("Slot \"counts\":\n")
   # print(object@counts)
   
@@ -20,22 +48,14 @@ setMethod("show", "dmDSdispersion", function(object){
   
   callNextMethod(object)
   
-  dots <- "..."
-  names(dots) <- "..."
-  
   cat("Slot \"mean_expression\":\n")
-  if(!is.null(object@mean_expression)){
-    cat(class(object@mean_expression), "of length", length(object@mean_expression), "\n")
-    print(c(round(head(object@mean_expression, 3), 2), dots , round(tail(object@mean_expression, 3), 2)), quote = FALSE, right = TRUE)
-    }else{
-      print(object@mean_expression)
-    }
-
+  show_numeric(object@mean_expression)
+  
   cat("Slot \"common_dispersion\":\n")
-  print(object@common_dispersion)
+  show_numeric(object@common_dispersion)
   
   cat("Slot \"tagwise_dispersion\":\n")
-  print(head(object@tagwise_dispersion))
+  show_numeric(object@tagwise_dispersion)
   
   })
 
@@ -53,7 +73,7 @@ setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, comm
     }
   
   if(common_dispersion){
-    common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e-01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
     }else{
       common_dispersion <- NULL
     }
@@ -89,7 +109,7 @@ setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALS
     }
   
   if(common_dispersion){
-    common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e-01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
     }else{
       common_dispersion <- x@common_dispersion
     }
@@ -117,7 +137,15 @@ setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALS
 
 
 
+setGeneric("dmDSplotDispersion", function(x, ...) standardGeneric("dmDSplotDispersion"))
 
+setMethod("dmDSplotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
+  
+  # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts@partitioning); common_dispersion = x@common_dispersion
+  
+  dmDS_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts@partitioning), common_dispersion = x@common_dispersion, out_dir = out_dir)
+  
+  })
 
 
 
