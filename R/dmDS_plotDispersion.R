@@ -5,12 +5,9 @@ dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features
   
   
   # pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
-  
   # #opar <- par()      # make a copy of current settings
   # par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
-  
   # # par(mar = opar$mar, mgp = opar$mgp) 
-  
   # dev.off()
   
   
@@ -29,8 +26,9 @@ dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features
     guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
     scale_colour_gradient(limits = c(1, df_quant), breaks = seq(1, df_quant, 1), low = "dodgerblue2", high="firebrick2", name = "Number of features", na.value = "firebrick2")
   
-    if(!is.null(common_dispersion))
+    if(!is.null(common_dispersion)){
      ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
+    }
 
   if(!is.null(out_dir))
   pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))

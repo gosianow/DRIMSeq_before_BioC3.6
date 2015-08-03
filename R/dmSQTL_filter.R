@@ -1,7 +1,7 @@
 # min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 0.10; BPPARAM = MulticoreParam(workers = 10)
 
 
-dmSQTL_filter <- function(data, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = MulticoreParam(workers = 1)){
+dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = MulticoreParam(workers = 1)){
 
 ########################################################
 # filtering on counts 
@@ -9,18 +9,15 @@ dmSQTL_filter <- function(data, min_samps_gene_expr = 70, min_gene_expr = 1, min
 ########################################################
 
   ### calculate cpm
-  x <- do.call(rbind, data@counts)
-  gene_id <- unlist(lapply(names(data@counts), function(g){rep(g, nrow(data@counts[[g]]))}))
-  expr_cpm <- edgeR::cpm(x)
-  expr_cpm_spl <- split.data.frame(expr_cpm, factor(gene_id, levels = unique(gene_id))) 
+  counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(counts@unlistData), partitioning = counts@partitioning)
   
-  expr_spl <- data@counts 
+  gene_list <- names(counts)
   
-  counts <- bplapply(names(expr_spl), function(g){
+  counts_new <- lapply(gene_list, function(g){
     # g = "ENSG00000008130.10"
     # print(g)
-    expr_cpm_gene <- expr_cpm_spl[[g]]
-    expr_gene <- expr_spl[[g]]
+    expr_cpm_gene <- counts_cpm[[g]]
+    expr_gene <- counts[[g]]
     
     ### no genes with one transcript
     if(dim(expr_gene)[1] == 1)
@@ -39,7 +36,7 @@ dmSQTL_filter <- function(data, min_samps_gene_expr = 70, min_gene_expr = 1, min
     if(sum(trans2keep) <= 1)
     return(NULL)
     
-    #### Have to think how to order the transcripts
+    #### Have to think how to order the transcripts because here I do not have the same grouping 
     # if(!max_features == Inf){
     #   if(sum(trans2keep) > max_features){
 
@@ -59,25 +56,24 @@ dmSQTL_filter <- function(data, min_samps_gene_expr = 70, min_gene_expr = 1, min
 
     return(expr)
     
-    }, BPPARAM = BPPARAM)
+    })
 
-names(counts) <- names(expr_spl)
-counts2keep <- !sapply(counts, is.null)
-counts <- counts[counts2keep]
+names(counts_new) <- names(counts)
+counts_new <- MatrixList(counts_new)
 
 ########################################################
 # filtering on genotypes
 ########################################################
 
-minor_allel_nr <- ceiling(minor_allel_freq * nrow(data@samples))
+minor_allel_nr <- ceiling(minor_allel_freq * nrow(samples))
 
-gene_list <- names(counts)
+gene_list <- names(counts_new)
 
-genotypes <- bplapply(gene_list, function(gene){ 
-  # gene <- gene_list[1]; print(gene)
+genotypes_new <- bplapply(gene_list, function(g){ 
+  # g <- gene_list[1]; print(g)
 
-  counts_gene <- counts[[gene]]
-  genotypes_gene <- data@genotypes[[gene]]
+  counts_gene <- counts[[g]]
+  genotypes_gene <- genotypes[[g]]
 
   ## NA for samples with non expressed genes and missing genotype
   genotypes_gene[, is.na(counts_gene[1,])] <- NA
@@ -114,12 +110,22 @@ genotypes <- bplapply(gene_list, function(gene){
 
   }, BPPARAM = BPPARAM)
 
-names(genotypes) <- gene_list
-genotypes <- genotypes[!sapply(genotypes, is.null)]
+names(genotypes_new) <- gene_list
+genotypes_new <- MatrixList(genotypes_new)
+counts_new <- counts_new[names(genotypes_new)]
 
-data_filtered <- new("dmSQTLdata", counts = counts[names(genotypes)], genotypes = genotypes, samples = data@samples)
+data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, samples = samples)
 
-return(data_filtered)
+return(data)
 
 }
+
+
+
+
+
+
+
+
+
 

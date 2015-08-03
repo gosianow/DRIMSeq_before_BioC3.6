@@ -174,3 +174,24 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
   new("MatrixList", unlistData = unlistData, partitioning = PartitioningByEnd(ends), elementMetadata = elementMetadata)
   
 })
+
+
+
+setMethod("nrow", "MatrixList", function(x){
+  
+  nrow(x@unlistData)
+  
+})
+
+
+setMethod("ncol", "MatrixList", function(x){
+  
+  ncol(x@unlistData)
+  
+})
+
+
+
+
+
+

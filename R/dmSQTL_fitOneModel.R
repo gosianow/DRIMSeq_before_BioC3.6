@@ -1,17 +1,18 @@
 ##############################################################################
-# multiple group fitting 
+# multiple group fffting 
 ##############################################################################
 
-dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
+# counts=x@counts; genotypes=x@genotypes; samples=x@samples; dispersion=100; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+
+
+dmSQTL_fffOneModel <- function(counts, genotypes, samples, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
-  gene_list <- names(data@counts)
+  gene_list <- names(counts)
   
-  if(length(dispersion) == 1){
-    gamma0 <- lapply(data@genotypes, function(g){
-      dispersion <- rep(dispersion, nrow(g))
-      names(dispersion) <- rownames(g)
-      return(dispersion)
-    })
+  if(class(dispersion) == "numeric" && length(dispersion) == 1){ 
+    gamma0 <- rep(dispersion, nrow(genotypes))
+    names(gamma0) <- rownames(genotypes@unlistData)
+    gamma0 <- relist(gamma0, genotypes@partitioning)
   } else {
     gamma0 <- dispersion
   }
@@ -23,17 +24,15 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
            
            cat("Fitting full model.. \n")
            
-           time <- system.time(fit <- bplapply(gene_list, function(g){
-             # g = "ENSG00000163348.3"; y = data@counts[[g]]; snps = data@genotypes[[g]]
+           time <- system.time(fff <- bplapply(gene_list, function(g){
+             # g = "ENSG00000131037.8"; y = counts[[g]]; snps = genotypes[[g]]
              
-             y = data@counts[[g]]
-             snps = data@genotypes[[g]]
+             y = counts[[g]]
+             snps = genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
-             f <- lapply(rownames(snps), function(i){
+             ff <- lapply(rownames(snps), function(i){
                # i = rownames(snps)[3]
-               
-               if(is.na(gamma0[[g]][i])) return(NULL)
                
                NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
                yg <- y[, !NAs]             
@@ -46,22 +45,34 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
                igroups <- lapply(lgroups, function(gr){which(group == gr)})
                names(igroups) <- lgroups
                
-               ff <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+               f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
                                              gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
                
-               return(ff)
+               return(f)
                
              })
              
-             names(f) <- rownames(snps)
+             names(ff) <- rownames(snps)
              
-             return(f)
+             pi <- MatrixList(lapply(ff, function(f){
+              # print(f$pi)
+              pp <- matrix(NA, nrow = nrow(f$pi), ncol = 3, dimnames = list(rownames(f$pi), 0:2)) 
+              pp[, colnames(f$pi)] <- f$pi
+              pp
+              }))
+             
+             stats <- do.call(rbind, lapply(ff, function(f) f$stats))
+             
+             return(list(pi = pi, stats = stats))
+             
              
            }, BPPARAM = BPPARAM))
            
            cat("Took ", time["elapsed"], " seconds.\n")
-           names(fit) <- gene_list
-           return(fit)
+           names(fff) <- gene_list
+           
+           
+           return(fff)
            
          }, 
          
@@ -69,23 +80,19 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
            
            cat("Fitting null model.. \n")
            
-           time <- system.time(fit <- bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = data@counts[[g]]; snps = data@genotypes[[g]]
+           time <- system.time(fff <- bplapply(gene_list, function(g){
+             # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
              
-             y = data@counts[[g]]
-             snps = data@genotypes[[g]]
+             y = counts[[g]]
+             snps = genotypes[[g]]
              # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
              
              groupg <- factor(rep("null", ncol(y)))
              ngroups <- 1
              lgroups <- "null"	 
              
-             f <- lapply(rownames(snps), function(i){
+             ff <- lapply(rownames(snps), function(i){
                # i = rownames(snps)[3]
-               
-               if(is.na(gamma0[[g]][i]))
-                 return(NULL)
-               
                
                NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
                yg <- y[, !NAs]             
@@ -93,22 +100,28 @@ dmSQTL_fitOneModel <- function(data, dispersion, model = c("full", "null")[1], p
                nlibs <- sum(!NAs)              
                igroups <- list(null = 1:nlibs)
                
-               ff <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+               f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
                                          gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
                
-               return(ff)
+               return(f)
                
              })
              
-             names(f) <- rownames(snps)
-            
-             return(f)
+             names(ff) <- rownames(snps)
+             
+             pi <- MatrixList(lapply(ff, function(f) f$pi ))
+             
+             stats <- do.call(rbind, lapply(ff, function(f) f$stats ))
+             
+             return(list(pi = pi, stats = stats))
              
            }, BPPARAM = BPPARAM))
            
            cat("Took ", time["elapsed"], " seconds.\n")
-           names(fit) <- gene_list
-           return(fit)
+           names(fff) <- gene_list
+           
+           
+           return(fff)
            
          })
 

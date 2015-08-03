@@ -7,6 +7,6 @@ Author: Malgorzata Nowicka, Mark Robinson
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
-Depends: BiocParallel
+Depends: BiocParallel, GenomicRanges
 Imports: Rcpp (>= 0.11.3), edgeR
 LinkingTo: Rcpp

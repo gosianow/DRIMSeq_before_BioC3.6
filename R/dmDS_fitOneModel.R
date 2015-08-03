@@ -1,5 +1,5 @@
 ##############################################################################
-# multiple group fitting 
+# multiple group ffting 
 ##############################################################################
 # model = c("full", "null")[1]; prop_mode=c("constrOptim2", "constrOptim2G", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = MulticoreParam(workers=10)
 
@@ -27,7 +27,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            names(igroups) <- lgroups
            
            
-           time <- system.time(fit <- bplapply(gene_list, function(g){  
+           time <- system.time(ff <- bplapply(gene_list, function(g){  
              # g = "FBgn0000008"
              # cat("Gene:", g, fill = TRUE)
 
@@ -38,10 +38,10 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
              
            }, BPPARAM = BPPARAM))
            
-           names(fit) <- gene_list
+           names(ff) <- gene_list
            
-           pi <- MatrixList(lapply(fit, function(f) f$pi))
-           stats <- do.call(rbind, lapply(fit, function(f) f$stats))
+           pi <- MatrixList(lapply(ff, function(f) f$pi))
+           stats <- do.call(rbind, lapply(ff, function(f) f$stats))
            
            cat("Took ", time["elapsed"], " seconds.\n")
            
@@ -58,7 +58,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            igroups <- list(null = 1:length(samples$group))
            
            
-           time <- system.time(fit <- bplapply(gene_list, function(g){  
+           time <- system.time(ff <- bplapply(gene_list, function(g){  
              # g = "ENSG00000135778"
              # cat("Gene:", g, fill = TRUE)
              
@@ -68,10 +68,10 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
              
            }, BPPARAM = BPPARAM))
            
-           names(fit) <- gene_list
+           names(ff) <- gene_list
            
-           pi <- MatrixList(lapply(fit, function(f) f$pi))
-           stats <- do.call(rbind, lapply(fit, function(f) f$stats))
+           pi <- MatrixList(lapply(ff, function(f) f$pi))
+           stats <- do.call(rbind, lapply(ff, function(f) f$stats))
            
            cat("Took ", time["elapsed"], " seconds.\n")
            

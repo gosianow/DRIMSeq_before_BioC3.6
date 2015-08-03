@@ -48,13 +48,13 @@ setMethod("show", "dmDSdispersion", function(object){
   
   callNextMethod(object)
   
-  cat("Slot \"mean_expression\":\n")
+  cat("\nSlot \"mean_expression\":\n")
   show_numeric(object@mean_expression)
   
-  cat("Slot \"common_dispersion\":\n")
+  cat("\nSlot \"common_dispersion\":\n")
   show_numeric(object@common_dispersion)
   
-  cat("Slot \"tagwise_dispersion\":\n")
+  cat("\nSlot \"tagwise_dispersion\":\n")
   show_numeric(object@tagwise_dispersion)
   
   })

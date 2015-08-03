@@ -1,4 +1,5 @@
-setClass("dmDSdata", representation(counts = "MatrixList", samples = "DataFrame"))
+setClass("dmDSdata", 
+  representation(counts = "MatrixList", samples = "DataFrame"))
 
 dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group){
   
@@ -44,7 +45,7 @@ setMethod("show", "dmDSdata", function(object){
   cat("Slot \"counts\":\n")
   print(object@counts)
   
-  cat("Slot \"samples\":\n")
+  cat("\nSlot \"samples\":\n")
   print(object@samples)
   
   })

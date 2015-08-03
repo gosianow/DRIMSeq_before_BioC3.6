@@ -4,11 +4,11 @@
 ##############################################################################
 
 
-dmSQTL_profileLikCommon <- function(gamma0, data, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, samples, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
   
   cat("Gamma in optimize:", gamma0, fill = TRUE)
   
-  fit_full <- dmSQTL_fitOneModel(data, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose=verbose, BPPARAM = BPPARAM)
+  fit_full <- dmSQTL_fitOneModel(counts, genotypes, samples, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose=verbose, BPPARAM = BPPARAM)
   
   lik <- sum(unlist( lapply(fit_full, function(g){lapply(g, function(s){sum(s$lik)})}) )) 
   
@@ -18,7 +18,7 @@ dmSQTL_profileLikCommon <- function(gamma0, data, disp_adjust = TRUE, prop_mode 
     return(lik)
   
   ## Cox-Reid adjustement
-  adj <- dmSQTL_adjustmentCommon(gamma0, data = data, fit_full = fit_full , BPPARAM = BPPARAM)
+  adj <- dmSQTL_adjustmentCommon(gamma0, counts, genotypes, samples, fit_full = fit_full , BPPARAM = BPPARAM)
   
   adjLik <- lik - adj
   

@@ -5,15 +5,15 @@
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   ### calculate cpm
-  expr_cpm_spl <- new("MatrixList", unlistData = edgeR::cpm(counts@unlistData), partitioning = counts@partitioning)
+  counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(counts@unlistData), partitioning = counts@partitioning)
   
-  expr_spl <- counts 
+  gene_list <- names(counts)
   
-  counts <- lapply(names(expr_spl), function(g){
+  counts_new <- lapply(gene_list, function(g){
     # g = "FBgn0000008"
     # print(g)
-    expr_cpm_gene <- expr_cpm_spl[[g]]
-    expr_gene <- expr_spl[[g]]
+    expr_cpm_gene <- counts_cpm[[g]]
+    expr_gene <- counts[[g]]
     
     ### no genes with one transcript
     if(dim(expr_gene)[1] == 1)
@@ -51,11 +51,12 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     
   })
   
-  names(counts) <- names(expr_spl)
+  names(counts_new) <- names(counts)
+  counts_new <- MatrixList(counts_new)
+  
+  data <- new("dmDSdata", counts = counts_new, samples = samples)
 
-  data_filtered <- new("dmDSdata", counts = MatrixList(counts), samples = samples)
-
-  return(data_filtered)
+  return(data)
   
 }
 
