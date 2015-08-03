@@ -90,12 +90,13 @@ setMethod("show", "MatrixList", function(object){
   }
   
   
-  cat("with mcols \n")
+  # cat("with mcols \n")
+  # print(object@elementMetadata)
+  
+  
+  if(!is.null(object@elementMetadata))
   print(object@elementMetadata)
   
-  
-  # if(!is.null(object@elementMetadata))
-  # show_matrix(object@elementMetadata, 1, 1)
   # else
   # print(NULL)
   

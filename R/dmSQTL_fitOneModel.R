@@ -1,11 +1,11 @@
 ##############################################################################
-# multiple group fffting 
+# multiple group fitting 
 ##############################################################################
 
-# counts=x@counts; genotypes=x@genotypes; samples=x@samples; dispersion=100; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+# counts=x@counts; genotypes=x@genotypes; dispersion=100; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
 
 
-dmSQTL_fffOneModel <- function(counts, genotypes, samples, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
   
   gene_list <- names(counts)
   
