@@ -2,68 +2,40 @@
 #  group testing
 #######################################################
 
-dmSQTL_test <- function(fit, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_test <- function(fit_full, fit_null, BPPARAM = MulticoreParam(workers=1)){
   
   ## calculate lr
   cat("Calculating likelihood ratio statistics.. \n")
+  time_start <- Sys.time()
   
-  gene_list <- names(fit$fit_full)
+  gene_list <- names(fit_full)
   
-  time <- system.time(lr_list <- bplapply(gene_list, function(g){
-    # g = "ENSG00000000457.8"
+  table_list <- bplapply(gene_list, function(g){
+    # g = "ENSG00000131037.8"
     
-    fit_full_g <- fit$fit_full[[g]]
-    fit_null_g <- fit$fit_null[[g]]
+    lr <- 2*(fit_full[[g]]@statistics[, "lik"] - fit_null[[g]]@statistics[, "lik"])
     
-    out_test <- matrix(NA, length(fit_full_g), 6)
-    colnames(out_test) <- c("lik_full", "lik_null", "nr_groups", "df", "lr", "pvalue")
+    df <- fit_full[[g]]@statistics[, "df"] - fit_null[[g]]@statistics[, "df"]
     
-    for(i in 1:length(fit_full_g)){
-      # i = 1
-      if(is.null(fit_full_g[[i]]) || is.null(fit_null_g[[i]])) 
-         next # out_test[i, ] <- NA
-      
-      out_test[i, "lik_full"] <- sum(fit_full_g[[i]]$lik)
-      out_test[i, "lik_null"] <- fit_null_g[[i]]$lik
-      out_test[i, "nr_groups"] <- length(fit_full_g[[i]]$df)
-      out_test[i, "df"] <- fit_null_g[[i]]$df * ( out_test[i, "nr_groups"] - 1 )
-
-    }
+    pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     
-    NAs <- complete.cases(out_test[, c("lik_full", "lik_null", "nr_groups", "df"), drop = FALSE])
+    tt <- DataFrame(gene_id = g, snp_id = rownames(fit_full[[g]]@statistics), lr = lr, df = df, pvalue = pvalue, row.names = paste0(g, ":", rownames(fit_full[[g]]@statistics)))
     
-    # lr <-  2 * (lik_full - lik_null)
-    out_test[NAs, "lr"] <- 2 * (out_test[NAs, "lik_full", drop = FALSE] - out_test[NAs, "lik_null", drop = FALSE])
-    out_test[NAs, "pvalue"] <- pchisq(out_test[NAs, "lr", drop = FALSE], df = out_test[NAs, "df", drop = FALSE] , lower.tail = FALSE)
-    
-    return(out_test)
-    
-  }, BPPARAM = BPPARAM))
-	
-	cat("Took ", time["elapsed"], " seconds.\n")
-	cat("Generating table with results.. \n")
-	
-	### gene and snp IDs
-  id_list <- bplapply(gene_list, function(g){
-    # g = gene_list[1] 
-		
-		matrix(c(rep(g, length(fit$fit_full[[g]])), names(fit$fit_full[[g]])), nrow = length(fit$fit_full[[g]]), byrow = FALSE, dimnames = list(NULL, c("gene_id", "snp_id")))
-	 
-  }, BPPARAM = BPPARAM)
+    }, BPPARAM = BPPARAM)
   
-
-	id <- do.call(rbind, id_list)	
-  lr <- data.matrix(do.call(rbind, lr_list))
-  adj_pvalue <- p.adjust(lr[, "pvalue"], method="BH")
-	
-	table <- data.frame(id, lr, adj_pvalue, stringsAsFactors = FALSE)
-	
+  
+  table <- do.call(rbind, table_list)
+  
+  adj_pvalue <- p.adjust(table[, "pvalue"], method="BH")
+  
+  table$adj_pvalue <- adj_pvalue
+  
   o <- order(table[, "pvalue"])  
+  table <- table[o,]
   
-	table <- table[o,]
-
-rownames(table) <- paste0(table$gene_id, ":", table$snp_id)
-
+  time_end <- Sys.time()
+  cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
+  
   return(table)
   
   

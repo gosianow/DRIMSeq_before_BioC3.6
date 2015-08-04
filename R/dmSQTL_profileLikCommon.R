@@ -10,7 +10,7 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRU
   
   fit_full <- dmSQTL_fitOneModel(counts, genotypes, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose=verbose, BPPARAM = BPPARAM)
   
-  lik <- sum(unlist( lapply(fit_full, function(g) g$stats[, "lik"]) ), na.rm = TRUE) 
+  lik <- sum(unlist( lapply(fit_full, function(g) g@statistics[, "lik"]) ), na.rm = TRUE) 
   
   cat("lik:", lik, fill = TRUE)
   
@@ -18,7 +18,7 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRU
     return(lik)
   
   ## Cox-Reid adjustement
-  pi <- lapply(fit_full, function(g) g$pi)
+  pi <- lapply(fit_full, function(g) g@proportions)
   
   adj <- dmSQTL_adjustmentCommon(gamma0, counts, genotypes, pi = pi , BPPARAM = BPPARAM)
   

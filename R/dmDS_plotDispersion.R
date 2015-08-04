@@ -1,17 +1,5 @@
-### colour for the df
-# colour = table[names(mean_expression), "df"]
 
 dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = NULL, out_dir = NULL){
-  
-  
-  # pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
-  # #opar <- par()      # make a copy of current settings
-  # par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
-  # # par(mar = opar$mar, mgp = opar$mgp) 
-  # dev.off()
-  
-  
-  ### plot dispersion versus mean
   
   df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(tagwise_dispersion), nr_features = nr_features)
   

@@ -1,41 +1,31 @@
-### colour for the df
-# colour = table[names(mean_expression), "df"]
 
-dmSQTL_plotDispersion <- function(dispersion, mean_expression, common_dispersion = NULL, out_dir = "./"){
+dmSQTL_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = NULL, out_dir = NULL){
   
+  mean_expression <- rep(mean_expression, width(tagwise_dispersion@partitioning))
   
-  # pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
+  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(tagwise_dispersion@unlistData), nr_features = nr_features)
   
-  # #opar <- par()      # make a copy of current settings
-  # par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
+  df_quant <- quantile(na.omit(df$nr_features), probs = 0.95)
   
-  # # par(mar = opar$mar, mgp = opar$mgp) 
-  
-  # dev.off()
-  
-  stopifnot(all(rownames(mean_expression) == names(dispersion)))
-
-df <- data.frame(mean_expression[ unlist(lapply(names(dispersion), function(g){rep(g, length(dispersion[[g]]))})) , ], row.names = NULL)
-df[, "mean_expression"] <- log10(df[, "mean_expression"] + 1)
-df <- cbind(df, dispersion = log10(unlist(dispersion))) 
-
-  df_quant <- quantile(na.omit(df[, "nr_features"]), probs = 0.95)
   
   ggp2 <- ggplot(df, aes(x = mean_expression, y = dispersion, colour = nr_features )) +
-    theme_bw() +
-    xlab("Log10(mean expression)") +
-    ylab("Log10(dispersion)") +
-    geom_point(size = 1.5, alpha = 0.5) +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top") +
-    guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
-    scale_colour_gradient(limits = c(1, df_quant), breaks = seq(1, df_quant, 1), low = "dodgerblue2", high="firebrick2", name = "Number of features", na.value = "firebrick2")
+  theme_bw() +
+  xlab("Log10(mean expression)") +
+  ylab("Log10(dispersion)") +
+  geom_point(size = 1.5, alpha = 0.5) +
+  theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top") +
+  guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
+  scale_colour_gradient(limits = c(1, df_quant), breaks = seq(1, df_quant, 1), low = "dodgerblue2", high="firebrick2", name = "Number of features", na.value = "firebrick2")
   
-    if(!is.null(common_dispersion))
-     ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
+  if(!is.null(common_dispersion))
+  ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
 
-  
+  if(!is.null(out_dir))
   pdf(paste0(out_dir, "dispersion_versus_mean.pdf"))
+  
   print(ggp2)
+  
+  if(!is.null(out_dir))
   dev.off()
   
   

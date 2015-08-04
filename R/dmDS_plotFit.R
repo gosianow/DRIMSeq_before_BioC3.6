@@ -24,7 +24,7 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = NULL, proportion
     
     if(!is.null(dispersion)){
       
-      if(length(dispersion == 1))
+      if(length(dispersion) == 1)
       dispersion_gene <- dispersion
       else
       dispersion_gene <- dispersion[gene]

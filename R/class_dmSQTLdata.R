@@ -1,5 +1,7 @@
 setClass("dmSQTLdata", 
-  representation(counts = "MatrixList", genotypes = "MatrixList", samples = "DataFrame"))
+  representation(counts = "MatrixList", 
+    genotypes = "MatrixList", 
+    samples = "DataFrame"))
 
 
 
@@ -113,6 +115,7 @@ setGeneric("dmSQTLfilter", function(x, ...) standardGeneric("dmSQTLfilter"))
 
 setMethod("dmSQTLfilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = MulticoreParam(workers = 1)){
   
+  # counts = x@counts; genotypes = x@genotypes; samples = x@samples
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
   

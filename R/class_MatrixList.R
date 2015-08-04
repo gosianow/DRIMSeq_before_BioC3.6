@@ -25,6 +25,7 @@ MatrixList <- function(...){
   }
 }
 
+# nhead = 3; ntail = 3
 
 show_matrix <- function(object, nhead = 3, ntail = 3){
   nr <- nrow(object)
@@ -37,11 +38,16 @@ show_matrix <- function(object, nhead = 3, ntail = 3){
     if(nr < (nhead + ntail + 1L)) {
       out <- object
     } else {
+      
       out <- do.call(rbind, list(head(object, nhead), rep.int("...", nc), tail(object, ntail)))
+      
       rownames(out) <- rownames_matrix(nms, nr, nhead, ntail)
     }
-    print(out, quote = FALSE, right = TRUE)
+    
+    ### print adjusted for numeric
+    print(out, quote = FALSE, right = TRUE, na.print = "NA")
   }
+  
 }
 
 
@@ -89,18 +95,11 @@ setMethod("show", "MatrixList", function(object){
     
   }
   
-  
-  # cat("with mcols \n")
-  # print(object@elementMetadata)
-  
-  
   if(!is.null(object@elementMetadata))
   print(object@elementMetadata)
   
-  # else
-  # print(NULL)
-  
 })
+
 
 
 setMethod("[[", "MatrixList", function(x, i, ...){

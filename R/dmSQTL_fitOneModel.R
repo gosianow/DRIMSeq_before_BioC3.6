@@ -2,7 +2,9 @@
 # multiple group fitting 
 ##############################################################################
 
-# counts=x@counts; genotypes=x@genotypes; dispersion=100; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+# counts=x@counts; genotypes=x@genotypes; dispersion=10; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+
+# it returns a list of list(pi - MatrixList, stats - matrix)
 
 
 dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = MulticoreParam(workers=1)){
@@ -63,7 +65,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
              stats <- do.call(rbind, lapply(ff, function(f) f$stats))
              
-             return(list(pi = pi, stats = stats))
+             return(new("dmFit", proportions = pi, statistics = DataFrame(stats, row.names = rownames(stats))))
              
              
            }, BPPARAM = BPPARAM))
@@ -113,7 +115,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
              stats <- do.call(rbind, lapply(ff, function(f) f$stats ))
              
-             return(list(pi = pi, stats = stats))
+             return(new("dmFit", proportions = pi, statistics = DataFrame(stats, row.names = rownames(stats))))
              
            }, BPPARAM = BPPARAM))
            

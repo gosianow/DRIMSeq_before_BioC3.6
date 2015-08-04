@@ -1,3 +1,23 @@
+setClass("dmFit", 
+  representation(
+    proportions = "MatrixList",
+    statistics = "DataFrame"))
+
+
+setMethod("show", "dmFit", function(object){
+  
+  cat("An object of class", class(object), "\n")
+  
+  cat("\nSlot \"proportions\":\n")
+  print(object@proportions)
+  
+  cat("\nSlot \"statistics\":\n")
+  print(object@statistics)
+  
+  })
+
+
+
 setClass("dmDSfit", 
   contains = "dmDSdispersion",
   representation(dispersion = "character",
@@ -31,19 +51,12 @@ setGeneric("dmDSfit", function(x, ...) standardGeneric("dmDSfit"))
 setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
    
    
-  # fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = 4000, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)  
-    
-   
   fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
-  
-  fit_full <- new("dmFit", proportions = fit_full$pi, statistics = DataFrame(fit_full$stats, row.names = rownames(fit_full$stats)))
-   
+
    
   fit_null <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
-  fit_null <- new("dmFit", proportions = fit_null$pi, statistics = DataFrame(fit_null$stats, row.names = rownames(fit_null$stats)))
-  
-  
+
   return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, fit_null = fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, tagwise_dispersion = x@tagwise_dispersion, counts = x@counts, samples = x@samples))
   
   

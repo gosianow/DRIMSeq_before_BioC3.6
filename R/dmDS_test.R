@@ -11,11 +11,11 @@ dmDS_test <- function(stats_full, stats_null){
   cat("Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
     
-  lr <- 2*(stats_full[, "lik"] - stats_null[, "lik"]);
+  lr <- 2*(stats_full[, "lik"] - stats_null[, "lik"])
   
-  df <- stats_full[, "df"] - stats_null[, "df"];
+  df <- stats_full[, "df"] - stats_null[, "df"]
   
-  pvalue <- pchisq(lr, df = df , lower.tail = FALSE);
+  pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
   
   adj_pvalue <- p.adjust(pvalue, method="BH")
   
