@@ -1,6 +1,8 @@
 
 dmSQTL_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = NULL, out_dir = NULL){
   
+  require("ggplot2")
+  
   mean_expression <- rep(mean_expression, width(tagwise_dispersion@partitioning))
   
   df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(tagwise_dispersion@unlistData), nr_features = nr_features)

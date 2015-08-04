@@ -16,6 +16,9 @@ colorb <- function(n){
 
 
 dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
+  
+  require("ggplot2")
+  require("reshape2")
 
   labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)

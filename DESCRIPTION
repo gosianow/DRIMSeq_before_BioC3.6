@@ -8,5 +8,5 @@ Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Depends: BiocParallel, GenomicRanges
-Imports: Rcpp (>= 0.11.3), edgeR
+Imports: Rcpp (>= 0.11.3), edgeR, ggplot2, reshape2
 LinkingTo: Rcpp

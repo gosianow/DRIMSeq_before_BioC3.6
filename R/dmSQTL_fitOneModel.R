@@ -12,7 +12,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
   gene_list <- names(counts)
   
   if(class(dispersion) == "numeric" && length(dispersion) == 1){ 
-    gamma0 <- rep(dispersion, nrow(genotypes))
+    gamma0 <- rep(dispersion, nrow(genotypes@unlistData))
     names(gamma0) <- rownames(genotypes@unlistData)
     gamma0 <- relist(gamma0, genotypes@partitioning)
   } else {
