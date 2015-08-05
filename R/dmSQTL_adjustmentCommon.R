@@ -7,7 +7,7 @@ dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = Mul
   
   gene_list <- names(counts)
   
-  adj <- bplapply(gene_list, function(g){  
+  adj <- BiocParallel::bplapply(gene_list, function(g){  
 		# g = geneList[1624]; y = data@counts[[g]]; snps = data@genotypes[[g]]
              
 		             y = counts[[g]]

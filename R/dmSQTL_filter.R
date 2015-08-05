@@ -14,7 +14,6 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
   
   counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
   
-  
   gene_list <- names(counts)
   
   counts_new <- lapply(gene_list, function(g){
@@ -44,8 +43,6 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
     # if(!max_features == Inf){
     #   if(sum(trans2keep) > max_features){
 
-    #     require("matrixStats")
-
     #     tr_order <- order(-rowQuantiles(-prop, min_samps_feature_prop/ncol(prop)), decreasing = TRUE)
 
     #     trans2keep <- trans2keep[trans2keep]
@@ -73,7 +70,7 @@ minor_allel_nr <- ceiling(minor_allel_freq * nrow(samples))
 
 gene_list <- names(counts_new)
 
-genotypes_new <- bplapply(gene_list, function(g){ 
+genotypes_new <- BiocParallel::bplapply(gene_list, function(g){ 
   # g <- gene_list[1]; print(g)
 
   counts_gene <- counts[[g]]

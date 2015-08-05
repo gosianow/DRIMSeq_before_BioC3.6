@@ -23,7 +23,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       
       optimize={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = 1
           #     print(g)
           
@@ -49,7 +49,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       
       optim={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = 12
           if(verbose)
             cat("gene", g, "\n")
@@ -86,7 +86,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       
       constrOptim={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = 1
           #     print(g)
           
@@ -124,7 +124,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
         ### calculate the likelihood for each gene at the spline dispersion points
         
-        loglikL <- bplapply(gene_list, function(g){
+        loglikL <- BiocParallel::bplapply(gene_list, function(g){
           # g = 1
           
           ll <- numeric(disp_grid_length)

@@ -1,6 +1,6 @@
 setClassUnion("matrixORNULL", c("matrix", "NULL"))
 
-
+#' @importClassesFrom IRanges CompressedList
 setClass("MatrixList", contains = "CompressedList", representation(unlistData = "matrix"), prototype(elementType = "matrix"))
 
 ### Constructor:

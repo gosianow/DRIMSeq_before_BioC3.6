@@ -1,7 +1,5 @@
-
+#' @import ggplot2
 dmSQTL_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = NULL, out_dir = NULL){
-  
-  require("ggplot2")
   
   mean_expression <- rep(mean_expression, width(tagwise_dispersion@partitioning))
   

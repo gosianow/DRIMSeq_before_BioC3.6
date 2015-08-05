@@ -26,7 +26,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            
            cat("Fitting full model.. \n")
            
-           time <- system.time(fff <- bplapply(gene_list, function(g){
+           time <- system.time(fff <- BiocParallel::bplapply(gene_list, function(g){
              # g = "ENSG00000131037.8"; y = counts[[g]]; snps = genotypes[[g]]
              
              y = counts[[g]]
@@ -82,7 +82,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            
            cat("Fitting null model.. \n")
            
-           time <- system.time(fff <- bplapply(gene_list, function(g){
+           time <- system.time(fff <- BiocParallel::bplapply(gene_list, function(g){
              # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
              
              y = counts[[g]]

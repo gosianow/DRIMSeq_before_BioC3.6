@@ -7,7 +7,7 @@ dm_estimateMeanExpression <- function(counts, BPPARAM = MulticoreParam(workers =
   ### calculate mean expression of genes 
   cat("Calculating mean gene expression.. \n")
 
-  time <- system.time(mean_expression <- unlist(bplapply(counts, function(g){ 
+  time <- system.time(mean_expression <- unlist(BiocParallel::bplapply(counts, function(g){ 
 
   	mean(colSums(g), na.rm = TRUE)
 

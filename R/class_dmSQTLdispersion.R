@@ -1,3 +1,4 @@
+#' @importClassesFrom IRanges CompressedNumericList
 setClassUnion("CompressedNumericListORNULL", c("CompressedNumericList", "NULL"))
 
 setClass("dmSQTLdispersion", 

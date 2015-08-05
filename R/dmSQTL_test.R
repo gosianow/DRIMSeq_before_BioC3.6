@@ -10,7 +10,7 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = MulticoreParam(workers=1))
   
   gene_list <- names(fit_full)
   
-  table_list <- bplapply(gene_list, function(g){
+  table_list <- BiocParallel::bplapply(gene_list, function(g){
     # g = "ENSG00000131037.8"
     
     lr <- 2*(fit_full[[g]]@statistics[, "lik"] - fit_null[[g]]@statistics[, "lik"])

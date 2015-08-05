@@ -13,7 +13,7 @@ dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = Multico
   igroups <- lapply(lgroups, function(gr){which(group == gr)})
   names(igroups) <- lgroups
   
-  adj <- bplapply(gene_list, function(g){  
+  adj <- BiocParallel::bplapply(gene_list, function(g){  
 		# g = gene_list[1]
     
     if(any(is.na(pi[[g]]))) 

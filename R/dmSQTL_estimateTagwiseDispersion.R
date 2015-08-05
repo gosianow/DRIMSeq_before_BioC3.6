@@ -16,7 +16,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       optimize={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
           
           y = counts[[g]]
@@ -73,7 +73,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       optim={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
           
           y = counts[[g]]
@@ -131,7 +131,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       constrOptim={
         
-        disp_list <- bplapply(gene_list, function(g){
+        disp_list <- BiocParallel::bplapply(gene_list, function(g){
           # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
           
           y = counts[[g]]
@@ -198,7 +198,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         
         ### calculate the likelihood for each gene at the spline dispersion points
         
-        loglikL <- bplapply(gene_list, function(g){
+        loglikL <- BiocParallel::bplapply(gene_list, function(g){
           # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
           
           y = counts[[g]]

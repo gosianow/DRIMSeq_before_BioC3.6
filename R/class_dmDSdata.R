@@ -1,6 +1,23 @@
+#' @include class_MatrixList.R
+NULL
+
 setClass("dmDSdata", 
   representation(counts = "MatrixList", samples = "DataFrame"))
 
+#' Create dmDSdata object from counts
+#' 
+#' @param counts A numeric matrix of counts. Rows represent features (exons,
+#'   bins or transcripts), columns represent samples.
+#' @param gene_id_counts A vector of gene IDs of lenght correspoding to the
+#'   number of rows in \code{counts}.
+#' @param feature_id_counts A vector of feature IDs of lenght correspoding to
+#'   the number of rows in \code{counts}.
+#' @param sample_id A vector of unique sample IDs of length corresponding to the
+#'   number of columns in \code{counts}.
+#' @param group A vector that defines the goupping of samples.
+#' @return Return \code{dmDSdata} object containing counts and sample
+#'   information.
+#' @export
 dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group){
   
   unlistData <- counts
