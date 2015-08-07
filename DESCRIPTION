@@ -11,16 +11,19 @@ Imports:
     methods,
     BiocParallel,
     GenomicRanges,
+    limma,
     edgeR,
     ggplot2,
-    reshape2,
-    Rcpp (>= 0.11.3)
-LinkingTo: Rcpp
+    reshape2
 LazyData: true
 ByteCompile: true
+VignetteBuilder: knitr
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown
 Collate:
     'DM.R'
-    'RcppExports.R'
     'class_MatrixList.R'
     'class_dmDSdata.R'
     'class_dmDSdispersion.R'

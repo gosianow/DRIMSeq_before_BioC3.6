@@ -52,9 +52,9 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
   colnames(genotypes) <- sample_id
   rownames(genotypes) <- snp_id_genotypes
   
-  counts <- new( "MatrixList", unlistData = counts, partitioning = PartitioningByEnd(as.numeric(gene_id_counts), NG = nlevels(gene_id_counts), names = levels(gene_id_counts)) )
+  counts <- new( "MatrixList", unlistData = counts, partitioning = IRanges::PartitioningByEnd(as.numeric(gene_id_counts), NG = nlevels(gene_id_counts), names = levels(gene_id_counts)) )
   
-  genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = PartitioningByEnd(as.numeric(gene_id_genotypes), NG = nlevels(gene_id_genotypes), names = levels(gene_id_genotypes)) )
+  genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = IRanges::PartitioningByEnd(as.numeric(gene_id_genotypes), NG = nlevels(gene_id_genotypes), names = levels(gene_id_genotypes)) )
   
   samples <- DataFrame(sample_id = sample_id)
   

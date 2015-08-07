@@ -20,7 +20,7 @@ MatrixList <- function(...){
     
     unlistData <- do.call(rbind, listData)
     
-    return(new("MatrixList", unlistData = unlistData, partitioning = PartitioningByEnd(listData)))
+    return(new("MatrixList", unlistData = unlistData, partitioning = IRanges::PartitioningByEnd(listData)))
     
   }
 }
@@ -171,7 +171,7 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
     }
   }
   
-  new("MatrixList", unlistData = unlistData, partitioning = PartitioningByEnd(ends), elementMetadata = elementMetadata)
+  new("MatrixList", unlistData = unlistData, partitioning = IRanges::PartitioningByEnd(ends), elementMetadata = elementMetadata)
   
 })
 

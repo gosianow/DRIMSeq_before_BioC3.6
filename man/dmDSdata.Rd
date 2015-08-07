@@ -2,30 +2,42 @@
 % Please edit documentation in R/class_dmDSdata.R
 \name{dmDSdata}
 \alias{dmDSdata}
-\title{Create dmDSdata object from counts}
+\title{Create dmDSdata object from a table of counts}
 \usage{
 dmDSdata(counts, gene_id_counts, feature_id_counts, sample_id, group)
 }
 \arguments{
 \item{counts}{A numeric matrix of counts. Rows represent features (exons,
-bins or transcripts), columns represent samples.}
+  bins or transcripts), columns represent samples.}
 
-\item{gene_id_counts}{A vector of gene IDs of lenght correspoding to the
-number of rows in \code{counts}.}
+\item{gene_id_counts,}{feature_id_counts Vectors of gene IDs and feature IDs
+  of lenght correspoding to the number of rows in \code{counts}.}
 
-\item{feature_id_counts}{A vector of feature IDs of lenght correspoding to
-the number of rows in \code{counts}.}
-
-\item{sample_id}{A vector of unique sample IDs of length corresponding to the
-number of columns in \code{counts}.}
+\item{sample_id}{A vector of unique sample IDs of length corresponding to
+  the number of columns in \code{counts}.}
 
 \item{group}{A vector that defines the goupping of samples.}
 }
 \value{
-Return \code{dmDSdata} object containing counts and sample
-  information.
+Returns \code{dmDSdata} object containing counts and sample
+   information \code{\linkS4class{dmDSdata}}.
 }
 \description{
-Create dmDSdata object from counts
+Create dmDSdata object from a table of counts
+}
+\examples{
+head(dataDS_counts)
+ dataDS_metadata
+
+ counts <- as.matrix(dataDS_counts[,-1])
+ group_id <- dataDS_counts[,1]
+ group_split <- limma::strsplit2(group_id, ":")
+ gene_id_counts <- group_split[, 1]
+ feature_id_counts <- group_split[, 2]
+ sample_id = dataDS_metadata$sample_id
+ group = dataDS_metadata$group
+
+ data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+ dmDSplotData(data)
 }
 

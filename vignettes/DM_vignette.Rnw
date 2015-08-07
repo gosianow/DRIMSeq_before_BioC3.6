@@ -1,0 +1,56 @@
+\documentclass{article}
+
+%\VignetteEngine{knitr::knitr}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+
+\bioctitle[Short title for headers]{Full title for title page}
+%% also: \bioctitle{Title used for both header and title page}
+%% or... \title{Title used for both header and title page}
+\author{Iman Author\footnote{iman@author.org}}
+
+
+\begin{document}
+\maketitle 
+\tableofcontents
+
+<<figureexample, fig.show='hide', fig.width=4.2, fig.height=4.6>>=
+v = seq(0, 60i, length=1000)
+plot(abs(v)*exp(v), type="l", col="Royalblue")
+@
+
+
+\incfig{figure/figureexample-1}{0.25\textwidth}{A curve.}
+{The code that creates this figure is shown in the code chunk.}
+
+
+\section{Tests}
+
+\R{} and \Bioconductor{} 
+
+
+
+\Biocpkg{IRanges} 
+
+\Rpackage{MyPkg} 
+
+
+
+\Rfunction{findOverlaps} for functions findOverlaps.
+
+\Robject{olaps} for variables olaps.
+
+\Rclass{GRanges} when referring to a formal class GRanges.
+
+\Rcode{log(x)} for R code, log(x).
+
+
+
+\fixme{incomplete functionality}
+
+\email{user@domain.com} 
+
+\end{document}
