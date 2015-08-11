@@ -1,6 +1,6 @@
 # counts = x@counts; genotypes = x@genotypes; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 0.10; BPPARAM = MulticoreParam(workers = 10)
 
-#' @importFrom edgeR cpm
+#' @importFrom edgeR DGEList cpm
 dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = MulticoreParam(workers = 1)){
 
 ########################################################
@@ -12,7 +12,7 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
   counts_for_cpm <- counts@unlistData
   counts_for_cpm[is.na(counts_for_cpm)] <- 0
   
-  counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
+  counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(edgeR::DGEList(counts_for_cpm)), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
   
   gene_list <- names(counts)
   
