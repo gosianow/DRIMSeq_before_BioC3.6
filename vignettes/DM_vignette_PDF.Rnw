@@ -7,50 +7,105 @@ BiocStyle::latex()
 @
 
 
-\bioctitle[Short title for headers]{Full title for title page}
+\bioctitle[Dirichlet-multinomial]{Dirichlet-multinomial framework for differential splicing and SQTL analysis.}
 %% also: \bioctitle{Title used for both header and title page}
 %% or... \title{Title used for both header and title page}
-\author{Iman Author\footnote{iman@author.org}}
+\author{Malgorzata Nowicka, Mark Robinson\footnote{gosia.nowicka@uzh.ch}}
 
 
 \begin{document}
 \maketitle 
 \tableofcontents
 
-<<figureexample, fig.show='hide', fig.width=4.2, fig.height=4.6>>=
-v = seq(0, 60i, length=1000)
-plot(abs(v)*exp(v), type="l", col="Royalblue")
+
+<<setup_knitr, include=FALSE, cache=FALSE>>=
+library(knitr)
+opts_chunk$set(cache = TRUE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.cutoff = 60), out.width = "8cm", out.height = "8cm", fig.align = "center")
+@
+
+\section{Dirichlet-multinomial workflow to detect differentiall splicing (DS) in RNA-seq data}
+
+Load \Rpackage{DM} package.
+
+<<library>>=
+library(DM)
 @
 
 
-\incfig{figure/figureexample-1}{0.25\textwidth}{A curve.}
-{The code that creates this figure is shown in the code chunk.}
+Create a \Rcode{dmDSdata} object that contains counts.
+
+<<dmDSdata>>=
+
+counts <- as.matrix(dataDS_counts[,-1])
+group_id <- dataDS_counts[,1]
+group_split <- limma::strsplit2(group_id, ":")
+gene_id_counts <- group_split[, 1]
+feature_id_counts <- group_split[, 2]
+sample_id = dataDS_metadata$sample_id
+group = dataDS_metadata$group
 
 
-\section{Tests}
+data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, 
+                 feature_id_counts = feature_id_counts, sample_id = sample_id, 
+                 group = group)
+dmDSplotData(data)
 
-\R{} and \Bioconductor{} 
-
-
-
-\Biocpkg{IRanges} 
-
-\Rpackage{MyPkg} 
+@
 
 
+Filter genes and transcripts with low expression.
 
-\Rfunction{findOverlaps} for functions findOverlaps.
-
-\Robject{olaps} for variables olaps.
-
-\Rclass{GRanges} when referring to a formal class GRanges.
-
-\Rcode{log(x)} for R code, log(x).
+<<dmDSfilter>>=
+data <- dmDSfilter(data)
+dmDSplotData(data)
+@
 
 
+Estimate dispersion.
 
-\fixme{incomplete functionality}
+<<dmDSdispersion>>=
+data <- dmDSdispersion(data)
+dmDSplotDispersion(data)
+@
 
-\email{user@domain.com} 
+
+Estimate proportions.
+
+
+
+<<dmDSfit, out.width = "16cm", fig.width = 14>>=
+data <- dmDSfit(data)
+
+dmDSplotFit(data, gene_id = "FBgn0032253", plot_type = "barplot")
+dmDSplotFit(data, gene_id = "FBgn0038922", plot_type = "barplot", plot_full = FALSE, plot_null = FALSE)
+@
+
+
+Use likelihood ratio to test for differential splicing.
+
+
+<<dmDStest>>=
+data <- dmDStest(data)
+
+dmDSplotTest(data)
+
+data@table
+@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}
