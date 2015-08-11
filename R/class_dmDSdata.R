@@ -118,6 +118,11 @@ setGeneric("dmDSfilter", function(x, ...) standardGeneric("dmDSfilter"))
 #'   should be between 0 and 1.
 #' @param max_features Maximum number of features that should be kept per gene.
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} object.
+#' @examples 
+#' data <- dataDS_dmDSdata
+#' dmDSplotData(data)
+#' data <- dmDSfilter(data)
+#' dmDSplotData(data)
 #' @export
 setMethod("dmDSfilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
@@ -145,7 +150,7 @@ setGeneric("dmDSplotData", function(x, ...) standardGeneric("dmDSplotData"))
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed.
 #' @param info \code{DataFrame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS). 
 #' @examples 
-#' dmDSplotData(dmDSdata)
+#' dmDSplotData(dataDS_dmDSdata)
 #' @export
 setMethod("dmDSplotData", "dmDSdata", function(x, out_dir = NULL, info = NULL){
   

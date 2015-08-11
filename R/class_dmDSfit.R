@@ -47,6 +47,10 @@ setGeneric("dmDSfit", function(x, ...) standardGeneric("dmDSfit"))
 #' @rdname dmDSfit
 #' @inheritParams dmDSdispersion
 #' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion", "common_dispersion"}
+#' @examples 
+#' data <- dataDS_dmDSdispersion
+#' data <- dmDSfit(data)
+#' dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
 #' @export
 setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
@@ -83,6 +87,11 @@ setGeneric("dmDSplotFit", function(x, ...) standardGeneric("dmDSplotFit"))
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
 #' @param plot_null Logical. Whether to plot the proportions estimated by the null model.
+#' @examples 
+#' data <- dataDS_dmDSdispersion
+#' data <- dmDSfit(data)
+#' dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
+#' dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot", plot_full = FALSE, plot_null = FALSE)
 #' @export
 setMethod("dmDSplotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   

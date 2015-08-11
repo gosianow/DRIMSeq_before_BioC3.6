@@ -104,6 +104,12 @@ setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' 
 #' @return Returns the \code{\linkS4class{dmDSdispersion}} object.
+#' @examples 
+#' data <- dataDS_dmDSdata
+#' data <- dmDSfilter(data)
+#' \donotrun{
+#' data <- dmDSdispersion(data)
+#' }
 #' @seealso \code{\link[BiocParallel]{bplapply}}
 #' @export
 setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
@@ -195,6 +201,8 @@ setGeneric("dmDSplotDispersion", function(x, ...) standardGeneric("dmDSplotDispe
 
 #' @rdname dmDSplotDispersion
 #' @inheritParams dmDSplotData
+#' @examples 
+#' dmDSplotDispersion(dataDS_dmDSdispersion)
 #' @export
 setMethod("dmDSplotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   

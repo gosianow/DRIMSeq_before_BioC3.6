@@ -79,13 +79,15 @@ use_data(dataDS_dmDSdata, overwrite = TRUE)
 data <- dataDS_dmDSdata
 dmDSplotData(data)
 
-
 data <- dmDSfilter(data)
 dmDSplotData(data)
 
 
-data <- dmDSdispersion(data)
+dataDS_dmDSdispersion <- dmDSdispersion(data)
 
+use_data(dataDS_dmDSdispersion, overwrite = TRUE)
+
+data <- dataDS_dmDSdispersion
 
 dmDSplotDispersion(data)
 
@@ -98,7 +100,6 @@ dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
 
 
 data <- dmDStest(data)
-
 
 dmDSplotTest(data)
 
