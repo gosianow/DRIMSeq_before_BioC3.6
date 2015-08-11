@@ -84,7 +84,7 @@ setGeneric("dmDSplotFit", function(x, ...) standardGeneric("dmDSplotFit"))
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
 #' @param plot_null Logical. Whether to plot the proportions estimated by the null model.
 #' @export
-setMethod("dmDSplotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_nunll = TRUE, out_dir = NULL){
+setMethod("dmDSplotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   
   
   dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full@proportions, proportions_null = x@fit_null@proportions, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, out_dir = out_dir)

@@ -10,7 +10,7 @@
 dmDSplotFit(x, ...)
 
 \S4method{dmDSplotFit}{dmDSfit}(x, gene_id, plot_type = "barplot",
-  order = TRUE, plot_full = TRUE, plot_nunll = TRUE, out_dir = NULL)
+  order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL)
 
 \S4method{dmDSplotFit}{dmDStest}(x, gene_id, plot_type = c("barplot",
   "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE,
@@ -29,9 +29,9 @@ dmDSplotFit(x, ...)
 
 \item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
 
-\item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
-
 \item{plot_null}{Logical. Whether to plot the proportions estimated by the null model.}
+
+\item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
 \description{
 Plot the estimated proportions.

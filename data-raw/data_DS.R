@@ -90,17 +90,21 @@ data <- dmDSdispersion(data)
 dmDSplotDispersion(data)
 
 
-data_fit <- dmDSfit(data, dispersion = "tagwise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers = 1))
+data <- dmDSfit(data)
+
+
+dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
 
 
 
-dmDSplotFit(data_fit, gene_id =   , plot_type = "barplot", order = TRUE, plot_full = FALSE, plot_nunll = FALSE)
+data <- dmDStest(data)
+
+
+dmDSplotTest(data)
 
 
 
-table <- dmDStest(data_fit)
 
 
-dmDSplotTest(table)
 
 

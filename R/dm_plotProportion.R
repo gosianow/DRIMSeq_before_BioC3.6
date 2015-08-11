@@ -63,16 +63,17 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
     prop_samp$sample_id <- factor(prop_samp$sample_id, levels = unique(prop_samp$sample_id[order_prop_samp]))
 
     width = 0.9
-
-    prop_est_full$xid <- as.numeric(prop_est_full$feature_id)
-    prop_est_full$group_prop <- prop_est_full$group
-    levels(prop_est_full$group_prop) <- group_counts/sum(group_counts)
-    prop_est_full$group_prop <- as.numeric(as.character(prop_est_full$group_prop))
-    prop_est_full$group_cumsum <- prop_est_full$group
-    levels(prop_est_full$group_cumsum) <- cumsum(group_counts)/sum(group_counts)
-    prop_est_full$group_cumsum <- as.numeric(as.character(prop_est_full$group_cumsum))
-    prop_est_full$x <- prop_est_full$xid - width/2 + prop_est_full$group_cumsum * width -prop_est_full$group_prop/2
-
+    
+    if(!is.null(pi_full)){
+      prop_est_full$xid <- as.numeric(prop_est_full$feature_id)
+      prop_est_full$group_prop <- prop_est_full$group
+      levels(prop_est_full$group_prop) <- group_counts/sum(group_counts)
+      prop_est_full$group_prop <- as.numeric(as.character(prop_est_full$group_prop))
+      prop_est_full$group_cumsum <- prop_est_full$group
+      levels(prop_est_full$group_cumsum) <- cumsum(group_counts)/sum(group_counts)
+      prop_est_full$group_cumsum <- as.numeric(as.character(prop_est_full$group_cumsum))
+      prop_est_full$x <- prop_est_full$xid - width/2 + prop_est_full$group_cumsum * width -prop_est_full$group_prop/2
+    }
 
     ggp <- ggplot() +
     theme_bw() + 
