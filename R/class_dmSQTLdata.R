@@ -1,4 +1,4 @@
-#' @importClassesFrom IRanges DataFrame
+#' @importClassesFrom S4Vectors DataFrame
 setClass("dmSQTLdata", 
   representation(counts = "MatrixList", 
     genotypes = "MatrixList", 
@@ -57,7 +57,7 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
   
   genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = IRanges::PartitioningByEnd(as.numeric(gene_id_genotypes), NG = nlevels(gene_id_genotypes), names = levels(gene_id_genotypes)) )
   
-  samples <- IRanges::DataFrame(sample_id = sample_id)
+  samples <- S4Vectors::DataFrame(sample_id = sample_id)
   
   data <- new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples)
   

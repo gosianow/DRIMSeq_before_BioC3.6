@@ -1,4 +1,4 @@
-#' @importClassesFrom IRanges DataFrame
+#' @importClassesFrom S4Vectors DataFrame
 setClass("dmSQTLtest", 
   contains = "dmSQTLfit",
   representation(table = "DataFrame"))

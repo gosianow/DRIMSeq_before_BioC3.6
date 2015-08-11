@@ -10,8 +10,8 @@ dmDSfit(x, ...)
 
 \S4method{dmDSfit}{dmDSdispersion}(x, dispersion = "tagwise_dispersion",
   prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
-  prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers =
-  1))
+  prop_tol = 1e-12, verbose = FALSE,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{x}{\code{\link{dmDSdispersion}} object or any that inherits from it i.e. \code{\link{dmDSfit}} or \code{\link{dmDStest}}.}

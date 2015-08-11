@@ -45,7 +45,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(new("dmFit", proportions = pi, statistics = IRanges::DataFrame(stats, row.names = rownames(stats))))
+           return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
            
          },
          
@@ -75,7 +75,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(new("dmFit", proportions = pi, statistics = IRanges::DataFrame(stats, row.names = rownames(stats))))
+           return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
            
            
          })

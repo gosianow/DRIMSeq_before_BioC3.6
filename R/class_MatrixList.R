@@ -160,7 +160,7 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
       elementMetadata <- do.call(rbind, lapply(tls, function(tl){
         # tl <- tls[[3]]
         if(is.null(tl@elementMetadata)){
-          el_meta <- IRanges::DataFrame(matrix(NA, length(tl@partitioning), dim_meta))
+          el_meta <- S4Vectors::DataFrame(matrix(NA, length(tl@partitioning), dim_meta))
           colnames(el_meta) <- names_meta[1, ]
           # if(!is.null(names(tl@partitioning)))
           #   rownames(el_meta) <- names(tl@partitioning)

@@ -19,7 +19,7 @@ dmDS_test <- function(stats_full, stats_null){
   
   adj_pvalue <- p.adjust(pvalue, method="BH")
   
-  table <- IRanges::DataFrame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, row.names = rownames(stats_full))
+  table <- S4Vectors::DataFrame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, row.names = rownames(stats_full))
 
   o <- order(table[, "pvalue"])
   table <- table[o,]

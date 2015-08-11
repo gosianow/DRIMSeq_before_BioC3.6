@@ -15,8 +15,8 @@ dmDSdispersion(x, ...)
   disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21,
   disp_grid_range = c(-10, 10), disp_moderation = "none",
   disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG",
-  prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers =
-  1))
+  prop_tol = 1e-12, verbose = FALSE,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmDSdispersion}{dmDSdispersion}(x, mean_expression = FALSE,
   common_dispersion = FALSE, tagwise_dispersion = TRUE,
@@ -25,7 +25,7 @@ dmDSdispersion(x, ...)
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
   disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
-  BPPARAM = MulticoreParam(workers = 1))
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{x}{\code{\link{dmDSdata}} or \code{\link{dmDSdispersion}} object of counts.}

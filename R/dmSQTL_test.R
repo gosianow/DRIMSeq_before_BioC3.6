@@ -19,7 +19,7 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = MulticoreParam(workers=1))
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     
-    tt <- IRanges::DataFrame(gene_id = g, snp_id = rownames(fit_full[[g]]@statistics), lr = lr, df = df, pvalue = pvalue, row.names = paste0(g, ":", rownames(fit_full[[g]]@statistics)))
+    tt <- S4Vectors::DataFrame(gene_id = g, snp_id = rownames(fit_full[[g]]@statistics), lr = lr, df = df, pvalue = pvalue, row.names = paste0(g, ":", rownames(fit_full[[g]]@statistics)))
     
     }, BPPARAM = BPPARAM)
   
