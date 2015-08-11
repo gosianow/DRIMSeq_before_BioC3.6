@@ -16,9 +16,15 @@ dmDStest(x, ...)
 \item{...}{Parameters needed for the likelihood ratio test.}
 }
 \value{
-This function returns a \code{\link{dmDStest}} object with sorted by significance \code{table} that contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+This function returns a \code{\link{dmDStest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 }
 \description{
 Likelihood ratio test between full and null model.
+}
+\examples{
+data <- dataDS_dmDSdispersion
+data <- dmDSfit(data)
+data <- dmDStest(data)
+dmDSplotTest(data)
 }
 

@@ -79,6 +79,13 @@ TODO: describe in detail all the methods...
 
 disp_tol: The accuracy defined as \code{tol} in \code{\link{optimize}} when \code{disp_mode = "optimize"}, as \code{factr} in \code{\link{optim}} when \code{disp_mode = "optim"}, as \code{reltol} in \code{\link{constrOptim}} when \code{disp_mode = "constrOptim"}.
 }
+\examples{
+data <- dataDS_dmDSdata
+data <- dmDSfilter(data)
+\\donotrun{
+data <- dmDSdispersion(data)
+}
+}
 \seealso{
 \code{\link[BiocParallel]{bplapply}}
 }

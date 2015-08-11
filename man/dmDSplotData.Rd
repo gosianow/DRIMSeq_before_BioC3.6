@@ -23,6 +23,6 @@ dmDSplotData(x, ...)
 Plots a histogram of number of features per gene.
 }
 \examples{
-dmDSplotData(dmDSdata)
+dmDSplotData(dataDS_dmDSdata)
 }
 

@@ -14,7 +14,7 @@ dmDSplotFit(x, ...)
 
 \S4method{dmDSplotFit}{dmDStest}(x, gene_id, plot_type = c("barplot",
   "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE,
-  plot_full = TRUE, plot_nunll = TRUE, out_dir = NULL)
+  plot_full = TRUE, plot_null = TRUE, out_dir = NULL)
 }
 \arguments{
 \item{x}{\code{\link{dmDSfit}} object or any that inherits from it i.e. \code{\link{dmDStest}}.}
@@ -35,5 +35,11 @@ dmDSplotFit(x, ...)
 }
 \description{
 Plot the estimated proportions.
+}
+\examples{
+data <- dataDS_dmDSdispersion
+data <- dmDSfit(data)
+dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
+dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot", plot_full = FALSE, plot_null = FALSE)
 }
 

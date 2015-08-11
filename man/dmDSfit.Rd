@@ -31,4 +31,9 @@ dmDSfit(x, ...)
 \description{
 Estimating the proportions and likelihoods of Dirichlet-multinomial full and null models.
 }
+\examples{
+data <- dataDS_dmDSdispersion
+data <- dmDSfit(data)
+dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
+}
 

@@ -20,4 +20,7 @@ dmDSplotDispersion(x, ...)
 \description{
 Plot the dispersion - mean trend.
 }
+\examples{
+dmDSplotDispersion(dataDS_dmDSdispersion)
+}
 
