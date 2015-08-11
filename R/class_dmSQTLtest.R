@@ -1,3 +1,4 @@
+#' @importClassesFrom IRanges DataFrame
 setClass("dmSQTLtest", 
   contains = "dmSQTLfit",
   representation(table = "DataFrame"))

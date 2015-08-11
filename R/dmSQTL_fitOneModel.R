@@ -65,7 +65,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
              stats <- do.call(rbind, lapply(ff, function(f) f$stats))
              
-             return(new("dmFit", proportions = pi, statistics = DataFrame(stats, row.names = rownames(stats))))
+             return(new("dmFit", proportions = pi, statistics = IRanges::DataFrame(stats, row.names = rownames(stats))))
              
              
            }, BPPARAM = BPPARAM))
@@ -115,7 +115,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
              stats <- do.call(rbind, lapply(ff, function(f) f$stats ))
              
-             return(new("dmFit", proportions = pi, statistics = DataFrame(stats, row.names = rownames(stats))))
+             return(new("dmFit", proportions = pi, statistics = IRanges::DataFrame(stats, row.names = rownames(stats))))
              
            }, BPPARAM = BPPARAM))
            

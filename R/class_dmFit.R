@@ -1,3 +1,4 @@
+#' @importClassesFrom IRanges DataFrame
 setClass("dmFit", 
   representation(
     proportions = "MatrixList",

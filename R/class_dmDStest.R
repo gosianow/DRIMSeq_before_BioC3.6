@@ -1,6 +1,7 @@
 #' Object that extends \code{dmDSfit} by adding the test.
 #' 
 #' @slot table DataFrame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @importClassesFrom IRanges DataFrame
 setClass("dmDStest", 
          contains = "dmDSfit",
          representation(table = "DataFrame"))

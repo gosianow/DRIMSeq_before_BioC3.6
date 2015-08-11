@@ -9,6 +9,7 @@ NULL
 #' 
 #' @slot counts \code{\linkS4class{MatrixList of counts}}.
 #' @slot samples DataFrame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
+#' @importClassesFrom IRanges DataFrame
 setClass("dmDSdata", 
          representation(counts = "MatrixList", samples = "DataFrame"))
 
@@ -62,7 +63,7 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   
   counts <- new("MatrixList", unlistData = unlistData, partitioning = IRanges::PartitioningByEnd(as.numeric(factor(gene_id_counts, levels = unique(gene_id_counts))), NG = length(unique(gene_id_counts)), names = unique(gene_id_counts)))
   
-  samples <- DataFrame(sample_id = sample_id, group = group)
+  samples <- IRanges::DataFrame(sample_id = sample_id, group = group)
   
   data <- new("dmDSdata", counts = counts, samples = samples)
   
