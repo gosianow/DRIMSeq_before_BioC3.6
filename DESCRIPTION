@@ -37,6 +37,7 @@ Collate:
     'dmDS_adjustmentCommon.R'
     'dmDS_estimateCommonDispersion.R'
     'dmDS_estimateTagwiseDispersion.R'
+    'dm_cpm.R'
     'dmDS_filter.R'
     'dmDS_fitOneModel.R'
     'dmDS_plotData.R'

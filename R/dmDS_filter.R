@@ -1,11 +1,13 @@
+#' @include dm_cpm.R
+NULL
+
 # data must be dmDSdata object
 # min_samps_gene_expr = 3; min_gene_expr = 1; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
 
-#' @importFrom edgeR DGEList cpm
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   ### calculate cpm
-  counts_cpm <- new("MatrixList", unlistData = edgeR::cpm(edgeR::DGEList(counts = counts@unlistData)), partitioning = counts@partitioning)
+  counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts@unlistData), partitioning = counts@partitioning)
   
   gene_list <- names(counts)
   
