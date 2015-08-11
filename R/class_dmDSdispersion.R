@@ -28,6 +28,7 @@ show_numeric <- function(object, nhead = 2, ntail = 2){
       out <- round(object, 2)
     } else {
       dots <- "... ..."
+      if(!is.null(names(object)))
       names(dots) <- "... ..."
       out <- c(round(head(object, nhead), 2), dots , round(tail(object, ntail), 2))
     }
@@ -105,7 +106,7 @@ setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 #' @return Returns the \code{\linkS4class{dmDSdispersion}} object.
 #' @seealso \code{\link[BiocParallel]{bplapply}}
 #' @export
-setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -142,7 +143,7 @@ setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, comm
 
 #' @rdname dmDSdispersion
 #' @export
-setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -176,6 +177,9 @@ setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALS
   
 })
 
+################################################################################
+### dmDSplotDispersion
+################################################################################
 
 
 #' Plot the dispersion - mean trend.
@@ -196,7 +200,7 @@ setMethod("dmDSplotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   
   # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts@partitioning); common_dispersion = x@common_dispersion
   
-  dmDS_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts@partitioning), common_dispersion = x@common_dispersion, out_dir = out_dir)
+  dmDS_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = IRanges::width(x@counts@partitioning), common_dispersion = x@common_dispersion, out_dir = out_dir)
   
 })
 

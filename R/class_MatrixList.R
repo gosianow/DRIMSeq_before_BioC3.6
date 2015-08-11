@@ -135,7 +135,7 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
   ends <- cumsum(do.call(c, lapply(tls, function(tl){
     # tl <- tls[[1]]
     
-    w <- width(tl@partitioning)
+    w <- IRanges::width(tl@partitioning)
     if(!is.null(names(tl@partitioning)))
       names(w) <- names(tl@partitioning)
     w

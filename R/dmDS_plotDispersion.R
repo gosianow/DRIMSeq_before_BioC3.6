@@ -15,7 +15,7 @@ dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features
     scale_colour_gradient(limits = c(1, df_quant), breaks = seq(1, df_quant, 1), low = "dodgerblue2", high="firebrick2", name = "Number of features", na.value = "firebrick2")
   
     if(!is.null(common_dispersion)){
-     ggp2 <- ggp2 + geom_hline(aes(yintercept = log10(common_dispersion)), colour = "black", linetype = "dashed", size =  0.5)
+     ggp2 <- ggp2 + geom_hline(yintercept = log10(common_dispersion), colour = "black", linetype = "dashed", size =  0.5)
     }
 
   if(!is.null(out_dir))

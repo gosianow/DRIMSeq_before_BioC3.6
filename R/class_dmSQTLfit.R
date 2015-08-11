@@ -26,7 +26,7 @@ setMethod("show", "dmSQTLfit", function(object){
 setGeneric("dmSQTLfit", function(x, ...) standardGeneric("dmSQTLfit"))
 
 
-setMethod("dmSQTLfit", "dmSQTLdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+setMethod("dmSQTLfit", "dmSQTLdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   # counts = x@counts; genotypes = x@genotypes; dispersion = slot(x, dispersion); model = "full"
    

@@ -267,7 +267,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
              
              trended={
               
-              mean_expression <- rep(mean_expression, width(genotypes@partitioning))[NAs]
+              mean_expression <- rep(mean_expression, IRanges::width(genotypes@partitioning))[NAs]
               o <- order(mean_expression)
               oo <- order(o)
               width <- floor(disp_span * nrow(loglik))

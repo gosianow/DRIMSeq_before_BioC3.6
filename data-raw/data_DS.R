@@ -1,6 +1,11 @@
 # Prepare data for examples and vignette 
 
 
+# library(devtools); library(GenomicRanges); library(BiocParallel); library(edgeR)
+
+
+# Rfiles <- list.files("R/", full.names=TRUE); for(i in Rfiles) source(i)
+
 
 ########################################################
 # load metadata
@@ -61,46 +66,28 @@ data_org <- DM::dmDSdata(counts = counts, gene_id_counts = gene_id_counts, featu
 dmDSplotData(data_org)
 
 
+dataDS_dmDSdata <- data_org
+
+use_data(dataDS_dmDSdata, overwrite = TRUE)
+
 
 ######################################
 # htseq counts: filtering
 ######################################
 
 
-min_samps_feature_prop_list <- 3
-min_feature_prop_list <- 0.01 # in cpm
-min_samps_gene_expr_list <- 6
-min_gene_expr_list <- 1
-max_features_list <- Inf
-
-
-i = 1
-
-min_samps_gene_expr = min_samps_gene_expr_list[i]
-min_gene_expr = min_gene_expr_list[i]
-min_samps_feature_prop = min_samps_feature_prop_list[i]
-min_feature_prop = min_feature_prop_list[i]
-max_features = max_features_list[i]
-
-
-data <- dmDSfilter(data_org, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features)
-
-
+data <- dataDS_dmDSdata
 dmDSplotData(data)
 
-dataDS_dmDSdata <- data
 
-use_data(dataDS_dmDSdata, overwrite = TRUE)
-
-
+data <- dmDSfilter(data)
+dmDSplotData(data)
 
 
+data <- dmDSdispersion(data)
 
 
-dispersion <- dmDSdispersion(data, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers = 2))
-
-
-dmDSplotDispersion(dispersion)
+dmDSplotDispersion(data)
 
 
 data_fit <- dmDSfit(data, dispersion = "tagwise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers = 1))

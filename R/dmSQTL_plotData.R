@@ -3,7 +3,7 @@
 dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
   
 
-  tt <- width(counts@partitioning)
+  tt <- IRanges::width(counts@partitioning)
   
   if(!is.null(out_dir))
   pdf(paste0(out_dir, "hist_feature_number.pdf")) 
@@ -19,7 +19,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
   
 
 
-  tt <- width(genotypes@partitioning)
+  tt <- IRanges::width(genotypes@partitioning)
   
   if(!is.null(out_dir))
   pdf(paste0(out_dir, "hist_snp_number.pdf"))

@@ -113,7 +113,7 @@ setMethod("names", "dmSQTLdata", function(x) names(data@counts) )
 setGeneric("dmSQTLfilter", function(x, ...) standardGeneric("dmSQTLfilter"))
 
 
-setMethod("dmSQTLfilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = MulticoreParam(workers = 1)){
+setMethod("dmSQTLfilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   # counts = x@counts; genotypes = x@genotypes; samples = x@samples
   

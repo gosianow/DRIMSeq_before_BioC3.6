@@ -18,7 +18,7 @@ setMethod("show", "dmSQTLtest", function(object){
 setGeneric("dmSQTLtest", function(x, ...) standardGeneric("dmSQTLtest"))
 
 
-setMethod("dmSQTLtest", "dmSQTLfit", function(x, BPPARAM = MulticoreParam(workers=1)){
+setMethod("dmSQTLtest", "dmSQTLfit", function(x, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   # fit_full = x@fit_full; fit_null = x@fit_null
   
