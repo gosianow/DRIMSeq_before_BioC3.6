@@ -10,7 +10,7 @@ Can be created with function \code{\link{dmDSdata}}.
 \section{Slots}{
 
 \describe{
-\item{\code{counts}}{\code{\linkS4class{MatrixList of counts}}.}
+\item{\code{counts}}{\code{\linkS4class{MatrixList}} of counts.}
 
 \item{\code{samples}}{DataFrame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
 }}

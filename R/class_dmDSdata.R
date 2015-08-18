@@ -2,25 +2,25 @@
 NULL
 
 
-
+##############################################################
 #' Object that contains counts and sample information.
 #' 
 #' Can be created with function \code{\link{dmDSdata}}.
 #' 
-#' @slot counts \code{\linkS4class{MatrixList of counts}}.
+#' @slot counts \code{\linkS4class{MatrixList}} of counts.
 #' @slot samples DataFrame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
 #' @importClassesFrom S4Vectors DataFrame
 setClass("dmDSdata", 
          representation(counts = "MatrixList", samples = "DataFrame"))
 
 
-
+##############################################################
 #'  Create dmDSdata object from a table of counts
 #'  
 #'  @param counts A numeric matrix of counts. Rows represent features (exons,
 #'    bins or transcripts), columns represent samples.
-#'  @param gene_id_counts, feature_id_counts Vectors of gene IDs and feature IDs
-#'    of lenght correspoding to the number of rows in \code{counts}.
+#'  @param gene_id_counts Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.
+#'  @param feature_id_counts Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.
 #'  @param sample_id A vector of unique sample IDs of length corresponding to
 #'    the number of columns in \code{counts}.
 #'  @param group A vector that defines the goupping of samples.
@@ -77,7 +77,7 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
 
 #   })
 
-
+##############################################################
 setMethod("show", "dmDSdata", function(object){
   
   cat("An object of class", class(object), "\n")
@@ -90,12 +90,11 @@ setMethod("show", "dmDSdata", function(object){
   
 })
 
-
-
-
+##############################################################
 setMethod("names", "dmDSdata", function(x) names(data@counts) )
 
 
+##############################################################
 #' Filtering.
 #' 
 #' Filtering of genes with low expression and features with low proportions.
@@ -107,7 +106,7 @@ setMethod("names", "dmDSdata", function(x) names(data@counts) )
 #' @export
 setGeneric("dmDSfilter", function(x, ...) standardGeneric("dmDSfilter"))
 
-
+##############################################################
 #' @rdname dmDSfilter
 #' @param min_samps_gene_expr Minimal number of samples where the genes should 
 #'   be expressed.
@@ -134,7 +133,7 @@ setMethod("dmDSfilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gen
   
 })
 
-
+##############################################################
 #' Plot the data information.
 #' 
 #' Plots a histogram of number of features per gene.
@@ -145,7 +144,7 @@ setMethod("dmDSfilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gen
 setGeneric("dmDSplotData", function(x, ...) standardGeneric("dmDSplotData"))
 
 
-
+##############################################################
 #' @rdname dmDSplotData
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed.
 #' @param info \code{DataFrame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS). 

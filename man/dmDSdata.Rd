@@ -10,8 +10,9 @@ dmDSdata(counts, gene_id_counts, feature_id_counts, sample_id, group)
 \item{counts}{A numeric matrix of counts. Rows represent features (exons,
   bins or transcripts), columns represent samples.}
 
-\item{gene_id_counts,}{feature_id_counts Vectors of gene IDs and feature IDs
-  of lenght correspoding to the number of rows in \code{counts}.}
+\item{gene_id_counts}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}
+
+\item{feature_id_counts}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
 
 \item{sample_id}{A vector of unique sample IDs of length corresponding to
   the number of columns in \code{counts}.}

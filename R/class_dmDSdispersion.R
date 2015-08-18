@@ -1,6 +1,6 @@
 setClassUnion("numericORNULL", c("numeric", "NULL"))
 
-
+##############################################################
 #' Object that extends \code{dmDSdata} by adding dipsersion.
 #' 
 #' @slot mean_expression Numeric vector of mean gene expression. When empty equals to NULL.
@@ -16,7 +16,7 @@ setClass("dmDSdispersion",
                    tagwise_dispersion = NULL))
 
 
-
+##############################################################
 show_numeric <- function(object, nhead = 2, ntail = 2){
   
   if(!is.null(object)){
@@ -67,7 +67,7 @@ setMethod("show", "dmDSdispersion", function(object){
 })
 
 
-
+##############################################################
 #' Estimating the dispersion in Dirichlet-multinomial model.
 #' 
 #' Function that is a wrapper for different optimazation methods used to estimate the dispersion parameters of Dirichlet-multinomial model with maximum likelihood. Parameters that are directly used in the dispersion estimation start with prefix \code{disp_} and the one that are used directly for the proportion estimation start with \code{prop_}.
@@ -82,7 +82,7 @@ setMethod("show", "dmDSdispersion", function(object){
 setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 
 
-
+##############################################################
 #' @rdname dmDSdispersion
 #' @param mean_expression Logical. Whether to estimate the mean expression of genes.
 #' @param common_dispersion Logical. Whether to estimate the common dispersion.
@@ -107,9 +107,14 @@ setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 #' @examples 
 #' data <- dataDS_dmDSdata
 #' data <- dmDSfilter(data)
-#' \donotrun{
+#' \dontrun{
 #' data <- dmDSdispersion(data)
 #' }
+#' \dontshow{
+#' data <- dataDS_dmDSdispersion
+#' }
+#' dmDSplotDispersion(data)
+#' 
 #' @seealso \code{\link[BiocParallel]{bplapply}}
 #' @export
 setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
@@ -146,7 +151,7 @@ setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, comm
   
 })
 
-
+##############################################################
 #' @rdname dmDSdispersion
 #' @export
 setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
@@ -187,7 +192,7 @@ setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALS
 ### dmDSplotDispersion
 ################################################################################
 
-
+##############################################################
 #' Plot the dispersion - mean trend.
 #' 
 #' @param x \code{\link{dmDSdispersion}} object or any that inherits from it i.e. \code{\link{dmDSfit}} or \code{\link{dmDStest}}.
@@ -198,7 +203,7 @@ setGeneric("dmDSplotDispersion", function(x, ...) standardGeneric("dmDSplotDispe
 
 
 
-
+##############################################################
 #' @rdname dmDSplotDispersion
 #' @inheritParams dmDSplotData
 #' @examples 

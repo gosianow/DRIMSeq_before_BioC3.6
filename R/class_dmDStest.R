@@ -1,4 +1,5 @@
-#' Object that extends \code{dmDSfit} by adding the test.
+################################################################################
+#' Object that extends \code{dmDSfit} by adding the test results.
 #' 
 #' @slot table DataFrame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' @importClassesFrom S4Vectors DataFrame
@@ -6,7 +7,7 @@ setClass("dmDStest",
          contains = "dmDSfit",
          representation(table = "DataFrame"))
 
-
+################################################################################
 setMethod("show", "dmDStest", function(object){
   
   callNextMethod(object)
@@ -17,7 +18,7 @@ setMethod("show", "dmDStest", function(object){
   
 })
 
-
+################################################################################
 #' Likelihood ratio test between full and null model.
 #' 
 #' @param x \code{\link{dmDStest}} object.
@@ -25,7 +26,7 @@ setMethod("show", "dmDStest", function(object){
 #' @export
 setGeneric("dmDStest", function(x, ...) standardGeneric("dmDStest"))
 
-
+################################################################################
 #' @rdname dmDStest
 #' @return This function returns a \code{\link{dmDStest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' @examples 
@@ -47,10 +48,6 @@ setMethod("dmDStest", "dmDSfit", function(x){
 
 
 ################################################################################
-### dmDSplotTest
-################################################################################
-
-
 #' Plot the histogram of p-values.
 #' 
 #' @param x \code{\link{dmDStest}} object.
@@ -60,7 +57,7 @@ setGeneric("dmDSplotTest", function(x, ...) standardGeneric("dmDSplotTest"))
 
 
 
-
+################################################################################
 #' @rdname dmDSplotTest
 #' @inheritParams dmDSplotFit
 #' @export
@@ -70,7 +67,7 @@ setMethod("dmDSplotTest", "dmDStest", function(x, out_dir = NULL){
   
 })
 
-
+################################################################################
 #' @rdname dmDSplotFit
 #' @export
 setMethod("dmDSplotFit", "dmDStest", function(x, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){

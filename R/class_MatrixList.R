@@ -1,10 +1,20 @@
 setClassUnion("matrixORNULL", c("matrix", "NULL"))
 
+
+##############################################################
+#' CompressedList object where unlistData is a matrix
+#' 
+#' 
 #' @importClassesFrom IRanges CompressedList
 setClass("MatrixList", contains = "CompressedList", representation(unlistData = "matrix"), prototype(elementType = "matrix"))
 
 ### Constructor:
 
+##############################################################
+#' Create a MatrixList object from a list of matrices
+#'
+#' @param ... A list of numeric matrices with the same number of columns. NULL is allowed.
+#' @export
 MatrixList <- function(...){
   
   listData <- list(...)

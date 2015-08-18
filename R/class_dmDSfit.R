@@ -2,10 +2,6 @@
 NULL
 
 ################################################################################
-### dmDSfit
-################################################################################
-
-
 #' Object that extends \code{dmDSdispersion} by adding fitting.
 #' 
 #' @slot dispersion Character specifying which type of dispersion was used for fitting.
@@ -17,7 +13,7 @@ setClass("dmDSfit",
                         fit_full = "dmFit",
                         fit_null = "dmFit"))
 
-
+################################################################################
 setMethod("show", "dmDSfit", function(object){
   
   callNextMethod(object)
@@ -34,7 +30,7 @@ setMethod("show", "dmDSfit", function(object){
   
 })
 
-
+################################################################################
 #' Estimating the proportions and likelihoods of Dirichlet-multinomial full and null models.
 #' 
 #' @param x \code{\link{dmDSdispersion}} object or any that inherits from it i.e. \code{\link{dmDSfit}} or \code{\link{dmDStest}}.
@@ -43,7 +39,7 @@ setMethod("show", "dmDSfit", function(object){
 setGeneric("dmDSfit", function(x, ...) standardGeneric("dmDSfit"))
 
 
-
+################################################################################
 #' @rdname dmDSfit
 #' @inheritParams dmDSdispersion
 #' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion", "common_dispersion"}
@@ -68,9 +64,6 @@ setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispers
 
 
 ################################################################################
-### dmDSplotFit
-################################################################################
-
 #' Plot the estimated proportions.
 #' 
 #' @param x \code{\link{dmDSfit}} object or any that inherits from it i.e. \code{\link{dmDStest}}.
@@ -79,7 +72,7 @@ setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispers
 setGeneric("dmDSplotFit", function(x, ...) standardGeneric("dmDSplotFit"))
 
 
-
+################################################################################
 #' @rdname dmDSplotFit
 #' @inheritParams dmDSplotDispersion
 #' @param gene_id Vector of gene IDs to be plotted.

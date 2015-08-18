@@ -2,7 +2,7 @@
 # multiple group fitting 
 ##############################################################################
 
-# counts=x@counts; genotypes=x@genotypes; dispersion=10; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+# counts=x@counts; genotypes=x@genotypes; dispersion = 38196.6; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
 
 # it returns a list of list(pi - MatrixList, stats - matrix)
 
@@ -14,7 +14,9 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
   if(class(dispersion) == "numeric" && length(dispersion) == 1){ 
     gamma0 <- rep(dispersion, nrow(genotypes@unlistData))
     names(gamma0) <- rownames(genotypes@unlistData)
-    gamma0 <- relist(gamma0, genotypes@partitioning)
+    # gamma0 <- IRanges::relist(gamma0, genotypes@partitioning) ### does not work, some problem with nchar...??
+    gamma0 <- IRanges::relist(gamma0, IRanges::PartitioningByEnd(cumsum(IRanges::width(genotypes@partitioning))))
+    names(gamma0) <- names(genotypes@partitioning)
   } else {
     gamma0 <- dispersion
   }

@@ -3,9 +3,9 @@
 \docType{class}
 \name{dmDStest-class}
 \alias{dmDStest-class}
-\title{Object that extends \code{dmDSfit} by adding the test.}
+\title{Object that extends \code{dmDSfit} by adding the test results.}
 \description{
-Object that extends \code{dmDSfit} by adding the test.
+Object that extends \code{dmDSfit} by adding the test results.
 }
 \section{Slots}{
 

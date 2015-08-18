@@ -293,9 +293,10 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         
         dispersion[NAs] <- disp_init * 2^out
         
-        dispersion <- relist(dispersion, genotypes@partitioning)
+        # dispersion <- IRanges::relist(dispersion, genotypes@partitioning) ### does not work, some problem with nchar...??
         
-        
+        dispersion <- IRanges::relist(dispersion, IRanges::PartitioningByEnd(cumsum(IRanges::width(genotypes@partitioning))))
+        names(dispersion) <- names(genotypes@partitioning)
         
       }))
 
