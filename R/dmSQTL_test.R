@@ -2,7 +2,7 @@
 #  group testing
 #######################################################
 
-dmSQTL_test <- function(fit_full, fit_null, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   ## calculate lr
   cat("Calculating likelihood ratio statistics.. \n")

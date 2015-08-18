@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   gene_list <- names(counts)
   

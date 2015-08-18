@@ -4,7 +4,7 @@
 ##############################################################################
 # gamma0 = 38196.6
 
-dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = MulticoreParam(workers=1)){
+dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   cat("Gamma in optimize:", gamma0, fill = TRUE)
   

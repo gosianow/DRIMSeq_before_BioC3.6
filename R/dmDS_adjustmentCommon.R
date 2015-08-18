@@ -2,7 +2,7 @@
 # adjustements to profile likelihood for common dispersion -> sum
 ##############################################################################
 
-dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = MulticoreParam(workers=1)){
+dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   gene_list <- names(counts)
 	

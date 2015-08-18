@@ -2,7 +2,7 @@
 # calculate common dispersion 
 ##############################################################################
 
-dm_estimateMeanExpression <- function(counts, BPPARAM = MulticoreParam(workers = 1)){
+dm_estimateMeanExpression <- function(counts, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
 	
   ### calculate mean expression of genes 
   cat("Calculating mean gene expression.. \n")

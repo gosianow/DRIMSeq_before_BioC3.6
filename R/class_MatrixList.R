@@ -135,7 +135,7 @@ setMethod("c", "MatrixList", function(x, ..., recursive = FALSE){
   else tls <- unname(list(x, ...))
   if (!all(sapply(tls, is, "MatrixList")))
     stop("all arguments in '...' must be MatrixList objects")
-  ecs <- sapply(tls, elementType)
+  ecs <- sapply(tls, S4Vectors::elementType)
   if (!all(sapply(ecs, extends, ecs[[1L]])))
     stop("all arguments in '...' must have an element class that extends that of the first argument")
   

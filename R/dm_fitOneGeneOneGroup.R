@@ -74,7 +74,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            pi_initOrg <- pi_init <- rowSums(y)/sum(y)
            piMAX <- pi <- pi_init[-k]
            lik1 <- 0
-           likMAX <- lik2 <- dmLogLikkm1(pi, gamma0, y)
+           likMAX <- lik2 <- dm_lik(pi, gamma0, y)
            ite <- 1
            conv <- TRUE 
            
@@ -83,7 +83,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
              piX <- piX[c(-1, -length(piX))]
              loglikY <- rep(0, length(piX))
              for(i in 1:length(loglikY))
-               loglikY[i] <- dmLogLikkm1(piX[i], gamma0, y)
+               loglikY[i] <- dm_lik(piX[i], gamma0, y)
              
              plot(piX, loglikY, type="l", col="deeppink", lwd=4, main = gamma0)
              abline(v = pi, lty =  3)
@@ -118,9 +118,9 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
                ### generate new starting params
                #         randInit <- runif(k)
                #         pi_init <- randInit/sum(randInit)
-               pi_init <- rdirichlet(1, pi_initOrg*10)
+               pi_init <- dm_rdirichlet(1, pi_initOrg*10)
                while(any(pi_init < 1e-10))
-                 pi_init <- rdirichlet(1, pi_initOrg*10)
+                 pi_init <- dm_rdirichlet(1, pi_initOrg*10)
                cat("pi_init:", pi_init, fill = T)
                pi <- pi_init[-k]
              }
