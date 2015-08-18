@@ -89,7 +89,7 @@ setGeneric("dmSQTLplotFit", function(x, ...) standardGeneric("dmSQTLplotFit"))
 #' @inheritParams dmDSplotFit
 #' @param snp_id Vector of SNP IDs to be plotted.
 #' @export
-setMethod("dmSQTLplotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_nunll = TRUE, out_dir = NULL){
+setMethod("dmSQTLplotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   
   # counts = x@counts; genotypes = x@genotypes; samples = x@samples; dispersion = slot(x, x@dispersion); fit_full = x@fit_full; fit_null = x@fit_null; table = NULL
   

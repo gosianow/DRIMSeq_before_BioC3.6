@@ -10,8 +10,9 @@ License: GPL (>= 2)
 Imports:
     methods,
     BiocParallel,
+    S4Vectors,
+    IRanges,
     GenomicRanges,
-    limma,
     edgeR,
     ggplot2,
     reshape2

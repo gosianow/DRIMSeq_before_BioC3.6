@@ -31,6 +31,7 @@ setGeneric("dmSQTLtest", function(x, ...) standardGeneric("dmSQTLtest"))
 
 ################################################################################
 #' @rdname dmSQTLtest
+#' @inheritParams dmSQTLfit
 #' @return This function returns a \code{\link{dmSQTLtest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' @examples 
 #' data <- dataSQTL_dmSQTLdispersion
@@ -44,7 +45,7 @@ setGeneric("dmSQTLtest", function(x, ...) standardGeneric("dmSQTLtest"))
 #' dmSQTLplotFit(data, gene_id, snp_id)
 #' 
 #' @export
-setMethod("dmSQTLtest", "dmSQTLfit", function(x, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+setMethod("dmSQTLtest", "dmSQTLfit", function(x, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   # fit_full = x@fit_full; fit_null = x@fit_null
   
