@@ -108,7 +108,8 @@ setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 #' data <- dataDS_dmDSdata
 #' data <- dmDSfilter(data)
 #' \dontrun{
-#' data <- dmDSdispersion(data)
+#' ### This part is quite time consuming thus if possible, increase the number of cores.
+#' data <- dmDSdispersion(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
 #' }
 #' \dontshow{
 #' data <- dataDS_dmDSdispersion

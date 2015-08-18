@@ -63,9 +63,9 @@ setGeneric("dmSQTLdispersion", function(x, ...) standardGeneric("dmSQTLdispersio
 #' dmSQTLplotData(data)
 #' 
 #' \dontrun{
-#' data <- dmSQTLdispersion(data)
+#' ### This part is quite time consuming thus if possible, increase the number of cores.
+#' data <- dmSQTLdispersion(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
 #' }
-#' 
 #' \dontshow{
 #' data <- dataSQTL_dmSQTLdispersion
 #' }
