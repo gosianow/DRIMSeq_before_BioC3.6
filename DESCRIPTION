@@ -20,9 +20,9 @@ LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr
 Suggests:
+    limma,
     BiocStyle,
-    knitr,
-    rmarkdown
+    knitr
 Collate:
     'DM.R'
     'class_MatrixList.R'

@@ -15,6 +15,8 @@ dmSQTLtest(x, ...)
 \item{x}{\code{\link{dmSQTLtest}} object.}
 
 \item{...}{Parameters needed for the likelihood ratio test.}
+
+\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
 This function returns a \code{\link{dmSQTLtest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.

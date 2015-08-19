@@ -1,6 +1,8 @@
-\documentclass{article}
-
+%\VignetteIndexEntry{User guide of DM}
+%\VignettePackage{DM}
 %\VignetteEngine{knitr::knitr}
+
+\documentclass{article}
 
 <<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
