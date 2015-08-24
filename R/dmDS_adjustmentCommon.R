@@ -2,9 +2,9 @@
 # adjustements to profile likelihood for common dispersion -> sum
 ##############################################################################
 
-dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  gene_list <- names(counts)
+  inds <- 1:length(counts)
 	
   group <- samples$group
   ngroups <- nlevels(group)
@@ -13,8 +13,8 @@ dmDS_adjustmentCommon <- function(gamma0, counts, samples, pi, BPPARAM = BiocPar
   igroups <- lapply(lgroups, function(gr){which(group == gr)})
   names(igroups) <- lgroups
   
-  adj <- BiocParallel::bplapply(gene_list, function(g){  
-		# g = gene_list[1]
+  adj <- BiocParallel::bplapply(inds, function(g){  
+		# g = 1
     
     if(any(is.na(pi[[g]]))) 
 			return(NA)

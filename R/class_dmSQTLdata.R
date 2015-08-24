@@ -2,22 +2,23 @@
 NULL
 
 ##############################################################
+
 #' Object that contains counts, genotypes and sample information.
 #' 
 #' Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdataFromRanges}}.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}}  of counts.
 #' @slot genotypes \code{\linkS4class{MatrixList}} with genotypes.
-#' @slot samples DataFrame with information about samples. Contains unique sample names (\code{sample_id}). 
-#' @importClassesFrom S4Vectors DataFrame
+#' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}). 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
-                        samples = "DataFrame"))
+                        samples = "data.frame"))
 
 
 
 ##############################################################
+
 #'  Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes
 #'  
 #'  @inheritParams dmDSdata
@@ -29,21 +30,24 @@ setClass("dmSQTLdata",
 #'  @export
 dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gene_id_genotypes, snp_id_genotypes, sample_id){
   
-  stopifnot( class( counts ) %in% c("matrix"))
+  stopifnot( class( counts ) %in% c("matrix", "data.frame"))
+  counts <- as.matrix(counts)
   stopifnot( mode( counts ) %in% c("numeric"))
   counts <- ceiling(counts)
   
-  stopifnot( class( gene_id_counts ) %in% c("character"))
-  stopifnot( class( feature_id_counts ) %in% c("character"))
+  stopifnot( class( gene_id_counts ) %in% c("character", "factor"))
+  stopifnot( class( feature_id_counts ) %in% c("character", "factor"))
   stopifnot( length(gene_id_counts) == length( feature_id_counts ) )
   
-  stopifnot( class( genotypes ) %in% c("matrix"))
+  stopifnot( class( genotypes ) %in% c("matrix", "data.frame"))
+  genotypes <- as.matrix(genotypes)
+  stopifnot( mode( genotypes ) %in% c("numeric"))
   
-  stopifnot( class( gene_id_genotypes ) %in% c("character"))
-  stopifnot( class( snp_id_genotypes ) %in% c("character"))
+  stopifnot( class( gene_id_genotypes ) %in% c("character", "factor"))
+  stopifnot( class( snp_id_genotypes ) %in% c("character", "factor"))
   stopifnot( length(gene_id_genotypes) == length( snp_id_genotypes ) )
   
-  stopifnot( class( sample_id ) %in% c("character"))
+  stopifnot( class( sample_id ) %in% c("character", "factor"))
   
   ### keep genes that are in counts and in genotypes
   
@@ -57,16 +61,25 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
   gene_id_genotypes <- gene_id_genotypes[genes2keep]
   snp_id_genotypes <- snp_id_genotypes[genes2keep]
   
-  ### order genes in genotypes as in counts
   
-  gene_id_genotypes <- factor(gene_id_genotypes, levels = unique(gene_id_counts))
+  
+  ### order genes in counts and in genotypes
+  if(class(gene_id_counts) == "character")
   gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
   
+  order_counts <- order(gene_id_counts)
+  counts <- counts[order_counts, , drop = FALSE]
+  gene_id_counts <- gene_id_counts[order_counts]
+  feature_id_counts <- feature_id_counts[order_counts]
   
+  
+  gene_id_genotypes <- factor(gene_id_genotypes, levels = levels(gene_id_counts))
+
   order_genotypes <- order(gene_id_genotypes)
   genotypes <- genotypes[order_genotypes, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[order_genotypes]
   snp_id_genotypes <- snp_id_genotypes[order_genotypes]
+  
   
   colnames(counts) <- sample_id
   rownames(counts) <- feature_id_counts
@@ -74,11 +87,15 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
   colnames(genotypes) <- sample_id
   rownames(genotypes) <- snp_id_genotypes
   
-  counts <- new( "MatrixList", unlistData = counts, partitioning = IRanges::PartitioningByEnd(as.numeric(gene_id_counts), NG = nlevels(gene_id_counts), names = levels(gene_id_counts)) )
+  partitioning_counts <- split(1:length(gene_id_counts), gene_id_counts)
+  partitioning_genotypes <- split(1:length(gene_id_genotypes), gene_id_genotypes)
   
-  genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = IRanges::PartitioningByEnd(as.numeric(gene_id_genotypes), NG = nlevels(gene_id_genotypes), names = levels(gene_id_genotypes)) )
   
-  samples <- S4Vectors::DataFrame(sample_id = sample_id)
+  counts <- new( "MatrixList", unlistData = counts, partitioning = partitioning_counts)
+  
+  genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = partitioning_genotypes)
+  
+  samples <- data.frame(sample_id = sample_id)
   
   data <- new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples)
   
@@ -173,19 +190,21 @@ setMethod("show", "dmSQTLdata", function(object){
   print(object@genotypes)
   
   cat("\nSlot \"samples\":\n")
-  print(object@samples)
+  show_matrix(object@samples)
   
 })
 
 
 
 ##############################################################
-setMethod("names", "dmSQTLdata", function(x) names(data@counts) )
+
+setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 
 
 
 
 ##############################################################
+
 #' Filtering.
 #' 
 #' Two step filtering. First, for counts - filtering of genes with low expression and features with low proportions. Second, for genotypes - filtering genotypes with too low monor allel frequency.

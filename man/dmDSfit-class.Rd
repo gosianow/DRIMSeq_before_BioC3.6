@@ -12,8 +12,8 @@ Object that extends \code{dmDSdispersion} by adding fitting.
 \describe{
 \item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting.}
 
-\item{\code{fit_full}}{\code{\linkS4class{dmFit}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.}
+\item{\code{fit_full}}{\code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.}
 
-\item{\code{fit_null}}{\code{\linkS4class{dmFit}} object containing the pooled proportions of feature expression and null model likelihoods and degrees of freedom.}
+\item{\code{fit_null}}{\code{\linkS4class{MatrixList}} object containing the pooled proportions of feature expression and null model likelihoods and degrees of freedom.}
 }}
 

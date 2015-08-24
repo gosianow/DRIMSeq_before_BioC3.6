@@ -1,18 +1,17 @@
 #' @include dm_cpm.R
 NULL
 
-# data must be dmDSdata object
-# min_samps_gene_expr = 3; min_gene_expr = 1; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
+# counts = x@counts; samples = x@samples; min_samps_gene_expr = 3; min_gene_expr = 1; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
 
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   ### calculate cpm
   counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts@unlistData), partitioning = counts@partitioning)
   
-  gene_list <- names(counts)
+  inds <- which(width(counts) > 1)
   
-  counts_new <- lapply(gene_list, function(g){
-    # g = "FBgn0000008"
+  counts_new <- lapply(inds, function(g){
+    # g = "ENSG00000162542"
     # print(g)
     expr_cpm_gene <- counts_cpm[[g]]
     expr_gene <- counts[[g]]
@@ -53,7 +52,8 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     
   })
   
-  names(counts_new) <- names(counts)
+  names(counts_new) <- names(counts)[inds]
+  counts_new <- counts_new[!sapply(counts_new, is.null)]
   counts_new <- MatrixList(counts_new)
   
   data <- new("dmDSdata", counts = counts_new, samples = samples)

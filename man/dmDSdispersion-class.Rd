@@ -10,9 +10,9 @@ Object that extends \code{dmDSdata} by adding dipsersion.
 \section{Slots}{
 
 \describe{
-\item{\code{mean_expression}}{Numeric vector of mean gene expression. When empty equals to NULL.}
+\item{\code{mean_expression}}{Numeric vector of mean gene expression.}
 
-\item{\code{common_dispersion}}{Numeric or NULL when not estimated.}
+\item{\code{common_dispersion}}{Numeric value of estimated common dispersion.}
 
 \item{\code{tagwise_dispersion}}{Numeric vector of estimated tagwise dispersion.}
 }}

@@ -2,25 +2,23 @@
 # multiple group fitting 
 ##############################################################################
 
-# counts=x@counts; genotypes=x@genotypes; dispersion = 38196.6; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = MulticoreParam(workers=10)
+# counts=x@counts; genotypes=x@genotypes; dispersion = 38196.6; model = c("full", "null")[1]; prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose=FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
-# it returns a list of list(pi - MatrixList, stats - matrix)
+# it returns a list of MatrixLists; unlistData = pi, metadata = stats
 
 
-dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  gene_list <- names(counts)
+  inds <- 1:length(counts)
   
-  if(class(dispersion) == "numeric" && length(dispersion) == 1){ 
-    gamma0 <- rep(dispersion, nrow(genotypes@unlistData))
-    names(gamma0) <- rownames(genotypes@unlistData)
-    # gamma0 <- IRanges::relist(gamma0, genotypes@partitioning) ### does not work, some problem with nchar...??
-    gamma0 <- IRanges::relist(gamma0, IRanges::PartitioningByEnd(cumsum(IRanges::width(genotypes@partitioning))))
-    names(gamma0) <- names(genotypes@partitioning)
+  if(class(dispersion) == "numeric"){ 
+    gamma0 <- relist(rep(dispersion, nrow(genotypes)), genotypes@partitioning)
   } else {
     gamma0 <- dispersion
   }
   
+  lgroups_g <- levels(factor(unique(as.numeric(genotypes@unlistData[!is.na(genotypes@unlistData)]))))
+  ngroups_g <- length(lgroups_g)
   
   switch(model, 
          
@@ -28,53 +26,55 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            
            cat("Fitting full model.. \n")
            
-           time <- system.time(fff <- BiocParallel::bplapply(gene_list, function(g){
-             # g = "ENSG00000131037.8"; y = counts[[g]]; snps = genotypes[[g]]
+           time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
+             # g = 1; y = counts[[g]]; snps = genotypes[[g]]
              
              y = counts[[g]]
+             n_y <- nrow(y)
              snps = genotypes[[g]]
-             # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
+             n_snps <- nrow(snps)
+             names_snps <- rownames(snps)
              
-             ff <- lapply(rownames(snps), function(i){
-               # i = rownames(snps)[3]
-               
-               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-               yg <- y[, !NAs]             
-               group <- snps[i, !NAs]
-               group <- factor(group)
-               ngroups <- nlevels(group)
-               lgroups <- levels(group)
-               nlibs <- length(group)
-               
-               igroups <- lapply(lgroups, function(gr){which(group == gr)})
-               names(igroups) <- lgroups
-               
-               f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                             gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
-               
-               return(f)
-               
-             })
+             pi <- matrix(NA, nrow = n_y * n_snps, ncol = ngroups_g, dimnames = list(rep(rownames(y), n_snps), lgroups_g))
+             stats <- matrix(NA, n_snps, 2, dimnames = list(names_snps, c("lik", "df")))
              
-             names(ff) <- rownames(snps)
+             for(i in 1:n_snps){          
+              # i = 1
+              
+              # print(i)
+              
+              NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+              yg <- y[, !NAs]             
+              group <- snps[i, !NAs]
+              group <- factor(group)
+              ngroups <- nlevels(group)
+              lgroups <- levels(group)
+              nlibs <- length(group)
+              
+              igroups <- lapply(lgroups, function(gr){which(group == gr)})
+              names(igroups) <- lgroups
+              
+              f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+                                            gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
+              
+              ipi <- (i-1)*n_y + 1
+              
+              pi[ipi:(ipi+n_y-1), lgroups] <- f$pi
+              stats[i, ] <- f$stats
+              
+             }
              
-             pi <- MatrixList(lapply(ff, function(f){
-              # print(f$pi)
-              pp <- matrix(NA, nrow = nrow(f$pi), ncol = 3, dimnames = list(rownames(f$pi), 0:2)) 
-              pp[, colnames(f$pi)] <- f$pi
-              pp
-              }))
+             partitioning <- split(1:nrow(pi), factor(rep(names_snps, each = n_y), levels = names_snps))
              
-             stats <- do.call(rbind, lapply(ff, function(f) f$stats))
+             ff <- new("MatrixList", unlistData = pi, partitioning = partitioning, metadata = stats)
              
-             return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
+             return(ff)
              
-             
+              
            }, BPPARAM = BPPARAM))
            
            cat("Took ", time["elapsed"], " seconds.\n")
-           names(fff) <- gene_list
-           
+           names(fff) <- names(counts)  
            
            return(fff)
            
@@ -84,45 +84,54 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            
            cat("Fitting null model.. \n")
            
-           time <- system.time(fff <- BiocParallel::bplapply(gene_list, function(g){
-             # g = gene_list[1]; y = counts[[g]]; snps = genotypes[[g]]
+           time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
+             # g = 1; y = counts[[g]]; snps = genotypes[[g]]
              
              y = counts[[g]]
+             n_y <- nrow(y)
              snps = genotypes[[g]]
-             # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
+             n_snps <- nrow(snps)
+             names_snps <- rownames(snps)
+             
+             pi <- matrix(NA, nrow = n_y * n_snps, ncol = 1, dimnames = list(rep(rownames(y), n_snps), "null"))
+             stats <- matrix(NA, n_snps, 2, dimnames = list(names_snps, c("lik", "df")))
              
              groupg <- factor(rep("null", ncol(y)))
              ngroups <- 1
-             lgroups <- "null"	 
+             lgroups <- "null"  
              
-             ff <- lapply(rownames(snps), function(i){
-               # i = rownames(snps)[3]
-               
-               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-               yg <- y[, !NAs]             
-               group <- groupg[!NAs]
-               nlibs <- sum(!NAs)              
-               igroups <- list(null = 1:nlibs)
-               
-               f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                         gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
-               
-               return(f)
-               
-             })
+             for(i in 1:n_snps){          
+              # i = 1
+              # print(i)
+              
+              NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
+              yg <- y[, !NAs]             
+              group <- groupg[!NAs]
+              nlibs <- sum(!NAs)
+              
+              igroups <- list(null = 1:nlibs)
+              
+              f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+                                            gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
+              
+              ipi <- (i-1)*n_y + 1
+              
+              pi[ipi:(ipi+n_y-1), ] <- f$pi
+              stats[i, ] <- f$stats
+              
+             }
              
-             names(ff) <- rownames(snps)
+             partitioning <- split(1:nrow(pi), factor(rep(names_snps, each = n_y), levels = names_snps))
              
-             pi <- MatrixList(lapply(ff, function(f) f$pi ))
+             ff <- new("MatrixList", unlistData = pi, partitioning = partitioning, metadata = stats)
              
-             stats <- do.call(rbind, lapply(ff, function(f) f$stats ))
+             return(ff)
              
-             return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
              
            }, BPPARAM = BPPARAM))
            
            cat("Took ", time["elapsed"], " seconds.\n")
-           names(fff) <- gene_list
+           names(fff) <- names(counts)
            
            
            return(fff)

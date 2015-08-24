@@ -10,6 +10,6 @@ Object that extends \code{dmSQTLfit} by adding the test results.
 \section{Slots}{
 
 \describe{
-\item{\code{table}}{DataFrame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
+\item{\code{table}}{data.frame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
 

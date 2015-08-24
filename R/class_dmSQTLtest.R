@@ -1,11 +1,11 @@
 ################################################################################
+
 #' Object that extends \code{dmSQTLfit} by adding the test results.
 #' 
-#' @slot table DataFrame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
-#' @importClassesFrom S4Vectors DataFrame
+#' @slot table data.frame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 setClass("dmSQTLtest", 
          contains = "dmSQTLfit",
-         representation(table = "DataFrame"))
+         representation(table = "data.frame"))
 
 ################################################################################
 setMethod("show", "dmSQTLtest", function(object){
@@ -13,7 +13,7 @@ setMethod("show", "dmSQTLtest", function(object){
   callNextMethod(object)
   
   cat("\nSlot \"table\":\n")
-  print(object@table)
+  show_matrix(object@table)
   
   
 })
@@ -84,6 +84,7 @@ setMethod("dmSQTLplotTest", "dmSQTLtest", function(x, out_dir = NULL){
 #' @export
 setMethod("dmSQTLplotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   
+  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
   dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = x@fit_null, table = x@table, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, out_dir = out_dir)
   

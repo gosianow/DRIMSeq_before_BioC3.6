@@ -3,8 +3,17 @@
 \docType{class}
 \name{MatrixList-class}
 \alias{MatrixList-class}
-\title{CompressedList object where unlistData is a matrix}
+\title{MatrixList container}
 \description{
-CompressedList object where unlistData is a matrix
+MatrixList container
 }
+\section{Slots}{
+
+\describe{
+\item{\code{unlistData}}{Matrix data}
+
+\item{\code{partitioning}}{List with indexes of each submatrix}
+
+\item{\code{metadata}}{Matrix of additional information}
+}}
 

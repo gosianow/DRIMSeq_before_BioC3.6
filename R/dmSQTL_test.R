@@ -2,24 +2,25 @@
 #  group testing
 #######################################################
 
-dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
   cat("Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
   
+  inds <- 1:length(fit_full)
   gene_list <- names(fit_full)
   
-  table_list <- BiocParallel::bplapply(gene_list, function(g){
+  table_list <- BiocParallel::bplapply(inds, function(g){
     # g = "ENSG00000131037.8"
     
-    lr <- 2*(fit_full[[g]]@statistics[, "lik"] - fit_null[[g]]@statistics[, "lik"])
+    lr <- 2*(fit_full[[g]]@metadata[, "lik"] - fit_null[[g]]@metadata[, "lik"])
     
-    df <- fit_full[[g]]@statistics[, "df"] - fit_null[[g]]@statistics[, "df"]
+    df <- fit_full[[g]]@metadata[, "df"] - fit_null[[g]]@metadata[, "df"]
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     
-    tt <- S4Vectors::DataFrame(gene_id = g, snp_id = rownames(fit_full[[g]]@statistics), lr = lr, df = df, pvalue = pvalue, row.names = paste0(g, ":", rownames(fit_full[[g]]@statistics)))
+    tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, row.names = paste0(gene_list[g], ":", rownames(fit_full[[g]]@metadata)), stringsAsFactors = FALSE)
     
     }, BPPARAM = BPPARAM)
   

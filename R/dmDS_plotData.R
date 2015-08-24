@@ -2,7 +2,7 @@
 
 dmDS_plotData <- function(counts, out_dir = NULL, info = NULL){
 
-  tt <- IRanges::width(counts@partitioning)
+  tt <- width(counts)
   
   if(!is.null(out_dir))
   pdf(paste0(out_dir, "hist_feature_number.pdf"))

@@ -1,7 +1,7 @@
 #' @include dm_cpm.R
 NULL
 
-# counts = x@counts; genotypes = x@genotypes; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 0.10; BPPARAM = MulticoreParam(workers = 10)
+# counts = x@counts; genotypes = x@genotypes; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 0.10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
 
 dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
 
@@ -16,10 +16,10 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
   
   counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
   
-  gene_list <- names(counts)
+  inds <- which(width(counts) > 1)
   
-  counts_new <- lapply(gene_list, function(g){
-    # g = "ENSG00000008130.10"
+  counts_new <- lapply(inds, function(g){
+    # g = 1
     # print(g)
     expr_cpm_gene <- counts_cpm[[g]]
     expr_gene <- counts[[g]]
@@ -61,7 +61,9 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
     
     })
 
-names(counts_new) <- names(counts)
+names(counts_new) <- names(counts)[inds]
+NULLs <- !sapply(counts_new, is.null)
+counts_new <- counts_new[NULLs]
 counts_new <- MatrixList(counts_new)
 
 ########################################################
@@ -70,12 +72,13 @@ counts_new <- MatrixList(counts_new)
 
 minor_allel_nr <- ceiling(minor_allel_freq * nrow(samples))
 
-gene_list <- names(counts_new)
+genotypes <- genotypes[inds[NULLs]]
 
-genotypes_new <- BiocParallel::bplapply(gene_list, function(g){ 
-  # g <- gene_list[1]; print(g)
 
-  counts_gene <- counts[[g]]
+genotypes_new <- BiocParallel::bplapply(1:length(counts_new), function(g){ 
+  # g = 1
+
+  counts_gene <- counts_new[[g]]
   genotypes_gene <- genotypes[[g]]
 
   ## NA for samples with non expressed genes and missing genotype
@@ -83,7 +86,7 @@ genotypes_new <- BiocParallel::bplapply(gene_list, function(g){
   genotypes_gene[genotypes_gene == -1] <- NA
 
   ##### Keep genotypes with at least minor_allel_nr number of variants per group; in other case replace them with NAs
-  genotypes_gene <- apply(genotypes_gene, 1 ,function(x){
+  genotypes_gene <- apply(genotypes_gene, 1, function(x){
     # x <- genotypes_gene[6,]
 
     tt <- table(x)
@@ -113,16 +116,19 @@ genotypes_new <- BiocParallel::bplapply(gene_list, function(g){
 
   }, BPPARAM = BPPARAM)
 
-names(genotypes_new) <- gene_list
+names(genotypes_new) <- names(genotypes)
+NULLs <- !sapply(genotypes_new, is.null)
+genotypes_new <- genotypes_new[NULLs]
 genotypes_new <- MatrixList(genotypes_new)
-counts_new <- counts_new[names(genotypes_new)]
+counts_new <- counts_new[NULLs]
 
 data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, samples = samples)
+
+# all(names(data@counts) == names(data@genotypes))
 
 return(data)
 
 }
-
 
 
 

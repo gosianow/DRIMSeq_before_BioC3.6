@@ -5,13 +5,13 @@
 
 # gamma0 = 38196.6; counts = x@counts; samples = x@samples; disp_adjust = TRUE; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
-dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   cat("Gamma in optimize:", gamma0, fill = TRUE)
 	
   fit_full <- dmDS_fitOneModel(counts = counts, samples = samples, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
 
-  lik <- sum(fit_full@statistics[, "lik"], na.rm = TRUE)
+  lik <- sum(fit_full@metadata[, "lik"], na.rm = TRUE) 
   
   cat("lik:", lik, fill = TRUE)
   # message("lik:", lik, "\n")
@@ -20,7 +20,7 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
     return(lik)
 
   ## Cox-Reid adjustement for common dispersion
-  adj <- dmDS_adjustmentCommon(gamma0, counts = counts, samples = samples, pi = fit_full@proportions, BPPARAM = BPPARAM)
+  adj <- dmDS_adjustmentCommon(gamma0, counts = counts, samples = samples, pi = fit_full, BPPARAM = BPPARAM)
 
   
   adjLik <- lik - adj

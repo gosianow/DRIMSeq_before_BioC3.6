@@ -1,17 +1,15 @@
-#' @include class_dmFit.R
-NULL
-
 ################################################################################
+
 #' Object that extends \code{dmDSdispersion} by adding fitting.
 #' 
 #' @slot dispersion Character specifying which type of dispersion was used for fitting.
-#' @slot fit_full \code{\linkS4class{dmFit}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.
-#' @slot fit_null \code{\linkS4class{dmFit}} object containing the pooled proportions of feature expression and null model likelihoods and degrees of freedom.
+#' @slot fit_full \code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.
+#' @slot fit_null \code{\linkS4class{MatrixList}} object containing the pooled proportions of feature expression and null model likelihoods and degrees of freedom.
 setClass("dmDSfit", 
          contains = "dmDSdispersion",
          representation(dispersion = "character",
-                        fit_full = "dmFit",
-                        fit_null = "dmFit"))
+                        fit_full = "MatrixList",
+                        fit_null = "MatrixList"))
 
 ################################################################################
 setMethod("show", "dmDSfit", function(object){
@@ -42,13 +40,13 @@ setGeneric("dmDSfit", function(x, ...) standardGeneric("dmDSfit"))
 ################################################################################
 #' @rdname dmDSfit
 #' @inheritParams dmDSdispersion
-#' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion", "common_dispersion"}
+#' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion"}, \code{"common_dispersion"}
 #' @examples 
 #' data <- dataDS_dmDSdispersion
 #' data <- dmDSfit(data)
 #' dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
 #' @export
-setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+setMethod("dmDSfit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   
   fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
@@ -76,7 +74,7 @@ setGeneric("dmDSplotFit", function(x, ...) standardGeneric("dmDSplotFit"))
 #' @rdname dmDSplotFit
 #' @inheritParams dmDSplotDispersion
 #' @param gene_id Vector of gene IDs to be plotted.
-#' @param plot_type Character defining type of the plot produced. Possible values \code{"barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"}.
+#' @param plot_type Character defining type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
 #' @param plot_null Logical. Whether to plot the proportions estimated by the null model.
@@ -88,8 +86,9 @@ setGeneric("dmDSplotFit", function(x, ...) standardGeneric("dmDSplotFit"))
 #' @export
 setMethod("dmDSplotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   
+  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full@proportions, proportions_null = x@fit_null@proportions, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, out_dir = out_dir)
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = x@fit_null, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, out_dir = out_dir)
   
   
 })

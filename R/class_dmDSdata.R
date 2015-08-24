@@ -8,16 +8,15 @@ NULL
 #' Can be created with function \code{\link{dmDSdata}}.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of counts.
-#' @slot samples DataFrame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
-#' @importClassesFrom S4Vectors DataFrame
+#' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
 setClass("dmDSdata", 
-         representation(counts = "MatrixList", samples = "DataFrame"))
+         representation(counts = "MatrixList", samples = "data.frame"))
 
 
 ##############################################################
 #'  Create dmDSdata object from a table of counts
 #'  
-#'  @param counts A numeric matrix of counts. Rows represent features (exons,
+#'  @param counts A numeric matrix or data.frame of counts. Rows represent features (exons,
 #'    bins or transcripts), columns represent samples.
 #'  @param gene_id_counts Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.
 #'  @param feature_id_counts Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.
@@ -43,11 +42,10 @@ setClass("dmDSdata",
 #'  @export
 dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group){
   
-  unlistData <- counts
-  
-  stopifnot(class(unlistData) == "matrix")
-  stopifnot(mode(unlistData) %in% "numeric")
-  unlistData <- ceiling(unlistData)
+  stopifnot(class(counts) %in% c("matrix", "data.frame"))
+  counts <- as.matrix(counts)
+  stopifnot(mode(counts) %in% "numeric")
+  counts <- ceiling(counts)
   
   stopifnot( class( gene_id_counts ) %in% c("character", "factor"))
   stopifnot( class( feature_id_counts ) %in% c("character", "factor"))
@@ -55,23 +53,59 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   stopifnot( class( group ) %in% c("character", "factor"))
   stopifnot( length(gene_id_counts) == length( feature_id_counts ) )
   stopifnot( length(sample_id) == length( group ) )
-  stopifnot(nrow(unlistData) == length(feature_id_counts))
-  stopifnot(ncol(unlistData) == length(sample_id))
+  stopifnot(nrow(counts) == length(feature_id_counts))
+  stopifnot(ncol(counts) == length(sample_id))
   
-  colnames(unlistData) <- sample_id
-  rownames(unlistData) <- feature_id_counts
+  if(class(gene_id_counts) == "character")
+  gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
   
-  counts <- new("MatrixList", unlistData = unlistData, partitioning = IRanges::PartitioningByEnd(as.numeric(factor(gene_id_counts, levels = unique(gene_id_counts))), NG = length(unique(gene_id_counts)), names = unique(gene_id_counts)))
+  if(class(group) == "character")
+  group <- factor(group, levels = unique(group))
   
-  samples <- S4Vectors::DataFrame(sample_id = sample_id, group = group)
   
-  data <- new("dmDSdata", counts = counts, samples = samples)
+  ### keep samples/groups with enough replicates
+  tbl <- table(group)
+  
+  if(sum(tbl > 1) < 2)
+  stop("There must be at least two groups and every group with at least two replicates!")
+  
+  levels <- names(tbl[tbl > 1])
+  
+  if(length(levels) < length(tbl))
+  message("Groups that are kept: ", paste(levels, collapse = ", "))
+  
+  keep_samps <- group %in% levels
+  
+  group <- factor(group[keep_samps], levels = levels)
+  
+  counts <- counts[, keep_samps]
+  sample_id <- sample_id[keep_samps]
+  
+  
+  ### ordering
+  or <- order(gene_id_counts)
+  oc <- order(group)
+  
+  counts <- counts[or, oc, drop = FALSE]
+  gene_id_counts <- gene_id_counts[or]
+  feature_id_counts <- feature_id_counts[or]
+  group <- group[oc]
+  sample_id <- sample_id[oc]
+  
+  colnames(counts) <- sample_id
+  rownames(counts) <- feature_id_counts
+  
+  partitioning <- split(1:length(gene_id_counts), gene_id_counts)
+
+  samples <- data.frame(sample_id = sample_id, group = group)
+  
+  data <- new("dmDSdata", counts = new("MatrixList", unlistData = counts, partitioning = partitioning), samples = samples)
   
   return(data)
   
 }
 
-# setValidity("Greeting", function(object){
+# setValidity("dmDSdata", function(object){
 
 #   # has to return TRUE when valid object!
 
@@ -86,12 +120,12 @@ setMethod("show", "dmDSdata", function(object){
   print(object@counts)
   
   cat("\nSlot \"samples\":\n")
-  print(object@samples)
+  show_matrix(object@samples)
   
 })
 
 ##############################################################
-setMethod("names", "dmDSdata", function(x) names(data@counts) )
+setMethod("names", "dmDSdata", function(x) names(x@counts) )
 
 
 ##############################################################

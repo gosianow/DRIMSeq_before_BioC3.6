@@ -1,18 +1,17 @@
 Package: DM
 Type: Package
 Title: What the package does (short line)
-Version: 0.1.8
+Version: 0.1.9
 Date: 2015-08-04
 Author: Malgorzata Nowicka, Mark Robinson
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
+Depends:
+    BiocGenerics
 Imports:
     methods,
     BiocParallel,
-    S4Vectors,
-    IRanges,
-    GenomicRanges,
     edgeR,
     ggplot2,
     reshape2
@@ -25,10 +24,10 @@ Suggests:
     knitr
 Collate:
     'DM.R'
+    'class_show_utils.R'
     'class_MatrixList.R'
     'class_dmDSdata.R'
     'class_dmDSdispersion.R'
-    'class_dmFit.R'
     'class_dmDSfit.R'
     'class_dmDStest.R'
     'class_dmSQTLdata.R'

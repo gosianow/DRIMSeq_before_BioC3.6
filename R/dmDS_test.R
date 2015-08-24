@@ -3,7 +3,7 @@
 #######################################################
 
 
-# stats_full = x@statistics_full; stats_null = x@statistics_null
+# stats_full = x@fit_full@metadata; stats_null = x@fit_null@metadata
 
 dmDS_test <- function(stats_full, stats_null){
 
@@ -19,7 +19,7 @@ dmDS_test <- function(stats_full, stats_null){
   
   adj_pvalue <- p.adjust(pvalue, method="BH")
   
-  table <- S4Vectors::DataFrame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, row.names = rownames(stats_full))
+  table <- data.frame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, row.names = rownames(stats_full), stringsAsFactors = FALSE)
 
   o <- order(table[, "pvalue"])
   table <- table[o,]

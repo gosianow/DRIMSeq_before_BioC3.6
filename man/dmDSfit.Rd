@@ -18,7 +18,7 @@ dmDSfit(x, ...)
 
 \item{...}{Parameters needed for the proportion estimation.}
 
-\item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion", "common_dispersion"}}
+\item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion"}, \code{"common_dispersion"}}
 
 \item{prop_mode}{Optimization method used to estimate the proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
 

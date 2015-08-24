@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE){
+dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "constrOptimG")[2], prop_tol = 1e-12, verbose = FALSE){
   ### y must be exons vs. samples
   ### If something is wrong, return NULL
   

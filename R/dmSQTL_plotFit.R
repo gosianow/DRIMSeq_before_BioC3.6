@@ -1,7 +1,7 @@
 
-# plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3]; order = TRUE; plot_full = TRUE; plot_null = TRUE; out_dir = "./"
+# counts = x@counts; genotypes = x@genotypes; samples = x@samples; dispersion = slot(x, x@dispersion); fit_full = x@fit_full; fit_null = x@fit_null; table = NULL; plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3]; order = TRUE; plot_full = TRUE; plot_null = TRUE; out_dir = "~/"
 
-dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersion = NULL, fit_full = NULL, fit_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(fit_full), FALSE, TRUE), plot_null = ifelse(is.null(fit_null), FALSE, TRUE), out_dir = NULL){
+dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersion = numeric(), fit_full = NULL, fit_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(fit_full), FALSE, TRUE), plot_null = ifelse(is.null(fit_null), FALSE, TRUE), out_dir = NULL){
 
 
   for(i in 1:length(gene_id)){
@@ -12,7 +12,7 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersi
     snp <- snp_id[i]
     counts_gene <- counts[[gene]]
     
-    if(nrow(counts_gene) <= 1){
+    if(nrow(counts_gene) < 2){
       cat(paste0("!Gene has to have at least 2 features! \n"))
       next
     }
@@ -29,9 +29,9 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersi
     
     main <- paste0(gene, ":", snp, "\n Mean expression = ", round(mean_expression_gene))
     
-    if(!is.null(dispersion)){
+    if(length(dispersion) > 0){
       
-      if(class(dispersion) == "numeric" && length(dispersion) == 1)
+      if(class(dispersion) == "numeric")
       dispersion_gene <- dispersion
       else
       dispersion_gene <- dispersion[[gene]][snp]
@@ -47,8 +47,8 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersi
     }
     
 
-    pi_full <- fit_full[[gene]]@proportions[[snp]][, levels(group), drop = FALSE]
-    pi_null <- fit_null[[gene]]@proportions[[snp]]
+    pi_full <- fit_full[[gene]][[snp]][, levels(group), drop = FALSE]
+    pi_null <- fit_null[[gene]][[snp]]
 
     ggp <- dm_plotProportion(counts = counts_gene, group = group, sample_id = sample_id, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
 

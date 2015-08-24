@@ -1,5 +1,6 @@
 ### one gene, many groups
 
+# y = counts[[g]]; gamma0 = gamma0[g]
 
 dm_fitOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE){
   
@@ -20,8 +21,7 @@ dm_fitOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, prop_m
   names(stats) <- c("lik", "df")
   
   for(gr in 1:ngroups){
-    # gr = 1
-    # cat(gr, fill = TRUE)
+    # gr = 3
     
     fit_gr <- dm_fitOneGeneOneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
     

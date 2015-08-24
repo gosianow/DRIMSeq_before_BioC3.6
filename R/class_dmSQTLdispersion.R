@@ -1,24 +1,20 @@
-#' @importClassesFrom IRanges CompressedNumericList
-setClassUnion("CompressedNumericListORNULL", c("CompressedNumericList", "NULL"))
-
-
 ##############################################################
+
 #' Object that extends \code{dmSQTLdata} by adding dipsersion.
 #' 
-#' @slot mean_expression Numeric vector of mean gene expression. When empty equals to NULL.
-#' @slot common_dispersion Numeric or NULL when not estimated.
-#' @slot tagwise_dispersion CompressedNumericList of estimated tagwise dispersion per gene and genotype or NULL when empty.
+#' @slot mean_expression Numeric vector of mean gene expression.
+#' @slot common_dispersion Numeric.
+#' @slot tagwise_dispersion List of estimated tagwise dispersion per gene and genotype.
 setClass("dmSQTLdispersion", 
          contains = "dmSQTLdata",
-         representation(mean_expression = "numericORNULL", 
-                        common_dispersion = "numericORNULL",
-                        tagwise_dispersion = "CompressedNumericListORNULL"), 
-         prototype(mean_expression = NULL,
-                   common_dispersion = NULL, 
-                   tagwise_dispersion = NULL))
+         representation(mean_expression = "numeric", 
+                        common_dispersion = "numeric",
+                        tagwise_dispersion = "list"))
+
 
 
 ##############################################################
+
 setMethod("show", "dmSQTLdispersion", function(object){
   
   callNextMethod(object)
@@ -30,12 +26,13 @@ setMethod("show", "dmSQTLdispersion", function(object){
   show_numeric(object@common_dispersion)
   
   cat("\nSlot \"tagwise_dispersion\":\n")
-  print(object@tagwise_dispersion)
+  show_numeric_list(object@tagwise_dispersion)
   
 })
 
 
 ##############################################################
+
 #' Estimating the dispersion in Dirichlet-multinomial model.
 #' 
 #' Function that is a wrapper for different optimazation methods used to estimate the dispersion parameters of Dirichlet-multinomial model with maximum likelihood. Parameters that are directly used in the dispersion estimation start with prefix \code{disp_} and the one that are used directly for the proportion estimation start with \code{prop_}.
@@ -79,19 +76,19 @@ setMethod("dmSQTLdispersion", "dmSQTLdata", function(x, mean_expression = TRUE, 
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
   }else{
-    mean_expression <- NULL
+    mean_expression <- numeric()
   }
   
   if(common_dispersion || disp_mode == "grid"){
     common_dispersion <- dmSQTL_estimateCommonDispersion(counts = x@counts, genotypes = x@genotypes, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   }else{
-    common_dispersion <- NULL
+    common_dispersion <- numeric()
   }
   
   
   if(tagwise_dispersion){
     
-    if(disp_mode == "grid" && !is.null(common_dispersion)){
+    if(disp_mode == "grid" && length(common_dispersion)){
       cat("!Using common dispersion as disp_init in 'grid' mode!\n")
       disp_init <- common_dispersion
     }
@@ -101,7 +98,7 @@ setMethod("dmSQTLdispersion", "dmSQTLdata", function(x, mean_expression = TRUE, 
     tagwise_dispersion <- dmSQTL_estimateTagwiseDispersion(counts = x@counts, genotypes = x@genotypes, mean_expression = mean_expression, disp_adjust = disp_adjust, disp_mode = disp_mode, disp_interval = disp_interval, disp_tol = disp_tol, disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
     
   }else{
-    tagwise_dispersion <- NULL
+    tagwise_dispersion <- numeric()
   }
   
   
@@ -165,9 +162,9 @@ setGeneric("dmSQTLplotDispersion", function(x, ...) standardGeneric("dmSQTLplotD
 #' @export
 setMethod("dmSQTLplotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   
-  # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = IRanges::width(x@counts@partitioning); common_dispersion = x@common_dispersion; out_dir = NULL
+  # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts); common_dispersion = x@common_dispersion; out_dir = NULL
   
-  dmSQTL_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = IRanges::width(x@counts@partitioning), common_dispersion = x@common_dispersion, out_dir = out_dir)
+  dmSQTL_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   
 })
 

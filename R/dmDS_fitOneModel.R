@@ -1,15 +1,14 @@
 ##############################################################################
 # multiple group ffting 
 ##############################################################################
-# model = c("full", "null")[1]; prop_mode=c("constrOptim2", "constrOptim2G", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = MulticoreParam(workers=10)
+# counts = x@counts; samples = x@samples; dispersion = 38196.6; model = c("full", "null")[1]; prop_mode=c("constrOptim2", "constrOptim2G", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
-dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim2", "constrOptim2G", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim2", "constrOptim2G", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  gene_list <-  names(counts)
-	
+  inds <-  1:length(counts)
+  
   if(length(dispersion) == 1){
-    gamma0 <- rep(dispersion, length(gene_list))
-		names(gamma0) <- gene_list
+    gamma0 <- rep(dispersion, length(inds))
   } else {
     gamma0 <- dispersion
   }
@@ -18,6 +17,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
   switch(model, 
          
          full = {
+          
            cat("Fitting full model.. \n")
            group <- samples$group
            ngroups <- nlevels(group)
@@ -27,8 +27,8 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            names(igroups) <- lgroups
            
            
-           time <- system.time(ff <- BiocParallel::bplapply(gene_list, function(g){  
-             # g = "FBgn0000008"
+           time <- system.time(ff <- BiocParallel::bplapply(inds, function(g){  
+             # g = 1
              # cat("Gene:", g, fill = TRUE)
 
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
@@ -38,14 +38,16 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
              
            }, BPPARAM = BPPARAM))
            
-           names(ff) <- gene_list
+           names(ff) <- names(counts)
            
-           pi <- MatrixList(lapply(ff, function(f) f$pi))
-           stats <- do.call(rbind, lapply(ff, function(f) f$stats))
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats
+           rownames(stats) <- names(counts)
+           
+           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
+           return(fff)
            
          },
          
@@ -58,8 +60,8 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            igroups <- list(null = 1:length(samples$group))
            
            
-           time <- system.time(ff <- BiocParallel::bplapply(gene_list, function(g){  
-             # g = "ENSG00000135778"
+           time <- system.time(ff <- BiocParallel::bplapply(inds, function(g){  
+             # g = 1
              # cat("Gene:", g, fill = TRUE)
              
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
@@ -68,14 +70,16 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
              
            }, BPPARAM = BPPARAM))
            
-           names(ff) <- gene_list
+           names(ff) <- names(counts)
            
-           pi <- MatrixList(lapply(ff, function(f) f$pi))
-           stats <- do.call(rbind, lapply(ff, function(f) f$stats))
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats
+           rownames(stats) <- names(counts)
+           
+           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            
            cat("Took ", time["elapsed"], " seconds.\n")
            
-           return(new("dmFit", proportions = pi, statistics = S4Vectors::DataFrame(stats, row.names = rownames(stats))))
+           return(fff)
            
            
          })

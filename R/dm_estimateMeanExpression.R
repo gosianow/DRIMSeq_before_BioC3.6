@@ -7,15 +7,15 @@ dm_estimateMeanExpression <- function(counts, BPPARAM = BiocParallel::MulticoreP
   ### calculate mean expression of genes 
   cat("Calculating mean gene expression.. \n")
   
-  gene_list <- names(counts)
+  inds <- 1:length(counts)
 
-  time <- system.time(mean_expression <- unlist(BiocParallel::bplapply(gene_list, function(g){ 
+  time <- system.time(mean_expression <- unlist(BiocParallel::bplapply(inds, function(g){ 
 
   	mean(colSums(counts[[g]]), na.rm = TRUE)
 
   	}, BPPARAM = BPPARAM)))
   
-  names(mean_expression) <- gene_list
+  names(mean_expression) <- names(counts)
 
   cat("Took ", time["elapsed"], " seconds.\n")
   cat("** Mean gene expression: ", head(mean_expression), "... \n")

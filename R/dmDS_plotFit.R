@@ -1,7 +1,7 @@
 
 # plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3]; order = TRUE; plot_full = TRUE; plot_null = TRUE; out_dir = "./"
 
-dmDS_plotFit <- function(gene_id, counts, samples, dispersion = NULL, proportions_full = NULL, proportions_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(proportions_full), FALSE, TRUE), plot_null = ifelse(is.null(proportions_null), FALSE, TRUE), out_dir = NULL){
+dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), proportions_full = NULL, proportions_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(proportions_full), FALSE, TRUE), plot_null = ifelse(is.null(proportions_null), FALSE, TRUE), out_dir = NULL){
 
 
   for(i in 1:length(gene_id)){
@@ -22,7 +22,7 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = NULL, proportion
     
     main <- paste0(gene, "\n Mean expression = ", round(mean_expression_gene))
     
-    if(!is.null(dispersion)){
+    if(length(dispersion) > 0){
       
       if(length(dispersion) == 1)
       dispersion_gene <- dispersion

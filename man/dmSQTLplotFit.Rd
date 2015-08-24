@@ -26,7 +26,7 @@ dmSQTLplotFit(x, ...)
 
 \item{snp_id}{Vector of SNP IDs to be plotted.}
 
-\item{plot_type}{Character defining type of the plot produced. Possible values \code{"barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"}.}
+\item{plot_type}{Character defining type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.}
 
 \item{order}{Logical. Whether to plot the features ordered by their expression.}
 

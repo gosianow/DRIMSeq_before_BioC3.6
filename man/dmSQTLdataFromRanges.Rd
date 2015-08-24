@@ -9,7 +9,7 @@ dmSQTLdataFromRanges(counts, gene_id_counts, feature_id_counts, gene_ranges,
   genotypes, snp_id_genotypes, snp_ranges, sample_id, window = 5000)
 }
 \arguments{
-\item{counts}{A numeric matrix of counts. Rows represent features (exons,
+\item{counts}{A numeric matrix or data.frame of counts. Rows represent features (exons,
   bins or transcripts), columns represent samples.}
 
 \item{gene_id_counts}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}

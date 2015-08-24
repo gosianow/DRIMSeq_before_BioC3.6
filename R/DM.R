@@ -1,4 +1,4 @@
-#' @importFrom methods setClass setGeneric setMethod
+#' @importFrom methods setClass setGeneric setMethod initialize
 NULL
 
 #' DM: A package to fit Dirichlet-multinomial model

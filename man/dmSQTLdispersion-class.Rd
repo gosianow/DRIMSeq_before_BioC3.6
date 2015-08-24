@@ -10,10 +10,10 @@ Object that extends \code{dmSQTLdata} by adding dipsersion.
 \section{Slots}{
 
 \describe{
-\item{\code{mean_expression}}{Numeric vector of mean gene expression. When empty equals to NULL.}
+\item{\code{mean_expression}}{Numeric vector of mean gene expression.}
 
-\item{\code{common_dispersion}}{Numeric or NULL when not estimated.}
+\item{\code{common_dispersion}}{Numeric.}
 
-\item{\code{tagwise_dispersion}}{CompressedNumericList of estimated tagwise dispersion per gene and genotype or NULL when empty.}
+\item{\code{tagwise_dispersion}}{List of estimated tagwise dispersion per gene and genotype.}
 }}
 

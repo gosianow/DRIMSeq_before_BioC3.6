@@ -1,5 +1,7 @@
 # Test DM on entire data set
 
+setwd("/home/gosia/R/multinomial_project/package_devel/DM")
+
 library(DM)
 
 ########################################################
@@ -34,10 +36,13 @@ group = metadata$group
 
 data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
 
-dmDSplotData(data)
+# dmDSplotData(data)
 
 
-system.time(data <- dmDSfilter(data))
+system.time(data_filt <- dmDSfilter(data))
+
+# system.time(data_filt <- myFilter(data@counts,data@samples))
+
 
 
 dmDSplotData(data)

@@ -14,6 +14,6 @@ Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdata
 
 \item{\code{genotypes}}{\code{\linkS4class{MatrixList}} with genotypes.}
 
-\item{\code{samples}}{DataFrame with information about samples. Contains unique sample names (\code{sample_id}).}
+\item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}).}
 }}
 

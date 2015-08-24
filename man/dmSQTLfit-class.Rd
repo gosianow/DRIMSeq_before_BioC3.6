@@ -12,8 +12,8 @@ Object that extends \code{dmSQTLdispersion} by adding fitting.
 \describe{
 \item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting.}
 
-\item{\code{fit_full}}{A List of \code{\linkS4class{dmFit}} objects. Each of them contains the per gene fitting results that include the group proportions (groups are defined by genotypes) of feature expression, full model likelihoods and degrees of freedom.}
+\item{\code{fit_full}}{List of \code{\linkS4class{MatrixList}} objects. Each of them contains the per gene fitting results that include the group proportions (groups are defined by genotypes) of feature expression, full model likelihoods and degrees of freedom.}
 
-\item{\code{fit_null}}{A List of \code{\linkS4class{dmFit}} objects. Each of them contsins the per gene fitting results that include the pooled proportions of feature expression, null model likelihoods and degrees of freedom.}
+\item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}} objects. Each of them contsins the per gene fitting results that include the pooled proportions of feature expression, null model likelihoods and degrees of freedom.}
 }}
 

@@ -12,6 +12,6 @@ Can be created with function \code{\link{dmDSdata}}.
 \describe{
 \item{\code{counts}}{\code{\linkS4class{MatrixList}} of counts.}
 
-\item{\code{samples}}{DataFrame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
+\item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
 }}
 
