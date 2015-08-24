@@ -74,24 +74,36 @@ setMethod("names", "MatrixList", function(x){
 
 setMethod("show", "MatrixList", function(object){
   
-  nn <- length(object)
-  cat(mode(object@unlistData),"MatrixList of length", nn,"\n")
+  nhead <- 2
   
-  if(nn){
+  nl <- length(object)  
+  cat(mode(object@unlistData),"MatrixList of length", nl,"\n")
+  
+  if(nl > 0){
+    np <- min(nl, nhead)
     
-    i <- names(object)
-    if(is.null(i)) i <- seq_len(nn)
+    object <- object[1:np]
     
-    what <- i[1]
-    cat("$", what, "\n", sep="")
-    show_matrix(object@unlistData[object@partitioning[[what]], , drop = FALSE])
+    if(is.null(names(object)))
+      print_names <- paste0("[[", 1:np, "]]\n")
+    else 
+      print_names <- paste0("$", names(object), "\n")
     
-    if(nn > 1){
-      if(nn > 2)
-        cat(":\n", sep="")
-      what <- i[nn]
-      cat("$", what, "\n", sep="")
-      show_matrix(object@unlistData[object@partitioning[[what]], , drop = FALSE])
+    for(i in 1:np){
+      
+      cat(print_names[i])
+      show_matrix(object[[i]])
+      cat("\n")
+      
+    }
+    
+    if(np < nl){
+      
+      if(is.null(names(object)))
+        cat(paste0("[[...]]\n"))
+      else 
+        cat(paste0("$...\n"))
+      
     }
     
   }
@@ -111,6 +123,14 @@ setMethod("show", "MatrixList", function(object){
 setMethod("[[", "MatrixList", function(x, i, ...){
   
   x@unlistData[x@partitioning[[i]], , drop = FALSE]
+  
+})
+
+
+#' @export
+setMethod("$", "MatrixList", function(x, name){
+  
+  x[[name]]
   
 })
 

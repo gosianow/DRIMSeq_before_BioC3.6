@@ -12,18 +12,28 @@ show_matrix <- function(object, nhead = 3, ntail = 3){
   cat(class(object), " with ", nr, ifelse(nr == 1, " row and ", " rows and "), nc, ifelse(nc == 1, " column\n", " columns\n"), sep = "")
   
   if(nr > 0 && nc > 0){
+    
     nms <- rownames(object)
-    if(nr < (nhead + ntail + 1L)) {
-      out <- object
-      } else {
-        
-        out <- do.call(rbind, list(head(object, nhead), matrix(rep.int("...", nc), 1, nc, dimnames = list(NULL, colnames(object))), tail(object, ntail)))
-        
-        rownames(out) <- rownames_matrix(nms, nr, nhead, ntail)
-      }
+    
+    if(nr < (nhead + ntail + 1L)){
       
-    ### print adjusted for numeric
-    print(out, quote = FALSE, right = TRUE, na.print = "NA")
+      out <- object
+      
+    } else {
+      
+      out <- do.call(rbind, list(head(object, nhead), matrix(rep.int("...", nc), 1, nc, dimnames = list(NULL, colnames(object))), tail(object, ntail)))
+      
+      rownames(out) <- rownames_matrix(nms, nr, nhead, ntail)
+      
+    }
+    
+    if(nc > (nhead + ntail)){
+      
+      out <- do.call(cbind, list(out[, 1:nhead], matrix(rep.int("...", ifelse(nr < (nhead + ntail + 1L), min(nr, nhead + ntail), nhead + ntail + 1L)), ncol = 1, dimnames = list(NULL, "...")), out[, (nc-ntail+1):nc]))
+      
+    }   
+    
+    print(out, quote = FALSE, right = TRUE, na.print = "NA") ### print adjusted for numeric
   }
   
 }
@@ -36,91 +46,96 @@ rownames_matrix <- function(nms, nrow, nhead, ntail){
   
   if (is.null(nms)) {
     if (nhead > 0)
-    s1 <- paste0("[",as.character(p1:nhead), ",]")
+      s1 <- paste0("[",as.character(p1:nhead), ",]")
     if (ntail > 0)
-    s2 <- paste0("[",as.character((nrow-p2):nrow), ",]")
-    } else {
-      if (nhead > 0)
+      s2 <- paste0("[",as.character((nrow-p2):nrow), ",]")
+  } else {
+    if (nhead > 0)
       s1 <- paste0(head(nms, nhead))
-      if (ntail > 0)
+    if (ntail > 0)
       s2 <- paste0(tail(nms, ntail))
-    }
-    c(s1, "...", s2)
   }
+  c(s1, "...", s2)
+}
 
 
 ################################################################################
 
-show_numeric <- function(object, nhead = 2, ntail = 2, class = TRUE, print = TRUE){
+show_numeric <- function(object, nhead = 3, ntail = 3, class = TRUE, print = TRUE){
   
   nl <- length(object)  
   if(class)
-  cat(class(object), "of length", length(object), "\n")
+    cat(class(object), "of length", length(object), "\n")
   
   if(nl > 0){
     
     if(nl < (nhead + ntail + 1L)) {
       out <- round(object, 2)
-      } else {
-        dots <- "..."
-        if(!is.null(names(object)))
+    } else {
+      dots <- "..."
+      if(!is.null(names(object)))
         names(dots) <- "..."
-        out <- c(round(head(object, nhead), 2), dots , round(tail(object, ntail), 2))
-      }
-      if(print)
-      print(out, quote = FALSE, right = TRUE)
-      else
-      return(out)
-      
-      }else{
-        
-        if(print)
-        print(object)
-        else
-        return(object)
-        
-      }
-      
+      out <- c(round(head(object, nhead), 2), dots , round(tail(object, ntail), 2))
     }
+    if(print)
+      print(out, quote = FALSE, right = TRUE)
+    else
+      return(out)
+    
+  }else{
+    
+    if(print)
+      print(object)
+    else
+      return(object)
+    
+  }
+  
+}
 
 
 ################################################################################
 
-show_numeric_list <- function(object, nhead = 3){
+
+show_numeric_list <- function(object, nhead = 2){
   
   nl <- length(object)  
   cat(class(object), "of length", nl, "\n")
-
+  
   if(nl > 0){
+    np <- min(nl, nhead)
     
-    if(nl < (nhead + 1L)) {
+    object <- object[1:np]
+    
+    if(is.null(names(object)))
+      print_names <- paste0("[[", 1:np, "]]\n")
+    else 
+      print_names <- paste0("$", names(object), "\n")
+    
+    for(i in 1:np){
       
-      out <- lapply(object, show_numeric, nhead = 5, ntail = 5, class = FALSE, print = FALSE)
-      print(out, quote = FALSE, right = TRUE)
+      cat(print_names[i])
+      show_numeric(object[[i]])
+      cat("\n")
       
-      } else {
-        
-        if(is.null(names(object)))
-        dots <- "[[...]]\n\n"
-        else
-        dots <- "$...\n\n"
-        
-        names(dots) <- ""
-        
-        out_head <- lapply(object[1:nhead], show_numeric, nhead = 5, ntail = 5, class = FALSE, print = FALSE)
-        
-        print(out_head, quote = FALSE, right = TRUE)
-        cat(dots)
-        
-      }
-      
-      }else{
-        
-        print(object)
-        
-      }
     }
-
+    
+    if(np < nl){
+      
+      if(is.null(names(object)))
+        cat(paste0("[[...]]\n"))
+      else 
+        cat(paste0("$...\n"))
+      
+    }
+    
+  }else{
+    
+    print(object)
+    
+  }
+  
+}
 
 
 
@@ -138,9 +153,9 @@ show_MatrixList_list <- function(object, nhead = 2){
     object <- object[1:np]
     
     if(is.null(names(object)))
-    print_names <- paste0("[[", 1:np, "]]\n")
+      print_names <- paste0("[[", 1:np, "]]\n")
     else 
-    print_names <- paste0("$", names(object), "\n")
+      print_names <- paste0("$", names(object), "\n")
     
     for(i in 1:np){
       
@@ -153,19 +168,22 @@ show_MatrixList_list <- function(object, nhead = 2){
     if(np < nl){
       
       if(is.null(names(object)))
-      cat(paste0("[[...]]\n"))
+        cat(paste0("[[...]]\n"))
       else 
-      cat(paste0("$...\n"))
-      
-      
-    }
-    }else{
-      
-      print(object)
+        cat(paste0("$...\n"))
       
     }
     
-
+  }else{
+    
+    print(object)
     
   }
+  
+}
+
+
+
+
+
 
