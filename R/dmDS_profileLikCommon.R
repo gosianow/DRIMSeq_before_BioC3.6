@@ -10,8 +10,8 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
   cat("Gamma in optimize:", gamma0, fill = TRUE)
 	
   fit_full <- dmDS_fitOneModel(counts = counts, samples = samples, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
-
-  lik <- sum(fit_full@metadata, na.rm = TRUE) 
+  
+  lik <- sum(fit_full@metadata, na.rm = TRUE) ### liks
   
   cat("lik:", lik, fill = TRUE)
   # message("lik:", lik, "\n")
@@ -20,8 +20,9 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
     return(lik)
 
   ## Cox-Reid adjustement for common dispersion
-  adj <- dmDS_adjustmentCommon(gamma0, counts = counts, samples = samples, pi = fit_full, BPPARAM = BPPARAM)
-
+  cat("Calculating adjustement.. \n")
+  time <- system.time(adj <- dmDS_adjustmentCommon(gamma0, counts = counts, samples = samples, pi = fit_full, BPPARAM = BPPARAM))
+  cat("Took ", time["elapsed"], " seconds.\n")
   
   adjLik <- lik - adj
   
@@ -31,5 +32,3 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
   return(adjLik)
   
 }
-
-

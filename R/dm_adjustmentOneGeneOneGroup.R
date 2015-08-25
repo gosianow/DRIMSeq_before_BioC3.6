@@ -4,19 +4,15 @@
 
 
 dm_adjustmentOneGeneOneGroup <- function(y, gamma0, pi){
-  # NULL for filtered genes or genes with one exon
-  if(dim(y)[1] <= 1) return(NULL)
-  
   ### y must be exons vs. samples
+  ### If something is wrong, return NAs
   
-  ### check for 0s in rows (exons)
+  ### check for 0s in rows (features)
   keep_row <- rowSums(y) > 0
-  if(sum(keep_row) < 2) return(NULL) ## must be at least two exons or transcripts
   y <- y[keep_row, , drop=FALSE]
   
-  ### check for 0s in cols (samples)
+  ### check for 0s in cols (replicates)
   keep_col <- colSums(y) > 0
-  if(sum(keep_col) < 2) return(NULL) ## must be at least two samples in a condition
   y <- y[, keep_col, drop=FALSE]
   
   N <- ncol(y) 

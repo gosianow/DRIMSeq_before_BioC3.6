@@ -3,23 +3,35 @@
 ##############################################################################
 
 dm_adjustmentOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, pi){  
-  # NULL for filtered genes or genes with one exon
-  k <- dim(y)[1]
-  if(k <= 1) return(NULL)
-
-  adj = rep(0, ngroups)
+  
+  if(all(is.na(pi[1, ])))
+    return(NA)
+  
+  adj <- numeric(ngroups)
   
   for(gr in 1:ngroups){
-# gr=1
-    a <- dm_adjustmentOneGeneOneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0, pi = pi[, lgroups[gr]])
+    # gr=1
     
-    if(is.null(a)) return(NULL)
-			
-    adj[gr] <- a
+    pi_tmp <- pi[, gr]
+    
+    if(is.na(pi_tmp[1])){
+      
+      adj[gr] <- NA
+      
+    }else{
+      
+      y_tmp  <- y[, igroups[[gr]], drop = FALSE]
+      a <- dm_adjustmentOneGeneOneGroup(y = y_tmp, gamma0, pi = pi_tmp)
+      adj[gr] <- a
+      
+    }
     
   }
   
-  adj <- sum(adj)
+  adj <- sum(adj, na.rm = TRUE)
+  
+  if(adj == Inf)
+    return(NA) 
   
   return(adj)
   

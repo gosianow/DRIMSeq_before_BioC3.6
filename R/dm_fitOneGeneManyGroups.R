@@ -12,7 +12,7 @@ dm_fitOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, prop_m
   stats <- rep(NA, ngroups)
   names(stats) <- lgroups
  
-  if(is.na(gamma0) || k <= 1)
+  if(is.na(gamma0) || k < 2)
   return(list(pi = pi, stats = stats))
   
   

@@ -9,24 +9,24 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   
   # NAs for genes with one feature
   kk <- nrow(y)
-  if(kk <= 1) 
+  if(kk < 2 || is.na(gamma0)) 
   return(list(pi = rep(NA, kk), stats = rep(NA, 2)))
   
-  ### check for 0s in rows (exons)
+  ### check for 0s in rows (features)
   keep_row <- rowSums(y) > 0
   if(sum(keep_row) < 2) 
-  return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two exons or transcripts
+  return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two features
   
   y <- y[keep_row, , drop=FALSE]
   
-  ### check for 0s in columns (samples)
+  ### check for 0s in columns (replicates)
   keep_col <- colSums(y) > 0
   y <- y[, keep_col, drop=FALSE]
   
   pi_init <- rowSums(y)/sum(y)
-  k <- length(pi_init) ## k - number of exons
+  k <- length(pi_init) ## k - number of features
 	
-  if(keep_col == 1){
+  if(sum(keep_col) == 1){
     
     keep_row[keep_row] <- pi_init
     pi <- keep_row

@@ -20,7 +20,7 @@ dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = Bio
     for(i in 1:nrow(snps)){
       # i = 1
       
-      if(all(is.na(pig[[i]]))) 
+      if(all(is.na(pig[[i]][1, ]))) 
         next
       
       NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
@@ -43,7 +43,7 @@ dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = Bio
   
   
   adj <- unlist(adj)
-  adj <- sum(adj[adj != Inf], na.rm = TRUE) ## some genes have adj = Inf so skipp them
+  adj <- sum(adj, na.rm = TRUE)
   
   return(adj)
   
