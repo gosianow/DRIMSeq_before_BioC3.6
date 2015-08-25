@@ -5,30 +5,38 @@
 
 dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "constrOptimG")[2], prop_tol = 1e-12, verbose = FALSE){
   ### y must be exons vs. samples
-  ### If something is wrong, return NULL
+  ### If something is wrong, return NAs
   
+  # NAs for genes with one feature
   kk <- nrow(y)
-	
-  # NULL for filtered genes or genes with one exon
-  if(any(dim(y) <= 1)) 
+  if(kk <= 1) 
   return(list(pi = rep(NA, kk), stats = rep(NA, 2)))
   
   ### check for 0s in rows (exons)
   keep_row <- rowSums(y) > 0
   if(sum(keep_row) < 2) 
   return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two exons or transcripts
+  
   y <- y[keep_row, , drop=FALSE]
   
-  ### check for 0s in cols (samples)
+  ### check for 0s in columns (samples)
   keep_col <- colSums(y) > 0
-  if(sum(keep_col) < 2) 
-  return(list(pi = rep(NA, kk), stats = rep(NA, 2))) ## must be at least two samples in a condition
   y <- y[, keep_col, drop=FALSE]
   
   pi_init <- rowSums(y)/sum(y)
   k <- length(pi_init) ## k - number of exons
-  N <- ncol(y) ## N - number of samples
 	
+  if(keep_col == 1){
+    
+    keep_row[keep_row] <- pi_init
+    pi <- keep_row
+    
+    df <- k - 1
+    lik <- dm_likG(pi = pi_init[-k], gamma0 = gamma0, y = y)
+
+    return(list(pi = pi, stats = c(lik = lik, df = df)))
+  }
+  
   
   switch(prop_mode, 
          
@@ -170,13 +178,10 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   
 keep_row[keep_row] <- pi
 pi <- keep_row
-names(pi) <- NULL
-names(lik) <- NULL
 
 df <- k - 1
-names(df) <- NULL
 
-return(list(pi = pi, stats = c(lik, df)))
+return(list(pi = pi, stats = c(lik = lik, df = df)))
   
   
 }

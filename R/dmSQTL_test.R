@@ -14,9 +14,11 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticorePar
   table_list <- BiocParallel::bplapply(inds, function(g){
     # g = "ENSG00000131037.8"
     
-    lr <- 2*(fit_full[[g]]@metadata[, "lik"] - fit_null[[g]]@metadata[, "lik"])
+    lr <- 2*(rowSums(fit_full[[g]]@metadata, na.rm = TRUE) - fit_null[[g]]@metadata[, "lik"])
     
-    df <- fit_full[[g]]@metadata[, "df"] - fit_null[[g]]@metadata[, "df"]
+    nrgroups <- apply(fit_full[[g]]@metadata, 1, function(r){ sum(!is.na(r)) })
+    
+    df <- (nrgroups - 1)*fit_null[[g]]@metadata[, "df"]
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     

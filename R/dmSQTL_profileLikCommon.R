@@ -2,7 +2,9 @@
 # calculate profile likelihood + adjustements for common dispersion
 # returns common likelihood = sum of likelihoods from all genes
 ##############################################################################
+
 # gamma0 = 38196.6; counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
+
 
 dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -10,7 +12,7 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRU
   
   fit_full <- dmSQTL_fitOneModel(counts = counts, genotypes = genotypes, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose=verbose, BPPARAM = BPPARAM)
 
-  lik <- sum(unlist(lapply(fit_full, function(g) g@metadata[, "lik"]) ), na.rm = TRUE)
+  lik <- sum(unlist(lapply(fit_full, function(g) sum(g@metadata, na.rm = TRUE))), na.rm = TRUE)
   
   cat("lik:", lik, fill = TRUE)
   

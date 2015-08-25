@@ -17,8 +17,8 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
     gamma0 <- dispersion
   }
   
-  lgroups_g <- levels(factor(unique(as.numeric(genotypes@unlistData[!is.na(genotypes@unlistData)]))))
-  ngroups_g <- length(lgroups_g)
+  lgroups_g <- c("0", "1", "2")
+  ngroups_g <- 3
   
   switch(model, 
          
@@ -36,7 +36,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              names_snps <- rownames(snps)
              
              pi <- matrix(NA, nrow = n_y * n_snps, ncol = ngroups_g, dimnames = list(rep(rownames(y), n_snps), lgroups_g))
-             stats <- matrix(NA, n_snps, 2, dimnames = list(names_snps, c("lik", "df")))
+             stats <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, lgroups_g))
              
              for(i in 1:n_snps){          
               # i = 1
@@ -54,13 +54,12 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               igroups <- lapply(lgroups, function(gr){which(group == gr)})
               names(igroups) <- lgroups
               
-              f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                            gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
+              f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
               
               ipi <- (i-1)*n_y + 1
               
               pi[ipi:(ipi+n_y-1), lgroups] <- f$pi
-              stats[i, ] <- f$stats
+              stats[i, lgroups] <- f$stats
               
              }
              
@@ -96,23 +95,15 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              pi <- matrix(NA, nrow = n_y * n_snps, ncol = 1, dimnames = list(rep(rownames(y), n_snps), "null"))
              stats <- matrix(NA, n_snps, 2, dimnames = list(names_snps, c("lik", "df")))
              
-             groupg <- factor(rep("null", ncol(y)))
-             ngroups <- 1
-             lgroups <- "null"  
              
              for(i in 1:n_snps){          
               # i = 1
               # print(i)
               
               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-              yg <- y[, !NAs]             
-              group <- groupg[!NAs]
-              nlibs <- sum(!NAs)
-              
-              igroups <- list(null = 1:nlibs)
-              
-              f <- dm_fitOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                            gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)  
+              yg <- y[, !NAs]
+                           
+              f <- dm_fitOneGeneOneGroup(y = yg, gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
               
               ipi <- (i-1)*n_y + 1
               

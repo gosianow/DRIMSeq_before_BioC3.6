@@ -82,24 +82,24 @@ setMethod("show", "MatrixList", function(object){
   if(nl > 0){
     np <- min(nl, nhead)
     
-    object <- object[1:np]
+    object_sub <- object[1:np]
     
-    if(is.null(names(object)))
+    if(is.null(names(object_sub)))
       print_names <- paste0("[[", 1:np, "]]\n")
     else 
-      print_names <- paste0("$", names(object), "\n")
+      print_names <- paste0("$", names(object_sub), "\n")
     
     for(i in 1:np){
       
       cat(print_names[i])
-      show_matrix(object[[i]])
+      show_matrix(object_sub[[i]])
       cat("\n")
       
     }
     
     if(np < nl){
       
-      if(is.null(names(object)))
+      if(is.null(names(object_sub)))
         cat(paste0("[[...]]\n"))
       else 
         cat(paste0("$...\n"))

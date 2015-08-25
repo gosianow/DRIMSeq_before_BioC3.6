@@ -5,7 +5,7 @@
 
 # nhead = 3; ntail = 3
 
-show_matrix <- function(object, nhead = 3, ntail = 3){
+show_matrix <- function(object, nhead = 2, ntail = 2){
   nr <- nrow(object)
   nc <- ncol(object)
   
@@ -61,7 +61,7 @@ rownames_matrix <- function(nms, nrow, nhead, ntail){
 
 ################################################################################
 
-show_numeric <- function(object, nhead = 3, ntail = 3, class = TRUE, print = TRUE){
+show_numeric <- function(object, nhead = 2, ntail = 2, class = TRUE, print = TRUE){
   
   nl <- length(object)  
   if(class)

@@ -42,12 +42,12 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
             gamma0 <- disp_interval[1] + (1-(sqrt(5) - 1)/2)*(disp_interval[2]-disp_interval[1])
             
-            if(is.na(dm_profileLikTagwise(gamma0 = gamma0, y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
+            if(is.na(dm_profileLikTagwise(gamma0 = gamma0, y = yg, ngroups = ngroups, lgroups = lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
             next
             
             
             optimum <- optimize(f = dm_profileLikTagwise, interval = disp_interval,
-                                y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, 
+                                y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
                                 disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
                                 maximum = TRUE, tol = disp_tol)
             

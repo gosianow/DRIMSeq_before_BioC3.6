@@ -40,7 +40,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            names(ff) <- names(counts)
            
-           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: liks
            rownames(stats) <- names(counts)
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
@@ -54,17 +54,14 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
          null = {
            
            cat("Fitting null model.. \n")
-           group <- factor(rep("null", length(samples$group)))
-           ngroups <- 1
-           lgroups <- "null"
-           igroups <- list(null = 1:length(samples$group))
-           
-           
+
            time <- system.time(ff <- BiocParallel::bplapply(inds, function(g){  
              # g = 1
              # cat("Gene:", g, fill = TRUE)
              
-             f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
+             f <- dm_fitOneGeneOneGroup(y = counts[[g]], gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
+             
+             f[[1]] <- matrix(f[[1]], dimnames = list(names(f[[1]]), "null")) ### convert pi into matrix
              
              return(f)
              
@@ -72,7 +69,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            names(ff) <- names(counts)
            
-           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: lik, df
            rownames(stats) <- names(counts)
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
