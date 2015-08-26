@@ -12,16 +12,16 @@
 dmDispersion(x, ...)
 
 \S4method{dmDispersion}{dmDSdata}(x, mean_expression = TRUE,
-  common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE,
-  disp_mode = "grid", disp_interval = c(0, 1e+05), disp_tol = 1e-08,
-  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21,
-  disp_grid_range = c(-10, 10), disp_moderation = "none",
-  disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG",
-  prop_tol = 1e-12, verbose = FALSE,
+  common_dispersion = TRUE, genewise_dispersion = TRUE,
+  disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
+  disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
+  disp_grid_length = 21, disp_grid_range = c(-10, 10),
+  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmDispersion}{dmDSdispersion}(x, mean_expression = FALSE,
-  common_dispersion = FALSE, tagwise_dispersion = TRUE,
+  common_dispersion = FALSE, genewise_dispersion = TRUE,
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
@@ -30,7 +30,7 @@ dmDispersion(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmDispersion}{dmSQTLdata}(x, mean_expression = TRUE,
-  common_dispersion = FALSE, tagwise_dispersion = TRUE,
+  common_dispersion = FALSE, genewise_dispersion = TRUE,
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
@@ -39,7 +39,7 @@ dmDispersion(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmDispersion}{dmSQTLdispersion}(x, mean_expression = FALSE,
-  common_dispersion = FALSE, tagwise_dispersion = TRUE,
+  common_dispersion = FALSE, genewise_dispersion = TRUE,
   disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim",
   "grid")[4], disp_interval = c(0, 1e+05), disp_tol = 1e-08,
   disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21,
@@ -58,7 +58,7 @@ dmDispersion(x, ...)
 
 \item{common_dispersion}{Logical. Whether to estimate the common dispersion.}
 
-\item{tagwise_dispersion}{Logical. Whether to estimate the tagwise dispersion.}
+\item{genewise_dispersion}{Logical. Whether to estimate the gene dispersion.}
 
 \item{disp_adjust}{Logical. Whether to use the adjusted or non-adjusted profile likelihood.}
 

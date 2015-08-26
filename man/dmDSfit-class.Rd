@@ -10,7 +10,7 @@ Object that extends \code{dmDSdispersion} class by adding fitting.
 \section{Slots}{
 
 \describe{
-\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting.}
+\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting: common_dispersion or genewise_dispersion.}
 
 \item{\code{fit_full}}{\code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.}
 

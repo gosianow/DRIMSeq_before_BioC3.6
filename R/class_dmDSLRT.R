@@ -42,7 +42,7 @@ setMethod("dmLRT", "dmDSfit", function(x){
   table <- dmDS_test(stats_full = x@fit_full@metadata, stats_null = x@fit_null@metadata)
   
   
-  return(new("dmDSLRT", table = table, dispersion = x@dispersion, fit_full = x@fit_full, fit_null = x@fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, tagwise_dispersion = x@tagwise_dispersion, counts = x@counts, samples = x@samples))
+  return(new("dmDSLRT", table = table, dispersion = x@dispersion, fit_full = x@fit_full, fit_null = x@fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
   
   
 })

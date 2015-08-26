@@ -9,12 +9,12 @@
 \usage{
 dmFit(x, ...)
 
-\S4method{dmFit}{dmDSdispersion}(x, dispersion = "tagwise_dispersion",
+\S4method{dmFit}{dmDSdispersion}(x, dispersion = "genewise_dispersion",
   prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
   prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-\S4method{dmFit}{dmSQTLdispersion}(x, dispersion = "tagwise_dispersion",
+\S4method{dmFit}{dmSQTLdispersion}(x, dispersion = "genewise_dispersion",
   prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
   prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
@@ -24,7 +24,7 @@ dmFit(x, ...)
 
 \item{...}{Parameters needed for the proportion estimation.}
 
-\item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion"}, \code{"common_dispersion"}}
+\item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}}
 
 \item{prop_mode}{Optimization method used to estimate the proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
 

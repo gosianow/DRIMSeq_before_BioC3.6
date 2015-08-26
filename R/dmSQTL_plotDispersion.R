@@ -1,12 +1,12 @@
 #' @import ggplot2
-dmSQTL_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
+dmSQTL_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
   
-  w <- sapply(tagwise_dispersion, length)
+  w <- sapply(genewise_dispersion, length)
   
   mean_expression <- rep(mean_expression, w)
   nr_features <- rep(nr_features, w)
   
-  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(unlist(tagwise_dispersion)), nr_features = nr_features)
+  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(unlist(genewise_dispersion)), nr_features = nr_features)
   
   df_quant <- quantile(na.omit(df$nr_features), probs = 0.95)
   

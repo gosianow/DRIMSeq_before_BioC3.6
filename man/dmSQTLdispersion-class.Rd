@@ -14,6 +14,6 @@ Object that extends \code{dmSQTLdata} by adding dipsersion.
 
 \item{\code{common_dispersion}}{Numeric.}
 
-\item{\code{tagwise_dispersion}}{List of estimated tagwise dispersion per gene and genotype.}
+\item{\code{genewise_dispersion}}{List of estimated tagwise dispersion per gene and genotype.}
 }}
 

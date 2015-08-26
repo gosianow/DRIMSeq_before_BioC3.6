@@ -14,6 +14,6 @@ Object that extends \code{dmDSdata} by adding dipsersion.
 
 \item{\code{common_dispersion}}{Numeric value of estimated common dispersion.}
 
-\item{\code{tagwise_dispersion}}{Numeric vector of estimated tagwise dispersion.}
+\item{\code{genewise_dispersion}}{Numeric vector of estimated tagwise dispersion.}
 }}
 

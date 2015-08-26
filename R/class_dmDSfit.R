@@ -5,7 +5,7 @@ NULL
 
 #' Object that extends \code{dmDSdispersion} class by adding fitting.
 #' 
-#' @slot dispersion Character specifying which type of dispersion was used for fitting.
+#' @slot dispersion Character specifying which type of dispersion was used for fitting: common_dispersion or genewise_dispersion.
 #' @slot fit_full \code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and full model likelihoods and degrees of freedom.
 #' @slot fit_null \code{\linkS4class{MatrixList}} object containing the pooled proportions of feature expression and null model likelihoods and degrees of freedom.
 setClass("dmDSfit", 
@@ -46,9 +46,9 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 
 #' @rdname dmFit
 #' @inheritParams dmDispersion
-#' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion"}, \code{"common_dispersion"}
+#' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}
 #' @export
-setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   
   fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
@@ -57,7 +57,7 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "tagwise_dispersio
   fit_null <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
   
-  return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, fit_null = fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, tagwise_dispersion = x@tagwise_dispersion, counts = x@counts, samples = x@samples))
+  return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, fit_null = fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
   
   
 })

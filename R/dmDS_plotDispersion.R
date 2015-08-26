@@ -1,7 +1,7 @@
 #' @import ggplot2
-dmDS_plotDispersion <- function(tagwise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
+dmDS_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
 
-  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(tagwise_dispersion), nr_features = nr_features)
+  df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(genewise_dispersion), nr_features = nr_features)
   
   df_quant <- quantile(na.omit(df$nr_features), probs = 0.95)
   

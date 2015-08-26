@@ -31,7 +31,7 @@ setMethod("dmLRT", "dmSQTLfit", function(x, BPPARAM = BiocParallel::MulticorePar
   
   table <- dmSQTL_test(fit_full = x@fit_full, fit_null = x@fit_null, BPPARAM = BPPARAM)
   
-  return(new("dmSQTLLRT", table = table, dispersion = x@dispersion, fit_full = x@fit_full, fit_null = x@fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, tagwise_dispersion = x@tagwise_dispersion, counts = x@counts, genotypes = x@genotypes, samples = x@samples))
+  return(new("dmSQTLLRT", table = table, dispersion = x@dispersion, fit_full = x@fit_full, fit_null = x@fit_null, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, samples = x@samples))
   
   
 })
