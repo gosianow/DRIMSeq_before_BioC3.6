@@ -71,6 +71,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: lik, df
            rownames(stats) <- names(counts)
+           colnames(stats) <- c("lik", "df")
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            

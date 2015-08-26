@@ -20,8 +20,9 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRU
     return(lik)
   
   ## Cox-Reid adjustement
-  
-  adj <- dmSQTL_adjustmentCommon(gamma0, counts, genotypes, pi = fit_full, BPPARAM = BPPARAM)
+  cat("Calculating adjustement.. \n")
+  time <- system.time(adj <- dmSQTL_adjustmentCommon(gamma0, counts, genotypes, pi = fit_full, BPPARAM = BPPARAM))
+  cat("Took ", time["elapsed"], " seconds.\n")
   
   adjLik <- lik - adj
   

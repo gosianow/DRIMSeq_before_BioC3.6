@@ -30,7 +30,7 @@ dm_adjustmentOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0,
   
   adj <- sum(adj, na.rm = TRUE)
   
-  if(adj == Inf)
+  if(adj == -Inf)
     return(NA) 
   
   return(adj)

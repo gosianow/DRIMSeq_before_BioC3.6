@@ -90,7 +90,7 @@ setMethod("show", "MatrixList", function(object){
       print_names <- paste0("$", names(object_sub), "\n")
     
     for(i in 1:np){
-      
+      # i = 1
       cat(print_names[i])
       show_matrix(object_sub[[i]])
       cat("\n")
