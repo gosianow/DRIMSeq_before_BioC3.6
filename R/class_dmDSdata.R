@@ -13,6 +13,21 @@ setClass("dmDSdata",
          representation(counts = "MatrixList", samples = "data.frame"))
 
 
+
+#' @export
+setGeneric("samples", function(x, ...) standardGeneric("samples"))
+
+#' @export
+setMethod("samples", "dmDSdata", function(x) x@samples )
+
+
+#' @export
+setGeneric("counts", function(x, ...) standardGeneric("counts"))
+
+#' @export
+setMethod("counts", "dmDSdata", function(x) x@counts )
+
+
 ##############################################################
 #'  Create dmDSdata object from a table of counts
 #'  
@@ -57,29 +72,23 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   
   if(class(gene_id_counts) == "character")
   gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
+  else 
+  gene_id_counts <- factor(gene_id_counts)
   
   if(class(group) == "character")
   group <- factor(group, levels = unique(group))
+  else 
+  group <- factor(group)
+  
+  if(class(sample_id) == "character")
+  sample_id <- factor(sample_id, levels = unique(sample_id))
+  else 
+  sample_id <- factor(sample_id)
   
   
-  ### keep samples/groups with enough replicates
   tbl <- table(group)
-  
-  if(sum(tbl > 1) < 2)
-  stop("There must be at least two groups and every group with at least two replicates!")
-  
-  levels <- names(tbl[tbl > 1])
-  
-  if(length(levels) < length(tbl))
-  message("Groups that are kept: ", paste(levels, collapse = ", "))
-  
-  keep_samps <- group %in% levels
-  
-  group <- factor(group[keep_samps], levels = levels)
-  
-  counts <- counts[, keep_samps]
-  sample_id <- sample_id[keep_samps]
-  
+  if(all(tbl < 2))
+  stop("There must be at least one group with two replicates!")
   
   ### ordering
   or <- order(gene_id_counts)
@@ -114,6 +123,7 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
 #   })
 
 ##############################################################
+
 setMethod("show", "dmDSdata", function(object){
   
   cat("An object of class", class(object), "\n")
@@ -122,7 +132,7 @@ setMethod("show", "dmDSdata", function(object){
   print(object@counts)
   
   cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples, nhead = 3, ntail = 3)
+  show_matrix(object@samples, nhead = 5, ntail = 5)
   
 })
 

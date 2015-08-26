@@ -9,15 +9,19 @@
 \usage{
 dmLRT(x, ...)
 
-\S4method{dmLRT}{dmDSfit}(x)
+\S4method{dmLRT}{dmDSfit}(x, pairwise_comparison = matrix(nrow = 0, ncol = 2),
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-\S4method{dmLRT}{dmSQTLfit}(x, BPPARAM = BiocParallel::MulticoreParam(workers
-  = 1))
+\S4method{dmLRT}{dmSQTLfit}(x, prop_mode = "constrOptimG", prop_tol = 1e-12,
+  verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.}
 
 \item{...}{Parameters needed for the likelihood ratio test.}
+
+\item{pairwise_comparison}{matrix}
 }
 \value{
 This function returns a \code{\linkS4class{dmDSLRT}} or \code{\linkS4class{dmSQTLLRT}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.

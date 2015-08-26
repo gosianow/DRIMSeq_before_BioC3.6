@@ -16,13 +16,13 @@
 plotFit(x, ...)
 
 \S4method{plotFit}{dmDSfit}(x, gene_id, plot_type = "barplot", order = TRUE,
-  plot_full = TRUE, plot_null = TRUE, out_dir = NULL)
+  plot_full = TRUE, out_dir = NULL)
 
 \S4method{plotFit}{dmSQTLLRT}(x, gene_id, snp_id, plot_type = "boxplot1",
   order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL)
 
 \S4method{plotFit}{dmSQTLfit}(x, gene_id, snp_id, plot_type = "boxplot1",
-  order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL)
+  order = TRUE, plot_full = TRUE, out_dir = NULL)
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object or any that inherits from them.}
@@ -34,8 +34,6 @@ plotFit(x, ...)
 \item{order}{Logical. Whether to plot the features ordered by their expression.}
 
 \item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
-
-\item{plot_null}{Logical. Whether to plot the proportions estimated by the null model.}
 
 \item{...}{Plotting parameters.}
 }

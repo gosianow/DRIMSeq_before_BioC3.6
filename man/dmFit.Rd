@@ -5,7 +5,7 @@
 \alias{dmFit}
 \alias{dmFit,dmDSdispersion-method}
 \alias{dmFit,dmSQTLdispersion-method}
-\title{Estimating the proportions and likelihoods of Dirichlet-multinomial full and null models.}
+\title{Estimating the proportions and likelihoods of Dirichlet-multinomial.}
 \usage{
 dmFit(x, ...)
 
@@ -15,8 +15,7 @@ dmFit(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmFit}{dmSQTLdispersion}(x, dispersion = "genewise_dispersion",
-  prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
-  prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
@@ -35,6 +34,6 @@ dmFit(x, ...)
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
 \description{
-Estimating the proportions and likelihoods of Dirichlet-multinomial full and null models.
+Estimating the proportions and likelihoods of Dirichlet-multinomial.
 }
 
