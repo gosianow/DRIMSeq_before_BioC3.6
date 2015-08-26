@@ -1,3 +1,6 @@
+#' @include class_dmDSdata.R
+NULL
+
 ##############################################################
 
 #' Object that extends \code{dmDSdata} by adding dipsersion.
@@ -40,14 +43,15 @@ setMethod("show", "dmDSdispersion", function(object){
 #' 
 #' disp_tol: The accuracy defined as \code{tol} in \code{\link{optimize}} when \code{disp_mode = "optimize"}, as \code{factr} in \code{\link{optim}} when \code{disp_mode = "optim"}, as \code{reltol} in \code{\link{constrOptim}} when \code{disp_mode = "constrOptim"}.
 #' 
-#' @param x \code{\link{dmDSdata}} or \code{\link{dmDSdispersion}} object of counts.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.
 #' @param ... Parameters needed for the dispersion estimation.
 #' @export
-setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
+setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 
 
 ##############################################################
-#' @rdname dmDSdispersion
+
+#' @rdname dmDispersion
 #' @param mean_expression Logical. Whether to estimate the mean expression of genes.
 #' @param common_dispersion Logical. Whether to estimate the common dispersion.
 #' @param tagwise_dispersion Logical. Whether to estimate the tagwise dispersion.
@@ -67,22 +71,10 @@ setGeneric("dmDSdispersion", function(x, ...) standardGeneric("dmDSdispersion"))
 #' @param verbose Logical.
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' 
-#' @return Returns the \code{\linkS4class{dmDSdispersion}} object.
-#' @examples 
-#' data <- dataDS_dmDSdata
-#' data <- dmDSfilter(data)
-#' \dontrun{
-#' ### This part is quite time consuming thus if possible, increase the number of cores.
-#' data <- dmDSdispersion(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
-#' }
-#' \dontshow{
-#' data <- dataDS_dmDSdispersion
-#' }
-#' dmDSplotDispersion(data)
-#' 
+#' @return Returns the \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
 #' @seealso \code{\link[BiocParallel]{bplapply}}
 #' @export
-setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -117,9 +109,9 @@ setMethod("dmDSdispersion", "dmDSdata", function(x, mean_expression = TRUE, comm
 })
 
 ##############################################################
-#' @rdname dmDSdispersion
+#' @rdname dmDispersion
 #' @export
-setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -153,30 +145,25 @@ setMethod("dmDSdispersion", "dmDSdispersion", function(x, mean_expression = FALS
   
 })
 
-################################################################################
-### dmDSplotDispersion
-################################################################################
 
 ##############################################################
+
 #' Plot the dispersion - mean trend.
 #' 
-#' @param x \code{\link{dmDSdispersion}} object or any that inherits from it i.e. \code{\link{dmDSfit}} or \code{\link{dmDStest}}.
+#' @param x \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object or any that inherits from it.
 #' @param ... Plotting parameters.
 #' @export
-setGeneric("dmDSplotDispersion", function(x, ...) standardGeneric("dmDSplotDispersion"))
+setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 
 
 
 
 ##############################################################
-#' @rdname dmDSplotDispersion
-#' @inheritParams dmDSplotData
-#' @examples 
-#' dmDSplotDispersion(dataDS_dmDSdispersion)
+
+#' @rdname plotDispersion
+#' @inheritParams plotData
 #' @export
-setMethod("dmDSplotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
-  
-  # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts); common_dispersion = x@common_dispersion
+setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   
   dmDS_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   

@@ -39,6 +39,5 @@ head(dataDS_counts)
  group = dataDS_metadata$group
 
  data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
- dmDSplotData(data)
 }
 

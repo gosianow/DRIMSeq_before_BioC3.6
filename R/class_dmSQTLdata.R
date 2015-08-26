@@ -87,8 +87,14 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
   colnames(genotypes) <- sample_id
   rownames(genotypes) <- snp_id_genotypes
   
-  partitioning_counts <- split(1:length(gene_id_counts), gene_id_counts)
-  partitioning_genotypes <- split(1:length(gene_id_genotypes), gene_id_genotypes)
+  
+  inds_counts <- 1:length(gene_id_counts)
+  names(inds_counts) <- feature_id_counts
+  partitioning_counts <- split(inds_counts, gene_id_counts)
+  
+  inds_genotypes <- 1:length(gene_id_genotypes)
+  names(inds_genotypes) <- snp_id_genotypes
+  partitioning_genotypes <- split(inds_genotypes, gene_id_genotypes)
   
   
   counts <- new( "MatrixList", unlistData = counts, partitioning = partitioning_counts)
@@ -153,7 +159,7 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
 #'  gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, 
 #'  window = 5e3)
 #'  
-#'  dmSQTLplotData(data)
+#'  plotData(data)
 #'  
 #'  @export
 dmSQTLdataFromRanges <- function(counts, gene_id_counts, feature_id_counts, gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, window = 5e3){
@@ -198,6 +204,7 @@ setMethod("show", "dmSQTLdata", function(object){
 
 ##############################################################
 
+#' @export
 setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 
 
@@ -205,39 +212,14 @@ setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 
 ##############################################################
 
-#' Filtering.
-#' 
-#' Two step filtering. First, for counts - filtering of genes with low expression and features with low proportions. Second, for genotypes - filtering genotypes with too low monor allel frequency.
-#' 
-#' Parameters should be adjusted based on the sample size used for the analysis...
-#' 
-#' @param x \code{\link{dmSQTLdata}} object with counts and genotypes.
-#' @param ... Filtering parameters.
-#' @export
-setGeneric("dmSQTLfilter", function(x, ...) standardGeneric("dmSQTLfilter"))
-
-
-
-
-##############################################################
-
-#' @rdname dmSQTLfilter
-#' @inheritParams dmDSfilter
+#' @rdname dmFilter
+#' @inheritParams dmFilter
 #' @param minor_allel_freq Value between 0 and 1 which corresponds to minimal
 #'   allel frequency.
 #' @param BPPARAM Parallelization method used by
 #'   \code{\link[BiocParallel]{bplapply}}.
-#' @return Returns filtered \code{\linkS4class{dmSQTLdata}} object.
-#' @examples 
-#' data <- dataSQTL_dmSQTLdata
-#' dmSQTLplotData(data)
-#' 
-#' data <- dmSQTLfilter(data)
-#' dmSQTLplotData(data)
 #' @export
-setMethod("dmSQTLfilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
-  
-  # counts = x@counts; genotypes = x@genotypes; samples = x@samples
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
   
@@ -247,23 +229,12 @@ setMethod("dmSQTLfilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, mi
 })
 
 
-##############################################################
-#' Plot the data information.
-#' 
-#' Plots histograms of number of features per gene and number of SNPs per gene.
-#' 
-#' @param x \code{\link{dmSQTLdata}} object of counts.
-#' @param ... Plotting parameters.
-#' @export
-setGeneric("dmSQTLplotData", function(x, ...) standardGeneric("dmSQTLplotData"))
-
-
 
 ##############################################################
-#' @rdname dmSQTLplotData
-#' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed.
+
+#' @rdname plotData
 #' @export
-setMethod("dmSQTLplotData", "dmSQTLdata", function(x, out_dir = NULL){
+setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
   dmSQTL_plotData(counts = x@counts, genotypes = x@genotypes, out_dir = out_dir)
   

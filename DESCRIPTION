@@ -1,8 +1,8 @@
 Package: DM
 Type: Package
 Title: What the package does (short line)
-Version: 0.2.1
-Date: 2015-08-24
+Version: 0.2.2
+Date: 2015-08-26
 Author: Malgorzata Nowicka, Mark Robinson
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
@@ -13,12 +13,15 @@ Imports:
     methods,
     BiocParallel,
     edgeR,
+    GenomicRanges,
     ggplot2,
     reshape2
 LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr
 Suggests:
+    S4Vectors,
+    IRanges,
     limma,
     BiocStyle,
     knitr
@@ -29,11 +32,11 @@ Collate:
     'class_dmDSdata.R'
     'class_dmDSdispersion.R'
     'class_dmDSfit.R'
-    'class_dmDStest.R'
+    'class_dmDSLRT.R'
     'class_dmSQTLdata.R'
     'class_dmSQTLdispersion.R'
     'class_dmSQTLfit.R'
-    'class_dmSQTLtest.R'
+    'class_dmSQTLLRT.R'
     'dmDS_adjustmentCommon.R'
     'dmDS_estimateCommonDispersion.R'
     'dmDS_estimateTagwiseDispersion.R'

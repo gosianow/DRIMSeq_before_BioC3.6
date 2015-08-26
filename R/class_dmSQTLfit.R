@@ -1,3 +1,6 @@
+#' @include class_dmSQTLdispersion.R
+NULL
+
 ################################################################################
 
 #' Object that extends \code{dmSQTLdispersion} by adding fitting.
@@ -31,32 +34,11 @@ setMethod("show", "dmSQTLfit", function(object){
 
 
 ################################################################################
-#' Estimating the proportions and likelihoods of Dirichlet-multinomial full and null models.
-#' 
-#' @param x \code{\link{dmSQTLdispersion}} object or any that inherits from it i.e. \code{\link{dmSQTLfit}} or \code{\link{dmSQTLtest}}.
-#' @param ... Parameters needed for the proportion estimation.
+
+#' @rdname dmFit
 #' @export
-setGeneric("dmSQTLfit", function(x, ...) standardGeneric("dmSQTLfit"))
-
-
-
-################################################################################
-#' @rdname dmSQTLfit
-#' @inheritParams dmSQTLdispersion
-#' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"tagwise_dispersion", "common_dispersion"}
-#' @examples 
-#' data <- dataSQTL_dmSQTLdispersion
-#' data <- dmSQTLfit(data)
-#' 
-#' snp_id <- "snp_19_12796435"
-#' gene_id <- "ENSG00000132004.7"
-#' 
-#' dmSQTLplotFit(data, gene_id, snp_id)
-#' 
-#' @export
-setMethod("dmSQTLfit", "dmSQTLdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "tagwise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  # counts = x@counts; genotypes = x@genotypes; dispersion = slot(x, dispersion); model = "full"
    
   fit_full <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
@@ -72,21 +54,10 @@ setMethod("dmSQTLfit", "dmSQTLdispersion", function(x, dispersion = "tagwise_dis
 
 
 ################################################################################
-#' Plot the estimated proportions.
-#' 
-#' @param x \code{\link{dmSQTLfit}} object or any that inherits from it i.e. \code{\link{dmSQTLtest}}.
-#' @param ... Plotting parameters.
+
+#' @rdname plotFit
 #' @export
-setGeneric("dmSQTLplotFit", function(x, ...) standardGeneric("dmSQTLplotFit"))
-
-
-
-################################################################################
-#' @rdname dmSQTLplotFit
-#' @inheritParams dmDSplotFit
-#' @param snp_id Vector of SNP IDs to be plotted.
-#' @export
-setMethod("dmSQTLplotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   

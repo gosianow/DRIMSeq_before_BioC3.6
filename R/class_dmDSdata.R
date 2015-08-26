@@ -38,7 +38,6 @@ setClass("dmDSdata",
 #'  group = dataDS_metadata$group
 #'  
 #'  data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
-#'  dmDSplotData(data)
 #'  @export
 dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group){
   
@@ -95,7 +94,10 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   colnames(counts) <- sample_id
   rownames(counts) <- feature_id_counts
   
-  partitioning <- split(1:length(gene_id_counts), gene_id_counts)
+  inds <- 1:length(gene_id_counts)
+  names(inds) <- feature_id_counts
+  
+  partitioning <- split(inds, gene_id_counts)
 
   samples <- data.frame(sample_id = sample_id, group = group)
   
@@ -120,11 +122,13 @@ setMethod("show", "dmDSdata", function(object){
   print(object@counts)
   
   cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples)
+  show_matrix(object@samples, nhead = 3, ntail = 3)
   
 })
 
 ##############################################################
+
+#' @export
 setMethod("names", "dmDSdata", function(x) names(x@counts) )
 
 
@@ -135,13 +139,13 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 #' 
 #' Parameters should be adjusted based on the sample size used for the analysis...
 #' 
-#' @param x \code{\link{dmDSdata}} object of counts.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @param ... Filtering parameters.
 #' @export
-setGeneric("dmDSfilter", function(x, ...) standardGeneric("dmDSfilter"))
+setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
 ##############################################################
-#' @rdname dmDSfilter
+#' @rdname dmFilter
 #' @param min_samps_gene_expr Minimal number of samples where the genes should 
 #'   be expressed.
 #' @param min_gene_expr Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.
@@ -150,15 +154,9 @@ setGeneric("dmDSfilter", function(x, ...) standardGeneric("dmDSfilter"))
 #' @param min_feature_prop Minimal proportion for feature expression. This value
 #'   should be between 0 and 1.
 #' @param max_features Maximum number of features that should be kept per gene.
-#' @return Returns filtered \code{\linkS4class{dmDSdata}} object.
-#' @examples 
-#' data <- dataDS_dmDSdata
-#' dmDSplotData(data)
-#' data <- dmDSfilter(data)
-#' dmDSplotData(data)
+#' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @export
-setMethod("dmDSfilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
-  
+setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   data_filtered <- dmDS_filter(counts = x@counts, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features)
   
@@ -172,20 +170,18 @@ setMethod("dmDSfilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gen
 #' 
 #' Plots a histogram of number of features per gene.
 #' 
-#' @param x \code{\link{dmDSdata}} object of counts.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object with data.
 #' @param ... Plotting parameters.
 #' @export
-setGeneric("dmDSplotData", function(x, ...) standardGeneric("dmDSplotData"))
+setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 
 ##############################################################
-#' @rdname dmDSplotData
+#' @rdname plotData
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed.
-#' @param info \code{DataFrame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS). 
-#' @examples 
-#' dmDSplotData(dataDS_dmDSdata)
+#' @param info \code{data.frame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS). 
 #' @export
-setMethod("dmDSplotData", "dmDSdata", function(x, out_dir = NULL, info = NULL){
+setMethod("plotData", "dmDSdata", function(x, out_dir = NULL, info = NULL){
   
   dmDS_plotData(counts = x@counts, out_dir = out_dir, info = info)
   

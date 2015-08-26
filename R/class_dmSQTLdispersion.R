@@ -1,3 +1,6 @@
+#' @include class_dmSQTLdata.R
+NULL
+
 ##############################################################
 
 #' Object that extends \code{dmSQTLdata} by adding dipsersion.
@@ -33,45 +36,9 @@ setMethod("show", "dmSQTLdispersion", function(object){
 
 ##############################################################
 
-#' Estimating the dispersion in Dirichlet-multinomial model.
-#' 
-#' Function that is a wrapper for different optimazation methods used to estimate the dispersion parameters of Dirichlet-multinomial model with maximum likelihood. Parameters that are directly used in the dispersion estimation start with prefix \code{disp_} and the one that are used directly for the proportion estimation start with \code{prop_}.
-#' 
-#' See details of \code{\link{dmDSdispersion}}
-#' 
-#' @param x \code{\link{dmSQTLdata}} object with counts and genotypes or any other object that inherits from it.
-#' @param ... Parameters needed for the dispersion estimation.
+#' @rdname dmDispersion
 #' @export
-setGeneric("dmSQTLdispersion", function(x, ...) standardGeneric("dmSQTLdispersion"))
-
-
-
-
-##############################################################
-#' @rdname dmSQTLdispersion
-#' @inheritParams dmDSdispersion
-#' 
-#' @return Returns the \code{\linkS4class{dmSQTLdispersion}} object.
-#' @examples 
-#' data <- dataSQTL_dmSQTLdata
-#' dmSQTLplotData(data)
-#' 
-#' data <- dmSQTLfilter(data)
-#' dmSQTLplotData(data)
-#' 
-#' \dontrun{
-#' ### This part is quite time consuming thus if possible, increase the number of cores.
-#' data <- dmSQTLdispersion(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
-#' }
-#' \dontshow{
-#' data <- dataSQTL_dmSQTLdispersion
-#' }
-#' 
-#' dmSQTLplotDispersion(data)
-#' 
-#' @seealso \code{\link[BiocParallel]{bplapply}}
-#' @export
-setMethod("dmSQTLdispersion", "dmSQTLdata", function(x, mean_expression = TRUE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -109,9 +76,10 @@ setMethod("dmSQTLdispersion", "dmSQTLdata", function(x, mean_expression = TRUE, 
 
 
 ##############################################################
-#' @rdname dmSQTLdispersion
+
+#' @rdname dmDispersion
 #' @export
-setMethod("dmSQTLdispersion", "dmSQTLdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
+setMethod("dmDispersion", "dmSQTLdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, tagwise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1)){
   
   if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
@@ -146,23 +114,11 @@ setMethod("dmSQTLdispersion", "dmSQTLdispersion", function(x, mean_expression = 
 })
 
 
-
 ##############################################################
-#' Plot the dispersion - mean trend.
-#' 
-#' @param x \code{\link{dmSQTLdispersion}} object or any that inherits from it i.e. \code{\link{dmSQTLfit}} or \code{\link{dmSQTLtest}}.
-#' @param ... Plotting parameters.
-#' @export
-setGeneric("dmSQTLplotDispersion", function(x, ...) standardGeneric("dmSQTLplotDispersion"))
 
-
-##############################################################
-#' @rdname dmSQTLplotDispersion
-#' @inheritParams dmSQTLplotData
+#' @rdname plotDispersion
 #' @export
-setMethod("dmSQTLplotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
-  
-  # tagwise_dispersion = x@tagwise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts); common_dispersion = x@common_dispersion; out_dir = NULL
+setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   
   dmSQTL_plotDispersion(tagwise_dispersion = x@tagwise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   

@@ -75,6 +75,6 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts,
  gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id,
  window = 5e3)
 
- dmSQTLplotData(data)
+ plotData(data)
 }
 

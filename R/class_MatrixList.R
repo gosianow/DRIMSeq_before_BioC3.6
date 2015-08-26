@@ -38,7 +38,10 @@ MatrixList <- function(..., metadata){
       
       partitioning <- vector("list", length(w))
       
-      partitioning[w != 0] <- split(1:nrow(unlistData), rep(1:length(w), w))
+      inds <- 1:nrow(unlistData)
+      names(inds) <- rownames(unlistData)
+      
+      partitioning[w != 0] <- split(inds, rep(1:length(w), w))
       
       if(!is.null(names(listData)))
       names(partitioning) <- names(listData)

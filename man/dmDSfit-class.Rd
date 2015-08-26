@@ -3,9 +3,9 @@
 \docType{class}
 \name{dmDSfit-class}
 \alias{dmDSfit-class}
-\title{Object that extends \code{dmDSdispersion} by adding fitting.}
+\title{Object that extends \code{dmDSdispersion} class by adding fitting.}
 \description{
-Object that extends \code{dmDSdispersion} by adding fitting.
+Object that extends \code{dmDSdispersion} class by adding fitting.
 }
 \section{Slots}{
 
