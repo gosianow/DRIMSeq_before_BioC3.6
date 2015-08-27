@@ -49,11 +49,11 @@ setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_disper
 
 #' @rdname plotFit
 #' @export
-setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, out_dir = out_dir)
+  dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
   
   
   })
@@ -65,9 +65,9 @@ setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxp
 
 #' @rdname dmSQTLfit-class
 #' @export
-setMethod("plot", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, out_dir = NULL){
+setMethod("plot", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  plotFit(x, gene_id, snp_id, plot_type = plot_type, order = order, plot_full = plot_full, out_dir = out_dir)
+  plotFit(x, gene_id, snp_id, plot_type = plot_type, order = order, plot_full = plot_full, plot_main = plot_main, out_dir = out_dir)
   
 })
 

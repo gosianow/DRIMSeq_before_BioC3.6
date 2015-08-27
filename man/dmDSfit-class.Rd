@@ -7,7 +7,7 @@
 \title{Object that extends \code{dmDSdispersion} class by adding fitting.}
 \usage{
 \S4method{plot}{dmDSfit,ANY}(x, gene_id, plot_type = "barplot",
-  order = TRUE, plot_full = TRUE, out_dir = NULL)
+  order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL)
 }
 \description{
 Object that extends \code{dmDSdispersion} class by adding fitting.

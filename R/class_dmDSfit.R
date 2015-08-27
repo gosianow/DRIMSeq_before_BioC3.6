@@ -73,12 +73,13 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @param plot_type Character defining type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
+#' @param plot_main Logical. Whether to plot the plot title.
 #' @export
-setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, out_dir = out_dir)
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
   
   
 })
@@ -89,9 +90,9 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
 
 #' @rdname dmDSfit-class
 #' @export
-setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, out_dir = NULL){
+setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  plotFit(x, gene_id, plot_type = plot_type, order = order, plot_full = plot_full, out_dir = out_dir)
+  plotFit(x, gene_id, plot_type = plot_type, order = order, plot_full = plot_full, plot_main = plot_main, out_dir = out_dir)
   
 })
 

@@ -7,7 +7,7 @@
 \title{Object that extends \code{dmSQTLdispersion} by adding fitting.}
 \usage{
 \S4method{plot}{dmSQTLfit,ANY}(x, gene_id, snp_id, plot_type = "boxplot1",
-  order = TRUE, plot_full = TRUE, out_dir = NULL)
+  order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL)
 }
 \description{
 Object that extends \code{dmSQTLdispersion} by adding fitting.

@@ -1,4 +1,5 @@
 #' @import ggplot2
+
 dmSQTL_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
   
   w <- sapply(genewise_dispersion, length)
@@ -25,7 +26,7 @@ dmSQTL_plotDispersion <- function(genewise_dispersion, mean_expression, nr_featu
   }
 
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "dispersion_vs_mean.pdf"))
+  pdf(paste0(out_dir, "DM_dispersion_vs_mean.pdf"))
   
   print(ggp2)
   

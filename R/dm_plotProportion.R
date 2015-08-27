@@ -1,18 +1,42 @@
 
 colorl <- function(n){
-  clrs <- c("dodgerblue4", "dodgerblue1", "mediumslateblue", "lavender", "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1" ,"darkorange2", "goldenrod1", "yellow", "forestgreen", "green3", "seagreen1", "darkorchid4", "darkorchid1", "deeppink3", "deeppink", "orchid1")
-  colorRampPalette(clrs)(n)
+  
+  # clrs <- c("steelblue3" ,"violetred3", "turquoise3", "tomato2", "thistle3", "purple2", "springgreen3", "yellow2",  "snow3", "darkorchid1", "seagreen2", "orangered2", "royalblue3", "peachpuff2", "magenta", "limegreen", "red2", "lightslateblue", "mediumturquoise", "lightpink1", "forestgreen", "firebrick1", "dodgerblue1", "darkolivegreen1")
+  
+  clrs <- c("dodgerblue3", "deeppink", "green3", "darkorange2", "mediumslateblue", "lavender", "seagreen1", "dodgerblue1",   "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1",  "yellow", "forestgreen",   "darkorchid4", "darkorchid1", "deeppink3", "orchid1")
+
+  # colorRampPalette(clrs)(n)
+  
+  nc <- length(clrs)
+  
+  if(n > nc)
+    clrs <- rep(clrs, ceiling(n/nc))
+    
+  clrs[1:n]
+  
 }
+
 
 colorb <- function(n){
-  # clrs <- c("#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-  clrs <- c("dodgerblue3", "deepskyblue", "forestgreen", "gold", "blueviolet",  "orchid2")
-  colorRampPalette(clrs)(n)
+  
+  clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "firebrick3", "blueviolet", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
+  
+  nc <- length(clrs)
+  
+  if(n > nc)
+    clrs <- rep(clrs, ceiling(n/nc))
+    
+  clrs[1:n]
+  
+  # colorRampPalette(clrs)(n)
+
 }
 
-# nb <- length(clrs)
+
+# nb <- 20
 # barplot(rep(1, nb), col = colorl(nb))
-# dev.off()
+
+
 
 #' @import ggplot2
 #' @importFrom reshape2 melt
@@ -77,7 +101,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title = element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
     ggtitle(main) +
     geom_bar(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, fill = group), stat = "identity", position = position_dodge(width = width)) +
     scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
@@ -132,7 +156,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
     ggtitle(main) +     
     geom_jitter(data = prop_samp, aes(x = feature_id, y = proportion, fill = group, colour = group), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE) +
     geom_boxplot(data = prop_samp, aes(x = feature_id, y = proportion, colour = group, fill = group), outlier.size = NA, alpha = 0.2, lwd = 0.5) +
@@ -172,7 +196,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10), panel.grid.major = element_blank()) +
+    theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), panel.grid.major = element_blank()) +
     geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
     ggtitle(main) +     
     geom_boxplot(data = prop_samp, aes(x = group, y = proportion, fill = feature_id), width = 1) + 
@@ -207,7 +231,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
     
     ggp <- ggplot() +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=12), axis.title =element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title =element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
     ggtitle(main) +
     geom_line(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, colour = group), size = 1.1) +
     coord_cartesian(ylim = c(-0.1, 1.1)) +
@@ -271,7 +295,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=12, face="bold"), plot.title = element_text(size=10)) +
+    theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
     ggtitle(main) +    
     coord_cartesian(ylim = c(-0.1, 1.1)) + 
     coord_cartesian(ylim = c(-0.1, 1.1)) +

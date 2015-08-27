@@ -32,7 +32,7 @@ dmDS_plotDataInfo <- function(counts, out_dir = NULL, info = NULL){
     colors <- colors[names(tas)]
     
     if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_info_filtering.pdf"), width = 7, height = 7)
+    pdf(paste0(out_dir, "DM_hist_info_filtering.pdf"), width = 7, height = 7)
     opar <- par() 
     par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
     

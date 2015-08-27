@@ -56,7 +56,7 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     
@@ -97,7 +97,7 @@ setMethod("dmDispersion", "dmSQTLdispersion", function(x, mean_expression = FALS
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     

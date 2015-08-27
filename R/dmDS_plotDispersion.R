@@ -1,4 +1,7 @@
 #' @import ggplot2
+
+# genewise_dispersion = x@genewise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts); common_dispersion = x@common_dispersion; out_dir = "~/"
+
 dmDS_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
 
   df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(genewise_dispersion), nr_features = nr_features)
@@ -19,7 +22,7 @@ dmDS_plotDispersion <- function(genewise_dispersion, mean_expression, nr_feature
     }
 
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "dispersion_vs_mean.pdf"))
+  pdf(paste0(out_dir, "DM_dispersion_vs_mean.pdf"))
   
   print(ggp2)
   

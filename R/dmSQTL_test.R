@@ -5,7 +5,7 @@
 dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
-  cat("Calculating likelihood ratio statistics.. \n")
+  cat("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
   
   inds <- 1:length(fit_full)
@@ -22,7 +22,7 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticorePar
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     
-    tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, row.names = paste0(gene_list[g], ":", rownames(fit_full[[g]]@metadata)), stringsAsFactors = FALSE)
+    tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, stringsAsFactors = FALSE)
     
     }, BPPARAM = BPPARAM)
   

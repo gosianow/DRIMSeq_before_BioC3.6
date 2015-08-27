@@ -19,7 +19,7 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
     return(lik)
 
   ## Cox-Reid adjustement for common dispersion
-  if(verbose) cat("Calculating adjustement.. \n")
+  if(verbose) cat("* Calculating adjustement.. \n")
   time <- system.time(adj <- dmDS_adjustmentCommon(gamma0, counts = counts, samples = samples, pi = fit_full, BPPARAM = BPPARAM))
   if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
   

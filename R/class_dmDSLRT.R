@@ -140,7 +140,10 @@ setGeneric("plotLRT", function(x, ...) standardGeneric("plotLRT"))
 #' @export
 setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
   
-  dm_plotTable(x@results, out_dir = out_dir)
+  col_pv <- colnames(x@results)[grepl("pvalue", colnames(x@results)) & !grepl("adj_pvalue", colnames(x@results))]
+  
+  for(i in 1:length(col_pv))
+  dm_plotTable(pvalues = x@results[, col_pv[i]], name = col_pv[i], out_dir = out_dir)
   
 })
 
@@ -161,11 +164,11 @@ setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
 
 #' @rdname plotFit
 #' @export
-setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = x@fit_full, table = x@table, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, out_dir = out_dir)
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = x@fit_full, table = x@table, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
   
   
 })

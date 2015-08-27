@@ -149,7 +149,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     
@@ -186,7 +186,7 @@ setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE,
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     

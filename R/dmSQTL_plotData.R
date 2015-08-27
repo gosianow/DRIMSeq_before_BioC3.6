@@ -2,35 +2,54 @@
 
 dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
   
-
   tt <- width(counts)
   
+  df <- data.frame(tt = tt)
+  
+  ggp <- ggplot(df, aes(x = tt)) +
+    theme_bw() +
+    ggtitle(paste0(length(tt), " genes \n ", sum(tt) , " features ")) +
+    xlab("Number of features per gene") +
+    ylab("Frequency") +
+    geom_histogram(binwidth = 1, fill = "forestgreen") +
+    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
+    coord_cartesian(xlim = c(1, max(tt) + 1))
+  
+  
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "hist_feature_number.pdf")) 
-  opar <- par()      # make a copy of current settings
-  par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
+  pdf(paste0(out_dir, "DM_hist_features.pdf"))
   
-  hist(tt, breaks = seq(0, max(tt), by = 1), col = "darkseagreen2", main = paste0(length(tt), " genes \n ", sum(tt) , " features "), xlab = "Number of features per gene", cex.lab=1.5, cex.axis=1.5, cex.main = 1.5)
+  print(ggp)
   
-  par(mar = opar$mar, mgp = opar$mgp) 
   if(!is.null(out_dir))
   dev.off()
-  
-  
+
+
 
 
   tt <- width(genotypes)
   
+  
+  df <- data.frame(tt = tt)
+  
+  ggp <- ggplot(df, aes(x = tt)) +
+    theme_bw() +
+    ggtitle(paste0(length(tt), " genes \n ", sum(tt) , " features ")) +
+    xlab("Number of SNPs per gene") +
+    ylab("Frequency") +
+    geom_histogram(binwidth = 10, fill = "dodgerblue4") +
+    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
+    coord_cartesian(xlim = c(1, max(tt) + 1))
+  
+  
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "hist_snp_number.pdf"))
-  opar <- par()      # make a copy of current settings
-  par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
+  pdf(paste0(out_dir, "DM_hist_snps.pdf"))
   
-  hist(tt, breaks = 100, col = "darkturquoise", main = paste0(length(tt), " genes \n ", sum(tt) , " SNPs "), xlab = "Number of SNPs per gene", cex.lab=1.5, cex.axis=1.5, cex.main = 1.5)
+  print(ggp)
   
-  par(mar = opar$mar, mgp = opar$mgp) 
   if(!is.null(out_dir))
   dev.off()
+  
   
   
   
