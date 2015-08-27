@@ -46,7 +46,7 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   
-  fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+  fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
   
   return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
@@ -84,6 +84,16 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
 })
 
 
+
+##############################################################
+
+#' @rdname dmDSfit-class
+#' @export
+setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, out_dir = NULL){
+  
+  plotFit(x, gene_id, plot_type = plot_type, order = order, plot_full = plot_full, out_dir = out_dir)
+  
+})
 
 
 

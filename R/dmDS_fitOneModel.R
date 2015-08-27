@@ -18,7 +18,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
          
          full = {
           
-           cat("Fitting full model.. \n")
+           if(verbose) cat("* Fitting full model.. \n")
            group <- samples$group
            ngroups <- nlevels(group)
            lgroups <- levels(group)
@@ -45,7 +45,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            
-           cat("Took ", time["elapsed"], " seconds.\n")
+           if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            
            return(fff)
            
@@ -53,7 +53,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
          
          null = {
            
-           cat("Fitting null model.. \n")
+           if(verbose) cat("* Fitting null model.. \n")
 
            time <- system.time(ff <- BiocParallel::bplapply(inds, function(g){  
              # g = 1
@@ -75,7 +75,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            
-           cat("Took ", time["elapsed"], " seconds.\n")
+           if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            
            return(fff)
            

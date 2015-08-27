@@ -58,22 +58,6 @@ MatrixList <- function(..., metadata){
 
 ##############################################################
 
-#' @export
-setMethod("length", "MatrixList", function(x){
-  
-  length(x@partitioning)
-  
-  })
-
-#' @export
-setMethod("names", "MatrixList", function(x){
-  
-  names(x@partitioning)
-  
-  })
-
-##############################################################
-
 
 setMethod("show", "MatrixList", function(object){
   
@@ -122,45 +106,41 @@ setMethod("show", "MatrixList", function(object){
 
 ##############################################################
 
+#' @rdname MatrixList-class
 #' @export
-setMethod("[[", "MatrixList", function(x, i, ...){
+setMethod("names", "MatrixList", function(x){
   
-  x@unlistData[x@partitioning[[i]], , drop = FALSE]
+  names(x@partitioning)
+  
+  })
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("rownames", "MatrixList", function(x){
+  
+  rownames(x@unlistData)
+  
+})
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("colnames", "MatrixList", function(x){
+  
+  colnames(x@unlistData)
   
 })
 
 
+#' @rdname MatrixList-class
 #' @export
-setMethod("$", "MatrixList", function(x, name){
+setMethod("length", "MatrixList", function(x){
   
-  x[[name]]
+  length(x@partitioning)
   
-})
+  })
 
 
-#' @export
-setMethod("nrow", "MatrixList", function(x){
-  
-  nrow(x@unlistData)
-  
-})
-
-#' @export
-setMethod("ncol", "MatrixList", function(x){
-  
-  ncol(x@unlistData)
-  
-})
-
-#' @export
-setMethod("dim", "MatrixList", function(x){
-  
-  dim(x@unlistData)
-  
-})
-
-##############################################################
-
+#' @rdname MatrixList-class
 #' @export
 setMethod("width", "MatrixList", function(x){
   
@@ -169,10 +149,54 @@ setMethod("width", "MatrixList", function(x){
 })
 
 
+#' @rdname MatrixList-class
+#' @export
+setMethod("dim", "MatrixList", function(x){
+  
+  dim(x@unlistData)
+  
+})
+
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("nrow", "MatrixList", function(x){
+  
+  nrow(x@unlistData)
+  
+})
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("ncol", "MatrixList", function(x){
+  
+  ncol(x@unlistData)
+  
+})
+
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("[[", "MatrixList", function(x, i){
+  
+  x@unlistData[x@partitioning[[i]], , drop = FALSE]
+  
+})
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("$", "MatrixList", function(x, name){
+  
+  x[[name]]
+  
+})
+
+
 ##############################################################
 
+#' @rdname MatrixList-class
 #' @export
-setMethod("[", "MatrixList", function(x, i, j, ..., drop = TRUE){
+setMethod("[", "MatrixList", function(x, i, j){
 
   if(!missing(i)){
     

@@ -3,7 +3,11 @@
 \docType{class}
 \name{dmSQTLdispersion-class}
 \alias{dmSQTLdispersion-class}
+\alias{plot,dmSQTLdispersion,ANY-method}
 \title{Object that extends \code{dmSQTLdata} by adding dipsersion.}
+\usage{
+\S4method{plot}{dmSQTLdispersion,ANY}(x, out_dir = NULL)
+}
 \description{
 Object that extends \code{dmSQTLdata} by adding dipsersion.
 }

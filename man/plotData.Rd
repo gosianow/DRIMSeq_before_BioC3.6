@@ -9,7 +9,7 @@
 \usage{
 plotData(x, ...)
 
-\S4method{plotData}{dmDSdata}(x, out_dir = NULL, info = NULL)
+\S4method{plotData}{dmDSdata}(x, out_dir = NULL)
 
 \S4method{plotData}{dmSQTLdata}(x, out_dir = NULL)
 }
@@ -19,8 +19,6 @@ plotData(x, ...)
 \item{...}{Plotting parameters.}
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
-
-\item{info}{\code{data.frame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS).}
 }
 \description{
 Plots a histogram of number of features per gene.

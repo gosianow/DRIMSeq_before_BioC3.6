@@ -9,26 +9,133 @@ NULL
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of counts.
 #' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
+
 setClass("dmDSdata", 
-         representation(counts = "MatrixList", samples = "data.frame"))
+         representation(counts = "MatrixList", 
+          samples = "data.frame"))
 
 
+# setValidity("dmDSdata", function(object){
 
-#' @export
-setGeneric("samples", function(x, ...) standardGeneric("samples"))
+#   # has to return TRUE when valid object!
 
-#' @export
-setMethod("samples", "dmDSdata", function(x) x@samples )
+#   })
 
 
+##############################################################
+
+#' @rdname dmDSdata-class
 #' @export
 setGeneric("counts", function(x, ...) standardGeneric("counts"))
 
+#' @rdname dmDSdata-class
 #' @export
 setMethod("counts", "dmDSdata", function(x) x@counts )
 
 
+#' @rdname dmDSdata-class
+#' @export
+setGeneric("samples", function(x, ...) standardGeneric("samples"))
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("samples", "dmDSdata", function(x) x@samples )
+
+
+
+#' @rdname dmDSdata-class
+#' @export
+setGeneric("samples<-", function(x, value) standardGeneric("samples<-"))
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("samples<-", "dmDSdata", function(x, value){
+  
+  stopifnot( ncol(x@counts) == nrow(value) )
+  stopifnot( c("sample_id", "group") %in% colnames(value))
+  stopifnot( class( value$sample_id ) %in% c("character", "factor"))
+  stopifnot( class( value$group ) %in% c("character", "factor"))
+  
+  if(class(value$group) == "character")
+  value$group <- factor(value$group, levels = unique(value$group))
+  else 
+  value$group <- factor(value$group)
+  
+  if(class(value$sample_id) == "character")
+  value$sample_id <- factor(value$sample_id, levels = unique(value$sample_id))
+  else 
+  value$sample_id <- factor(value$sample_id)
+  
+  colnames(x@counts@unlistData) <- value$sample_id
+  
+  rownames(value) <- NULL
+  
+  if(!all(value$group == x@samples$group)){
+    
+    return(new("dmDSdata", counts = x@counts, samples = value))
+    
+  }else{
+    
+    return(initialize(x, samples = value))
+    
+  }
+  
+  
+  })
+
+
+
 ##############################################################
+
+setMethod("show", "dmDSdata", function(object){
+  
+  cat("An object of class", class(object), "\n")
+  
+  cat("Slot \"counts\":\n")
+  print(object@counts)
+  
+  cat("\nSlot \"samples\":\n")
+  show_matrix(object@samples, nhead = 5, ntail = 5)
+  
+})
+
+##############################################################
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("names", "dmDSdata", function(x) names(x@counts) )
+
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("length", "dmDSdata", function(x) length(x@counts) )
+
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("[", "dmDSdata", function(x, i, j){
+  
+  counts <- x@counts[i, j]
+  samples <- x@samples
+  
+  if(!missing(j)){
+    rownames(samples) <- samples$sample_id
+    samples <- samples[j, ]
+    samples$sample_id <- factor(samples$sample_id)
+    samples$group <- factor(samples$group)
+    rownames(samples) <- NULL
+  }
+
+  # initialize(x, counts = counts, samples = samples)
+  
+  return(new("dmDSdata", counts = counts, samples = samples))
+  
+})
+
+
+
+##############################################################
+
 #'  Create dmDSdata object from a table of counts
 #'  
 #'  @param counts A numeric matrix or data.frame of counts. Rows represent features (exons,
@@ -116,33 +223,9 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   
 }
 
-# setValidity("dmDSdata", function(object){
-
-#   # has to return TRUE when valid object!
-
-#   })
 
 ##############################################################
 
-setMethod("show", "dmDSdata", function(object){
-  
-  cat("An object of class", class(object), "\n")
-  
-  cat("Slot \"counts\":\n")
-  print(object@counts)
-  
-  cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples, nhead = 5, ntail = 5)
-  
-})
-
-##############################################################
-
-#' @export
-setMethod("names", "dmDSdata", function(x) names(x@counts) )
-
-
-##############################################################
 #' Filtering.
 #' 
 #' Filtering of genes with low expression and features with low proportions.
@@ -154,7 +237,10 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 #' @export
 setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
+
+
 ##############################################################
+
 #' @rdname dmFilter
 #' @param min_samps_gene_expr Minimal number of samples where the genes should 
 #'   be expressed.
@@ -176,6 +262,7 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_
 })
 
 ##############################################################
+
 #' Plot the data information.
 #' 
 #' Plots a histogram of number of features per gene.
@@ -187,18 +274,26 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 
 ##############################################################
+
 #' @rdname plotData
-#' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed.
-#' @param info \code{data.frame} with \code{gene_id} and \code{feature_id} that are differentially spliced (DS). 
+#' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
 #' @export
-setMethod("plotData", "dmDSdata", function(x, out_dir = NULL, info = NULL){
+setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
-  dmDS_plotData(counts = x@counts, out_dir = out_dir, info = info)
+  dmDS_plotData(counts = x@counts, out_dir = out_dir)
   
 })
 
 
+##############################################################
 
+#' @rdname dmDSdata-class
+#' @export
+setMethod("plot", "dmDSdata", function(x, out_dir = NULL){
+  
+  plotData(x, out_dir = out_dir)
+  
+})
 
 
 

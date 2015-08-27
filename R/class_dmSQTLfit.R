@@ -35,7 +35,7 @@ setMethod("show", "dmSQTLfit", function(object){
 setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
    
-  fit_full <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+  fit_full <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
 
  
   return(new("dmSQTLfit", dispersion = dispersion, fit_full = fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, samples = x@samples))
@@ -61,6 +61,15 @@ setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxp
 
 
 
+##############################################################
+
+#' @rdname dmSQTLfit-class
+#' @export
+setMethod("plot", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, out_dir = NULL){
+  
+  plotFit(x, gene_id, snp_id, plot_type = plot_type, order = order, plot_full = plot_full, out_dir = out_dir)
+  
+})
 
 
 

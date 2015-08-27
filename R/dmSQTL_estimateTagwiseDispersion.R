@@ -7,7 +7,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
   
   inds <- 1:length(counts)
   
-  cat("Estimating tagwise dispersion.. \n")
+  cat("* Estimating genewise dispersion.. \n")
   
   time <- system.time(
     switch(
@@ -289,7 +289,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
 
 
   cat("Took ", time["elapsed"], " seconds.\n")
-  cat("** Tagwise dispersion done! \n")
+  if(verbose) cat("*** Genewise dispersion: ", head(dispersion[[1]]), "... \n")
   
   return(dispersion)
   

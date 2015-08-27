@@ -3,7 +3,12 @@
 \docType{class}
 \name{dmSQTLfit-class}
 \alias{dmSQTLfit-class}
+\alias{plot,dmSQTLfit,ANY-method}
 \title{Object that extends \code{dmSQTLdispersion} by adding fitting.}
+\usage{
+\S4method{plot}{dmSQTLfit,ANY}(x, gene_id, snp_id, plot_type = "boxplot1",
+  order = TRUE, plot_full = TRUE, out_dir = NULL)
+}
 \description{
 Object that extends \code{dmSQTLdispersion} by adding fitting.
 }

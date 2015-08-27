@@ -8,7 +8,7 @@
 dmDS_test <- function(stats_full, stats_null){
 
   ## calculate lr
-  cat("Calculating likelihood ratio statistics.. \n")
+  cat("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
     
   lr <- 2*(rowSums(stats_full) - stats_null[, "lik"])

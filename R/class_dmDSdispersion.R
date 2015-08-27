@@ -15,6 +15,63 @@ setClass("dmDSdispersion",
                         genewise_dispersion = "numeric"))
 
 
+##############################################################
+
+
+#' @rdname dmDSdispersion-class
+#' @export
+setGeneric("mean_expression", function(x, ...) standardGeneric("mean_expression"))
+
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("mean_expression", "dmDSdispersion", function(x) x@mean_expression )
+
+
+#' @rdname dmDSdispersion-class
+#' @export
+setGeneric("common_dispersion", function(x, ...) standardGeneric("common_dispersion"))
+
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("common_dispersion", "dmDSdispersion", function(x) x@common_dispersion )
+
+
+#' @rdname dmDSdispersion-class
+#' @export
+setGeneric("common_dispersion<-", function(x, value) standardGeneric("common_dispersion<-"))
+
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("common_dispersion<-", "dmDSdispersion", function(x, value){
+  
+  return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = value, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
+  
+  })
+
+#' @rdname dmDSdispersion-class
+#' @export
+setGeneric("genewise_dispersion", function(x, ...) standardGeneric("genewise_dispersion"))
+
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("genewise_dispersion", "dmDSdispersion", function(x) x@genewise_dispersion )
+
+
+#' @rdname dmDSdispersion-class
+#' @export
+setGeneric("genewise_dispersion<-", function(x, value) standardGeneric("genewise_dispersion<-"))
+
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("genewise_dispersion<-", "dmDSdispersion", function(x, value){
+  
+  return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = value, counts = x@counts, samples = x@samples))
+  
+  # initialize(x, genewise_dispersion = value)
+  
+  })
+
+
 
 ##############################################################
 
@@ -76,13 +133,13 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' @export
 setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
-    mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
+  if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
+    mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     mean_expression <- numeric()
   }
   
-  if(common_dispersion || disp_mode == "grid"){
+  if(common_dispersion || (genewise_dispersion && disp_mode == "grid")){
     common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     common_dispersion <- numeric()
@@ -92,7 +149,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      cat("!Using common dispersion as disp_init in 'grid' mode!\n")
+      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     
@@ -113,13 +170,13 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
 #' @export
 setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  if(mean_expression || (disp_mode == "grid" && disp_moderation == "trended")){
-    mean_expression <- dm_estimateMeanExpression(counts = x@counts, BPPARAM = BPPARAM)
+  if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
+    mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     mean_expression <- x@mean_expression
   }
   
-  if(common_dispersion || disp_mode == "grid"){
+  if(common_dispersion || (genewise_dispersion && disp_mode == "grid")){
     common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     common_dispersion <- x@common_dispersion
@@ -129,7 +186,7 @@ setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE,
   if(genewise_dispersion){
     
     if(disp_mode == "grid" && length(common_dispersion)){
-      cat("!Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode!\n")
+      message("! Using common_dispersion =", round(common_dispersion, 2), "as disp_init in 'grid' mode !")
       disp_init <- common_dispersion
     }
     
@@ -165,12 +222,25 @@ setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 #' @export
 setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   
+  if(!length(x@genewise_dispersion) == length(x@counts))
+  stop("Genewise dispersion must be estimated for each gene!")
+  if(!length(x@genewise_dispersion) == length(x@mean_expression))
+  stop("Mean expression must be estimated for each gene!")
+  
   dmDS_plotDispersion(genewise_dispersion = x@genewise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   
 })
 
 
+##############################################################
 
+#' @rdname dmDSdispersion-class
+#' @export
+setMethod("plot", "dmDSdispersion", function(x, out_dir = NULL){
+  
+  plotDispersion(x, out_dir = out_dir)
+  
+})
 
 
 

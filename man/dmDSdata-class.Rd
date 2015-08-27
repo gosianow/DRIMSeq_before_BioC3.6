@@ -2,8 +2,39 @@
 % Please edit documentation in R/class_dmDSdata.R
 \docType{class}
 \name{dmDSdata-class}
+\alias{[,dmDSdata,ANY,ANY-method}
+\alias{counts}
+\alias{counts,dmDSdata-method}
 \alias{dmDSdata-class}
+\alias{length,dmDSdata-method}
+\alias{names,dmDSdata-method}
+\alias{plot,dmDSdata,ANY-method}
+\alias{samples}
+\alias{samples,dmDSdata-method}
+\alias{samples<-}
+\alias{samples<-,dmDSdata-method}
 \title{Object that contains counts and sample information.}
+\usage{
+counts(x, ...)
+
+\S4method{counts}{dmDSdata}(x)
+
+samples(x, ...)
+
+\S4method{samples}{dmDSdata}(x)
+
+samples(x) <- value
+
+\S4method{samples}{dmDSdata}(x) <- value
+
+\S4method{names}{dmDSdata}(x)
+
+\S4method{length}{dmDSdata}(x)
+
+\S4method{[}{dmDSdata,ANY,ANY}(x, i, j)
+
+\S4method{plot}{dmDSdata,ANY}(x, out_dir = NULL)
+}
 \description{
 Can be created with function \code{\link{dmDSdata}}.
 }

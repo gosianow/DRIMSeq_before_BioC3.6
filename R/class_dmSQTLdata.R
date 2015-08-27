@@ -16,6 +16,76 @@ setClass("dmSQTLdata",
                         samples = "data.frame"))
 
 
+##############################################################
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("counts", "dmSQTLdata", function(x) x@counts )
+
+
+#' @rdname dmSQTLdata-class
+#' @export
+setGeneric("genotypes", function(x, ...) standardGeneric("genotypes"))
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("genotypes", "dmSQTLdata", function(x) x@genotypes )
+
+
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("samples", "dmSQTLdata", function(x) x@samples )
+
+
+##############################################################
+
+setMethod("show", "dmSQTLdata", function(object){
+  
+  cat("An object of class", class(object), "\n")
+  
+  cat("Slot \"counts\":\n")
+  print(object@counts)
+  
+  cat("\nSlot \"genotypes\":\n")
+  print(object@genotypes)
+  
+  cat("\nSlot \"samples\":\n")
+  show_matrix(object@samples)
+  
+})
+
+
+
+##############################################################
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
+
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("[", "dmSQTLdata", function(x, i, j){
+  
+  counts <- x@counts[i, j]
+  genotypes <- x@genotypes[i, j]
+  samples <- x@samples
+  
+  if(!missing(j)){
+    rownames(samples) <- samples$sample_id
+    samples <- samples[j, ]
+    samples$sample_id <- factor(samples$sample_id)
+    rownames(samples) <- NULL
+  }
+
+  return(new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples))
+  
+})
 
 ##############################################################
 
@@ -184,42 +254,17 @@ dmSQTLdataFromRanges <- function(counts, gene_id_counts, feature_id_counts, gene
   
 }
 
-##############################################################
-setMethod("show", "dmSQTLdata", function(object){
-  
-  cat("An object of class", class(object), "\n")
-  
-  cat("Slot \"counts\":\n")
-  print(object@counts)
-  
-  cat("\nSlot \"genotypes\":\n")
-  print(object@genotypes)
-  
-  cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples)
-  
-})
-
-
-
-##############################################################
-
-#' @export
-setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
-
-
 
 
 ##############################################################
 
 #' @rdname dmFilter
 #' @inheritParams dmFilter
-#' @param minor_allel_freq Value between 0 and 1 which corresponds to minimal
-#'   allel frequency.
+#' @param minor_allel_freq Number of samples that the minor allel must be present in.
 #' @param BPPARAM Parallelization method used by
 #'   \code{\link[BiocParallel]{bplapply}}.
 #' @export
-setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 0.05, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
   
@@ -242,6 +287,15 @@ setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
 
 
 
+##############################################################
+
+#' @rdname dmSQTLdata-class
+#' @export
+setMethod("plot", "dmSQTLdata", function(x, out_dir = NULL){
+  
+  plotData(x, out_dir = out_dir)
+  
+})
 
 
 

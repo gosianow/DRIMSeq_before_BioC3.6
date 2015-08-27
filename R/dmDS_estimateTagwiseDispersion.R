@@ -18,7 +18,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
   
   
   ### Find optimized dispersion
-  cat("Estimating tagwise dispersion.. \n")
+  cat("* Estimating genewise dispersion.. \n")
   time <- system.time(
     switch(
       disp_mode, 
@@ -154,7 +154,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         if(nrow(loglik) == 0){
           dispersion <- rep(NA, length(inds))
           names(dispersion) <- names(counts)
-          cat("** Tagwise dispersion: ", head(dispersion), "... \n")
+          if(verbose) cat("*** Genewise dispersion: ", head(dispersion), "... \n")
           return(dispersion)
         }
         
@@ -206,7 +206,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       }))
   
   cat("Took ", time["elapsed"], " seconds.\n")
-  cat("** Tagwise dispersion: ", head(dispersion), "... \n")
+  if(verbose) cat("*** Genewise dispersion: ", head(dispersion), "... \n")
   
   return(dispersion)
   

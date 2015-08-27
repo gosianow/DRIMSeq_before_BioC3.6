@@ -2,8 +2,42 @@
 % Please edit documentation in R/class_dmDSdispersion.R
 \docType{class}
 \name{dmDSdispersion-class}
+\alias{common_dispersion}
+\alias{common_dispersion,dmDSdispersion-method}
+\alias{common_dispersion<-}
+\alias{common_dispersion<-,dmDSdispersion-method}
 \alias{dmDSdispersion-class}
+\alias{genewise_dispersion}
+\alias{genewise_dispersion,dmDSdispersion-method}
+\alias{genewise_dispersion<-}
+\alias{genewise_dispersion<-,dmDSdispersion-method}
+\alias{mean_expression}
+\alias{mean_expression,dmDSdispersion-method}
+\alias{plot,dmDSdispersion,ANY-method}
 \title{Object that extends \code{dmDSdata} by adding dipsersion.}
+\usage{
+mean_expression(x, ...)
+
+\S4method{mean_expression}{dmDSdispersion}(x)
+
+common_dispersion(x, ...)
+
+\S4method{common_dispersion}{dmDSdispersion}(x)
+
+common_dispersion(x) <- value
+
+\S4method{common_dispersion}{dmDSdispersion}(x) <- value
+
+genewise_dispersion(x, ...)
+
+\S4method{genewise_dispersion}{dmDSdispersion}(x)
+
+genewise_dispersion(x) <- value
+
+\S4method{genewise_dispersion}{dmDSdispersion}(x) <- value
+
+\S4method{plot}{dmDSdispersion,ANY}(x, out_dir = NULL)
+}
 \description{
 Object that extends \code{dmDSdata} by adding dipsersion.
 }

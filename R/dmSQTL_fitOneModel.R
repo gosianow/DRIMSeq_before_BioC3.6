@@ -24,7 +24,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
          
          full={
            
-           cat("Fitting full model.. \n")
+           if(verbose) cat("* Fitting full model.. \n")
            
            time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
              # g = 1; y = counts[[g]]; snps = genotypes[[g]]
@@ -72,7 +72,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               
            }, BPPARAM = BPPARAM))
            
-           cat("Took ", time["elapsed"], " seconds.\n")
+           if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            names(fff) <- names(counts)  
            
            return(fff)
@@ -81,7 +81,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
          
          null={
            
-           cat("Fitting null model.. \n")
+           if(verbose) cat("* Fitting null model.. \n")
            
            time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
              # g = 1; y = counts[[g]]; snps = genotypes[[g]]
@@ -121,7 +121,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
            }, BPPARAM = BPPARAM))
            
-           cat("Took ", time["elapsed"], " seconds.\n")
+           if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            names(fff) <- names(counts)
            
            

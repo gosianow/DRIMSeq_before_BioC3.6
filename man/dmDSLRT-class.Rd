@@ -3,7 +3,17 @@
 \docType{class}
 \name{dmDSLRT-class}
 \alias{dmDSLRT-class}
+\alias{plot,dmDSLRT,ANY-method}
+\alias{results}
+\alias{results,dmDSLRT-method}
 \title{Object that extends \code{dmDSfit} by adding the test results.}
+\usage{
+results(x, ...)
+
+\S4method{results}{dmDSLRT}(x)
+
+\S4method{plot}{dmDSLRT,ANY}(x, out_dir = NULL)
+}
 \description{
 Object that extends \code{dmDSfit} by adding the test results.
 }

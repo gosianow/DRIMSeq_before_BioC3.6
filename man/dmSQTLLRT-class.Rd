@@ -3,7 +3,14 @@
 \docType{class}
 \name{dmSQTLLRT-class}
 \alias{dmSQTLLRT-class}
+\alias{plot,dmSQTLLRT,ANY-method}
+\alias{results,dmSQTLLRT-method}
 \title{Object that extends \code{dmSQTLfit} by adding the test results.}
+\usage{
+\S4method{results}{dmSQTLLRT}(x)
+
+\S4method{plot}{dmSQTLLRT,ANY}(x, out_dir = NULL)
+}
 \description{
 Object that extends \code{dmSQTLfit} by adding the test results.
 }

@@ -13,6 +13,19 @@ setClass("dmDSLRT",
           fit_null = "list",
           results = "data.frame"))
 
+
+##############################################################
+
+#' @rdname dmDSLRT-class
+#' @export
+setGeneric("results", function(x, ...) standardGeneric("results"))
+
+#' @rdname dmDSLRT-class
+#' @export
+setMethod("results", "dmDSLRT", function(x) x@results )
+
+
+
 ################################################################################
 
 setMethod("show", "dmDSLRT", function(object){
@@ -56,7 +69,7 @@ setMethod("dmLRT", "dmDSfit", function(x, pairwise_comparison = matrix(nrow = 0,
     message("Running comparison between all groups..")
     fit_null <- list()
     
-    fit_null[[1]] <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    fit_null[[1]] <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
     
     results <- dmDS_test(stats_full = x@fit_full@metadata, stats_null = fit_null[[1]]@metadata)
     
@@ -86,7 +99,7 @@ setMethod("dmLRT", "dmDSfit", function(x, pairwise_comparison = matrix(nrow = 0,
       samples$sample_id <- factor(samples$sample_id)
       samples$group <- factor(samples$group)
       
-      fit_null[[i]] <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+      fit_null[[i]] <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
       
       tables[[i]] <- dmDS_test(stats_full = x@fit_full@metadata[, pairwise_comparison[i, ]], stats_null = fit_null[[i]]@metadata)
       
@@ -130,6 +143,19 @@ setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
   dm_plotTable(x@results, out_dir = out_dir)
   
 })
+
+
+##############################################################
+
+#' @rdname dmDSLRT-class
+#' @export
+setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
+  
+  plotLRT(x, out_dir = out_dir)
+  
+})
+
+
 
 ################################################################################
 

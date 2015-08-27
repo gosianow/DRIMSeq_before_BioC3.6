@@ -12,6 +12,14 @@ setClass("dmSQTLLRT",
          representation(fit_null = "list",
           results = "data.frame"))
 
+##############################################################
+
+#' @rdname dmSQTLLRT-class
+#' @export
+setMethod("results", "dmSQTLLRT", function(x) x@results )
+
+
+
 ################################################################################
 
 setMethod("show", "dmSQTLLRT", function(object){
@@ -34,7 +42,7 @@ setMethod("show", "dmSQTLLRT", function(object){
 #' @export
 setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+  fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
   results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, BPPARAM = BPPARAM)
   
@@ -51,6 +59,17 @@ setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol
 setMethod("plotLRT", "dmSQTLLRT", function(x, out_dir = NULL){
   
   dm_plotTable(x@results, out_dir = out_dir)
+  
+})
+
+
+##############################################################
+
+#' @rdname dmSQTLLRT-class
+#' @export
+setMethod("plot", "dmSQTLLRT", function(x, out_dir = NULL){
+  
+  plotLRT(x, out_dir = out_dir)
   
 })
 

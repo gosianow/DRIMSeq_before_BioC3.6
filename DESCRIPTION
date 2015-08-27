@@ -44,6 +44,7 @@ Collate:
     'dmDS_filter.R'
     'dmDS_fitOneModel.R'
     'dmDS_plotData.R'
+    'dmDS_plotDataInfo.R'
     'dmDS_plotDispersion.R'
     'dmDS_plotFit.R'
     'dmDS_profileLikCommon.R'

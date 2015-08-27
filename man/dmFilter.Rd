@@ -14,7 +14,7 @@ dmFilter(x, ...)
 
 \S4method{dmFilter}{dmSQTLdata}(x, min_samps_gene_expr = 70,
   min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1,
-  max_features = Inf, minor_allel_freq = 0.05,
+  max_features = Inf, minor_allel_freq = 5,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
@@ -35,8 +35,7 @@ should be between 0 and 1.}
 
 \item{max_features}{Maximum number of features that should be kept per gene.}
 
-\item{minor_allel_freq}{Value between 0 and 1 which corresponds to minimal
-allel frequency.}
+\item{minor_allel_freq}{Number of samples that the minor allel must be present in.}
 
 \item{BPPARAM}{Parallelization method used by
 \code{\link[BiocParallel]{bplapply}}.}
