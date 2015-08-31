@@ -1,0 +1,120 @@
+%\VignetteIndexEntry{User guide of DM}
+%\VignettePackage{DM}
+%\VignetteEngine{knitr::knitr}
+
+\documentclass{article}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+
+\bioctitle[Dirichlet-multinomial]{Dirichlet-multinomial framework for differential splicing and SQTL analysis.}
+%% also: \bioctitle{Title used for both header and title page}
+%% or... \title{Title used for both header and title page}
+\author{Malgorzata Nowicka, Mark Robinson\footnote{gosia.nowicka@uzh.ch}}
+
+
+\begin{document}
+\maketitle 
+\tableofcontents
+
+
+<<setup_knitr, include=FALSE, cache=FALSE>>=
+library(knitr)
+opts_chunk$set(cache = TRUE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.cutoff = 60), out.width = "8cm", out.height = "8cm", fig.align = "center")
+@
+
+\section{Dirichlet-multinomial workflow to detect differentiall splicing (DS) in RNA-seq data}
+
+Load \Rpackage{DM} package.
+
+<<library>>=
+library(DM)
+@
+
+
+Create a \Rcode{dmDSdata} object that contains counts.
+
+<<DSdmDSdata>>=
+
+counts <- dataDS_counts[,-1]
+group_id <- dataDS_counts[,1]
+group_split <- limma::strsplit2(group_id, ":")
+gene_id_counts <- group_split[, 1]
+feature_id_counts <- group_split[, 2]
+sample_id = dataDS_metadata$sample_id
+group = dataDS_metadata$group
+
+
+d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, 
+                 feature_id_counts = feature_id_counts, sample_id = sample_id, 
+                 group = group)
+
+plotData(d)
+
+@
+
+
+Filter genes and transcripts with low expression.
+
+<<DSdmFilter>>=
+d <- dmFilter(d)
+plotData(d)
+@
+
+
+Estimate dispersion.
+
+<<dmDSdispersion>>=
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
+plotDispersion(d)
+@
+
+
+Estimate proportions.
+
+
+
+<<DSdmFit, out.width = "16cm", fig.width = 14>>=
+d <- dmFit(d)
+
+gene_id <- names(d)[1]
+plotFit(d, gene_id = gene_id, plot_type = "barplot")
+
+@
+
+
+Use likelihood ratio to test for differential splicing.
+
+
+<<DSdmLRT>>=
+d <- dmLRT(d)
+
+plotLRT(d)
+
+results <- results(d)
+
+gene_id <- results$gene_id[1]
+plotFit(d, gene_id = gene_id)
+
+
+@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

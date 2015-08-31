@@ -1,0 +1,5 @@
+^data-raw$
+^vignettes/cache$
+^vignettes/figure$
+^.*\.Rproj$
+^\.Rproj\.user$

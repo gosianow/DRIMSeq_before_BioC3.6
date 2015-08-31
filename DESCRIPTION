@@ -1,0 +1,79 @@
+Package: DM
+Type: Package
+Title: What the package does (short line)
+Version: 0.2.2
+Date: 2015-08-26
+Author: Malgorzata Nowicka, Mark Robinson
+Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
+Description: More about what it does (maybe more than one line)
+License: GPL (>= 2)
+Depends:
+    BiocGenerics
+Imports:
+    methods,
+    BiocParallel,
+    edgeR,
+    GenomicRanges,
+    ggplot2,
+    reshape2
+LazyData: true
+ByteCompile: true
+VignetteBuilder: knitr
+Suggests:
+    S4Vectors,
+    IRanges,
+    limma,
+    BiocStyle,
+    knitr
+Collate:
+    'DM.R'
+    'class_show_utils.R'
+    'class_MatrixList.R'
+    'class_dmDSdata.R'
+    'class_dmDSdispersion.R'
+    'class_dmDSfit.R'
+    'class_dmDSLRT.R'
+    'class_dmSQTLdata.R'
+    'class_dmSQTLdispersion.R'
+    'class_dmSQTLfit.R'
+    'class_dmSQTLLRT.R'
+    'dmDS_adjustmentCommon.R'
+    'dmDS_estimateCommonDispersion.R'
+    'dmDS_estimateTagwiseDispersion.R'
+    'dm_cpm.R'
+    'dmDS_filter.R'
+    'dmDS_fitOneModel.R'
+    'dmDS_plotData.R'
+    'dmDS_plotDataInfo.R'
+    'dmDS_plotDispersion.R'
+    'dmDS_plotFit.R'
+    'dmDS_profileLikCommon.R'
+    'dmDS_test.R'
+    'dmSQTL_adjustmentCommon.R'
+    'dmSQTL_estimateCommonDispersion.R'
+    'dmSQTL_estimateTagwiseDispersion.R'
+    'dmSQTL_filter.R'
+    'dmSQTL_fitOneModel.R'
+    'dmSQTL_plotData.R'
+    'dmSQTL_plotDispersion.R'
+    'dmSQTL_plotFit.R'
+    'dmSQTL_profileLikCommon.R'
+    'dmSQTL_test.R'
+    'dm_FIMexp.R'
+    'dm_FIMobs.R'
+    'dm_FIMobsG.R'
+    'dm_adjustmentOneGeneManyGroups.R'
+    'dm_adjustmentOneGeneOneGroup.R'
+    'dm_estimateMeanExpression.R'
+    'dm_fitOneGeneManyGroups.R'
+    'dm_fitOneGeneOneGroup.R'
+    'dm_lik.R'
+    'dm_likG.R'
+    'dm_plotProportion.R'
+    'dm_plotROC_TPRFDR.R'
+    'dm_plotTable.R'
+    'dm_profileLikTagwise.R'
+    'dm_rdirichlet.R'
+    'dm_score.R'
+    'dm_scoreG.R'
+    'dm_weirMoM.R'
