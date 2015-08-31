@@ -19,7 +19,9 @@ colorl <- function(n){
 
 colorb <- function(n){
   
-  clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "firebrick3", "blueviolet", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
+  # clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "firebrick3", "blueviolet", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
+  
+  clrs <- c("dodgerblue3", "maroon2",  "forestgreen",  "blueviolet", "firebrick3", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
   
   nc <- length(clrs)
   
