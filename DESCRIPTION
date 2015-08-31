@@ -70,6 +70,7 @@ Collate:
     'dm_lik.R'
     'dm_likG.R'
     'dm_plotProportion.R'
+    'dm_plotROC_TPRFDR.R'
     'dm_plotTable.R'
     'dm_profileLikTagwise.R'
     'dm_rdirichlet.R'
