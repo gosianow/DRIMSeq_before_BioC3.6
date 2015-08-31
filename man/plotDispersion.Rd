@@ -23,4 +23,9 @@ plotDispersion(x, ...)
 \description{
 Plot the dispersion - mean trend.
 }
+\examples{
+d <- dataDS_dmDSdispersion
+plotDispersion(d)
+plot(d)
+}
 

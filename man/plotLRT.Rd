@@ -21,4 +21,17 @@ plotLRT(x, ...)
 \description{
 Plot the histogram of p-values.
 }
+\examples{
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+d <- dmLRT(d)
+
+results <- results(d)
+
+plotLRT(d)
+plot(d)
+}
 

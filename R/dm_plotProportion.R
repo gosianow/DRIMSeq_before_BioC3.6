@@ -1,27 +1,7 @@
 
-colorl <- function(n){
-  
-  # clrs <- c("steelblue3" ,"violetred3", "turquoise3", "tomato2", "thistle3", "purple2", "springgreen3", "yellow2",  "snow3", "darkorchid1", "seagreen2", "orangered2", "royalblue3", "peachpuff2", "magenta", "limegreen", "red2", "lightslateblue", "mediumturquoise", "lightpink1", "forestgreen", "firebrick1", "dodgerblue1", "darkolivegreen1")
-  
-  clrs <- c("dodgerblue3", "deeppink", "green3", "darkorange2", "mediumslateblue", "lavender", "seagreen1", "dodgerblue1",   "cyan4",  "cyan1" , "bisque4", "bisque1" ,"firebrick", "firebrick1","indianred1",  "yellow", "forestgreen",   "darkorchid4", "darkorchid1", "deeppink3", "orchid1")
-
-  # colorRampPalette(clrs)(n)
-  
-  nc <- length(clrs)
-  
-  if(n > nc)
-    clrs <- rep(clrs, ceiling(n/nc))
-    
-  clrs[1:n]
-  
-}
-
-
 colorb <- function(n){
   
-  # clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "firebrick3", "blueviolet", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
-  
-  clrs <- c("dodgerblue3", "maroon2",  "forestgreen",  "blueviolet", "firebrick3", "deepskyblue",  "orchid2", "chartreuse3", "tomato" , "slateblue1")
+  clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "darkorange1" ,"blueviolet", "firebrick2", "deepskyblue",  "orchid2", "chartreuse3", "gold", "slateblue1", "tomato" , "blue", "magenta", "green3", "yellow", "purple3", "red" ,"darkslategray1", "lightpink1", "lightgreen", "khaki1", "plum3", "salmon")
   
   nc <- length(clrs)
   
@@ -35,9 +15,9 @@ colorb <- function(n){
 }
 
 
-# nb <- 20
-# barplot(rep(1, nb), col = colorl(nb))
-
+# nb <- 24
+# barplot(rep(1, nb), col = colorb(nb))
+# dev.off()
 
 
 #' @import ggplot2
@@ -82,7 +62,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
   
   if(plot_type == "barplot"){
 
-    values <- c(colorb(nlevels(group)), "#E69F00")
+    values <- c(colorb(nlevels(group)), "grey65")
     names(values) <- c(levels(group), "null")
     
     order_prop_samp <- order(prop_samp$group, prop_samp$sample_id)
@@ -103,7 +83,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right") +
     ggtitle(main) +
     geom_bar(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, fill = group), stat = "identity", position = position_dodge(width = width)) +
     scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
@@ -139,7 +119,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
   if(plot_type == "boxplot1"){
     ### box plots with points
     
-    values <- c(colorb(nlevels(group)), "#E69F00")
+    values <- c(colorb(nlevels(group)), "grey65")
     names(values) <- c(levels(group), "null")
     
     ### white boxplots
@@ -158,7 +138,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
 
     ggp <- ggplot() +
     theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right") +
     ggtitle(main) +     
     geom_jitter(data = prop_samp, aes(x = feature_id, y = proportion, fill = group, colour = group), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE) +
     geom_boxplot(data = prop_samp, aes(x = feature_id, y = proportion, colour = group, fill = group), outlier.size = NA, alpha = 0.2, lwd = 0.5) +
@@ -193,7 +173,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
   
   if(plot_type == "boxplot2"){
     ### box plots per group
-    values <- colorl(length(labels_org))
+    values <- colorb(length(labels_org))
     names(values) <- labels_org
 
     ggp <- ggplot() +
@@ -228,12 +208,12 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
   if(plot_type == "lineplot"){
     ### line plots
     
-    values <- c(colorb(nlevels(group)), "#E69F00")
+    values <- c(colorb(nlevels(group)), "grey65")
     names(values) <- c(levels(group), "null")
     
     ggp <- ggplot() +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title =element_text(size=14, face="bold"), plot.title = element_text(size=14)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title =element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right") +
     ggtitle(main) +
     geom_line(data = prop_samp, aes(x = feature_id, y = proportion, group = sample_id, colour = group), size = 1.1) +
     coord_cartesian(ylim = c(-0.1, 1.1)) +
@@ -264,7 +244,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
   
   if(plot_type == "ribbonplot" & !is.null(pi_full)){
 
-    values <- colorl(length(labels_org))
+    values <- colorb(length(labels_org))
     names(values) <- labels_org
     breaks <- labels
 

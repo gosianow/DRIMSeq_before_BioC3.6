@@ -42,6 +42,9 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 #' @rdname dmFit
 #' @inheritParams dmDispersion
 #' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' d <- dmFit(d)
 #' @export
 setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -74,6 +77,26 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
 #' @param plot_main Logical. Whether to plot the plot title.
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' 
+#' # If possible, increase the number of workers
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' gene_id <- names(d)[1]
+#' 
+#' plotFit(d, gene_id = gene_id)
+#' plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
+#' 
+#' d <- dmLRT(d)
+#' 
+#' results <- results(d)
+#' 
+#' gene_id <- results$gene_id[1:3]
+#' 
+#' plotFit(d, gene_id = gene_id)
+#' 
+#' 
 #' @export
 setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
@@ -89,6 +112,17 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
 ##############################################################
 
 #' @rdname dmDSfit-class
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' 
+#' # If possible, increase the number of workers
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' gene_id <- names(d)[1]
+#' 
+#' plotFit(d, gene_id = gene_id)
+#' plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
+#' 
 #' @export
 setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   

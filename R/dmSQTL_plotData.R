@@ -13,7 +13,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
     ylab("Frequency") +
     geom_histogram(binwidth = 1, fill = "forestgreen") +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
-    coord_cartesian(xlim = c(1, max(tt) + 1))
+    coord_cartesian(xlim = c(0, max(tt) + 2))
   
   
   if(!is.null(out_dir))

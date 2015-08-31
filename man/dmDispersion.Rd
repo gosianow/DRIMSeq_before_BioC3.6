@@ -101,6 +101,14 @@ TODO: describe in detail all the methods...
 
 disp_tol: The accuracy defined as \code{tol} in \code{\link{optimize}} when \code{disp_mode = "optimize"}, as \code{factr} in \code{\link{optim}} when \code{disp_mode = "optim"}, as \code{reltol} in \code{\link{constrOptim}} when \code{disp_mode = "constrOptim"}.
 }
+\examples{
+d <- dataDS_dmDSdata
+d <- dmFilter(d)
+\dontrun{
+# If possible, increase the number of workers
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+}
+}
 \seealso{
 \code{\link[BiocParallel]{bplapply}}
 }

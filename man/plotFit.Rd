@@ -43,4 +43,23 @@ plotFit(x, ...)
 \description{
 Plot the estimated proportions.
 }
+\examples{
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+gene_id <- names(d)[1]
+
+plotFit(d, gene_id = gene_id)
+plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
+
+d <- dmLRT(d)
+
+results <- results(d)
+
+gene_id <- results$gene_id[1:3]
+
+plotFit(d, gene_id = gene_id)
+}
 

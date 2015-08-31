@@ -24,4 +24,17 @@ Object that extends \code{dmDSfit} by adding the test results.
 
 \item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
+\examples{
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+d <- dmLRT(d)
+
+results <- results(d)
+
+plotLRT(d)
+plot(d)
+}
 

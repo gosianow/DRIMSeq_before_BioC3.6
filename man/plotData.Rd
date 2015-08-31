@@ -23,4 +23,9 @@ plotData(x, ...)
 \description{
 Plots a histogram of number of features per gene.
 }
+\examples{
+d <- dataDS_dmDSdata
+plotData(d)
+plot(d)
+}
 

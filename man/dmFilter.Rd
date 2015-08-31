@@ -49,4 +49,14 @@ Filtering of genes with low expression and features with low proportions.
 \details{
 Parameters should be adjusted based on the sample size used for the analysis...
 }
+\examples{
+dd <- dataDS_dmDSdata
+plotData(dd)
+
+d <- dmFilter(dd)
+plotData(d)
+
+d <- dmFilter(dd, max_features = 10)
+plotData(d)
+}
 

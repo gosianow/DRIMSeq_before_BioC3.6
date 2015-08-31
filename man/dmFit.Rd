@@ -36,4 +36,8 @@ dmFit(x, ...)
 \description{
 Estimating the proportions and likelihoods of Dirichlet-multinomial.
 }
+\examples{
+d <- dataDS_dmDSdispersion
+d <- dmFit(d)
+}
 

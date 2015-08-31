@@ -30,7 +30,7 @@ Create dmDSdata object from a table of counts
 head(dataDS_counts)
  dataDS_metadata
 
- counts <- as.matrix(dataDS_counts[,-1])
+ counts <- dataDS_counts[,-1]
  group_id <- dataDS_counts[,1]
  group_split <- limma::strsplit2(group_id, ":")
  gene_id_counts <- group_split[, 1]
@@ -38,6 +38,6 @@ head(dataDS_counts)
  sample_id = dataDS_metadata$sample_id
  group = dataDS_metadata$group
 
- data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+ d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
 }
 

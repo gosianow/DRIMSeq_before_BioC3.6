@@ -29,4 +29,14 @@ This function returns a \code{\linkS4class{dmDSLRT}} or \code{\linkS4class{dmSQT
 \description{
 Likelihood ratio test between full and null model.
 }
+\examples{
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+d <- dmLRT(d)
+
+results <- results(d)
+}
 

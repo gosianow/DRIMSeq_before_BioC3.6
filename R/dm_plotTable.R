@@ -9,7 +9,8 @@ dm_plotTable <- function(pvalues, name = "pvalue", out_dir = NULL){
     xlab("p-values") +
     ylab("Frequency") +
     geom_histogram(binwidth = 0.01, fill = "deeppink4") +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) 
+    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
+    coord_cartesian(xlim = c(-0.02, 1.02))
   
   
   if(!is.null(out_dir))

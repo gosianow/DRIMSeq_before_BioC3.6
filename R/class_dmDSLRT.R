@@ -60,6 +60,16 @@ setGeneric("dmLRT", function(x, ...) standardGeneric("dmLRT"))
 #' @inheritParams dmFit
 #' @param pairwise_comparison matrix
 #' @return This function returns a \code{\linkS4class{dmDSLRT}} or \code{\linkS4class{dmSQTLLRT}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' 
+#' # If possible, increase the number of workers
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' d <- dmLRT(d)
+#' 
+#' results <- results(d)
+#' 
 #' @export
 setMethod("dmLRT", "dmDSfit", function(x, pairwise_comparison = matrix(nrow = 0, ncol = 2), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -137,6 +147,19 @@ setGeneric("plotLRT", function(x, ...) standardGeneric("plotLRT"))
 
 #' @rdname plotLRT
 #' @inheritParams plotFit
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' 
+#' # If possible, increase the number of workers
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' d <- dmLRT(d)
+#' 
+#' results <- results(d)
+#' 
+#' plotLRT(d)
+#' plot(d)
+#' 
 #' @export
 setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
   
@@ -151,6 +174,19 @@ setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
 ##############################################################
 
 #' @rdname dmDSLRT-class
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' 
+#' # If possible, increase the number of workers
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' d <- dmLRT(d)
+#' 
+#' results <- results(d)
+#' 
+#' plotLRT(d)
+#' plot(d)
+#' 
 #' @export
 setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
   
@@ -168,7 +204,7 @@ setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = c("barplot", "b
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = x@fit_full, table = x@table, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = x@fit_null, table = x@results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
   
   
 })

@@ -36,9 +36,9 @@ library(DM)
 
 Create a \Rcode{dmDSdata} object that contains counts.
 
-<<dmDSdata>>=
+<<DSdmDSdata>>=
 
-counts <- as.matrix(dataDS_counts[,-1])
+counts <- dataDS_counts[,-1]
 group_id <- dataDS_counts[,1]
 group_split <- limma::strsplit2(group_id, ":")
 gene_id_counts <- group_split[, 1]
@@ -47,27 +47,28 @@ sample_id = dataDS_metadata$sample_id
 group = dataDS_metadata$group
 
 
-data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, 
+d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, 
                  feature_id_counts = feature_id_counts, sample_id = sample_id, 
                  group = group)
-dmDSplotData(data)
+
+plotData(d)
 
 @
 
 
 Filter genes and transcripts with low expression.
 
-<<dmDSfilter>>=
-data <- dmDSfilter(data)
-dmDSplotData(data)
+<<DSdmFilter>>=
+d <- dmFilter(d)
+plotData(d)
 @
 
 
 Estimate dispersion.
 
 <<dmDSdispersion>>=
-data <- dmDSdispersion(data)
-dmDSplotDispersion(data)
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
+plotDispersion(d)
 @
 
 
@@ -75,23 +76,29 @@ Estimate proportions.
 
 
 
-<<dmDSfit, out.width = "16cm", fig.width = 14>>=
-data <- dmDSfit(data)
+<<DSdmFit, out.width = "16cm", fig.width = 14>>=
+d <- dmFit(d)
 
-dmDSplotFit(data, gene_id = "FBgn0032253", plot_type = "barplot")
-dmDSplotFit(data, gene_id = "FBgn0038922", plot_type = "barplot", plot_full = FALSE, plot_null = FALSE)
+gene_id <- names(d)[1]
+plotFit(d, gene_id = gene_id, plot_type = "barplot")
+
 @
 
 
 Use likelihood ratio to test for differential splicing.
 
 
-<<dmDStest>>=
-data <- dmDStest(data)
+<<DSdmLRT>>=
+d <- dmLRT(d)
 
-dmDSplotTest(data)
+plotLRT(d)
 
-data@table
+results <- results(d)
+
+gene_id <- results$gene_id[1]
+plotFit(d, gene_id = gene_id)
+
+
 @
 
 

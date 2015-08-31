@@ -1,10 +1,12 @@
 # Prepare data for examples and vignette 
 
+setwd("/home/gosia/R/multinomial_project/package_devel/DM/")
 
-# library(devtools); library(GenomicRanges); library(BiocParallel); library(edgeR)
 
+library(DM)
 
-# Rfiles <- list.files("R/", full.names=TRUE); for(i in Rfiles) source(i)
+library(devtools)
+
 
 
 ########################################################
@@ -19,9 +21,9 @@ metadata
 
 
 
-##############################################################################################################
+################################################################################
 # htseq counts
-##############################################################################################################
+################################################################################
 
 htseq <- read.table("data-raw/simulations_sim5_drosophila_noDE_noNull/2_counts/dexseq_nomerge/htseq_counts.txt", header = TRUE, as.is = TRUE)
 htseq <- htseq[!grepl(pattern = "_", htseq$group_id), ]
@@ -36,7 +38,9 @@ sample_id = metadata$sample_id
 group = metadata$group
 
 
-### sample only 100 genes 
+
+
+### sample only 100 random genes 
 
 length(unique(gene_id_counts))
 
@@ -44,14 +48,44 @@ set.seed(1)
 genes_subset <- unique(gene_id_counts)[sample(length(unique(gene_id_counts)), size = 100, replace = FALSE)]
 
 
+### sample 100 genes with 'nice' dipsersion
+
+d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+
+plotData(d)
+dev.off()
+
+d <- dmFilter(d, min_samps_gene_expr = 6)
+
+plotData(d)
+dev.off()
+
+d <- dmDispersion(d, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 20))
+
+plotDispersion(d)
+dev.off()
+
+genes_subset <- which(log10(d@genewise_dispersion) > 2 & log10(d@genewise_dispersion) < 6)
+length(genes_subset)
+
+
+
+################################################################################
+# data for DS examples
+################################################################################
+
+
+
 dataDS_counts <- htseq[gene_id_counts %in% genes_subset, ]
 dataDS_metadata <- metadata
+
 
 use_data(dataDS_counts, dataDS_metadata, overwrite = TRUE)
 
 
 
 
+### Start examples
 counts <- as.matrix(dataDS_counts[,-1])
 group_id <- dataDS_counts[,1]
 group_split <- limma::strsplit2(group_id, ":")
@@ -61,51 +95,109 @@ sample_id = dataDS_metadata$sample_id
 group = dataDS_metadata$group
 
 
-data_org <- DM::dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
 
-dmDSplotData(data_org)
+plotData(d)
+dev.off()
+
+### End examples
 
 
-dataDS_dmDSdata <- data_org
+dataDS_dmDSdata <- d
 
 use_data(dataDS_dmDSdata, overwrite = TRUE)
 
 
-######################################
-# htseq counts: filtering
-######################################
 
 
-data <- dataDS_dmDSdata
-dmDSplotData(data)
+### Start examples
 
-data <- dmDSfilter(data)
-dmDSplotData(data)
+dd <- dataDS_dmDSdata
+plot(dd)
+plotData(dd)
+dev.off()
+
+d <- dmFilter(dd)
+plot(dd)
+plotData(d)
+dev.off()
+
+d <- dmFilter(dd, max_features = 10)
+plotData(d)
+dev.off()
+
+### End examples
 
 
-dataDS_dmDSdispersion <- dmDSdispersion(data)
+
+
+### Start examples
+
+d <- dataDS_dmDSdata
+
+d <- dmFilter(d)
+
+# If possible, increase the number of workers
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### End examples
+
+
+
+dataDS_dmDSdispersion <- d
 
 use_data(dataDS_dmDSdispersion, overwrite = TRUE)
 
 
 
-data <- dataDS_dmDSdispersion
+### Start examples
 
-dmDSplotDispersion(data)
+d <- dataDS_dmDSdispersion
 
+plotDispersion(d)
+plot(d)
+dev.off()
 
-data <- dmDSfit(data)
-
-
-dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
-
-
-
-data <- dmDStest(data)
-
-dmDSplotTest(data)
+### End examples
 
 
+
+### Start examples
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+gene_id <- names(d)[1]
+
+plotFit(d, gene_id = gene_id)
+plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
+dev.off()
+
+### End examples
+
+
+
+### Start examples
+d <- dataDS_dmDSdispersion
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+d <- dmLRT(d)
+
+results <- results(d)
+
+plotLRT(d)
+plot(d)
+dev.off()
+
+gene_id <- results$gene_id[1]
+plotFit(d, gene_id = gene_id)
+dev.off()
+
+
+### End examples
 
 
 

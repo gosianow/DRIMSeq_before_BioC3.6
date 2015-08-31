@@ -130,6 +130,13 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' 
 #' @return Returns the \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
 #' @seealso \code{\link[BiocParallel]{bplapply}}
+#' @examples 
+#' d <- dataDS_dmDSdata
+#' d <- dmFilter(d)
+#' \dontrun{
+#' # If possible, increase the number of workers
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' }
 #' @export
 setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -219,6 +226,10 @@ setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 
 #' @rdname plotDispersion
 #' @inheritParams plotData
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' plotDispersion(d)
+#' plot(d)
 #' @export
 setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   
@@ -235,6 +246,10 @@ setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
 ##############################################################
 
 #' @rdname dmDSdispersion-class
+#' @examples 
+#' d <- dataDS_dmDSdispersion
+#' plotDispersion(d)
+#' plot(d)
 #' @export
 setMethod("plot", "dmDSdispersion", function(x, out_dir = NULL){
   

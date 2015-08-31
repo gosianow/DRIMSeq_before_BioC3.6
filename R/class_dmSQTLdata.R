@@ -95,8 +95,45 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @param genotypes A numeric matrix of matched genotypes. See Details.
 #'  @param gene_id_genotypes Vector of gene IDs that are matched with genotypes.
 #'  @param snp_id_genotypes Vector of SNP IDs that correspond to genotypes.
-#'  @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample 
-#'    information.
+#' @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, 
+#'    genotypes and sample information.
+#'    @examples 
+#'    ### counts
+#'  head(dataSQTL_counts)
+#'  counts <- as.matrix(dataSQTL_counts[, -1])
+#'  
+#'  group_id <- dataSQTL_counts[,1]
+#'  group_split <- limma::strsplit2(group_id, ":")
+#'  gene_id_counts <- group_split[, 1]
+#'  feature_id_counts <- group_split[, 2]
+#'  
+#'  ### gene_ranges
+#'  dataSQTL_gene_ranges
+#'  gene_ranges <- dataSQTL_gene_ranges
+#'  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
+#'  
+#'  
+#'  ### genotypes
+#'  head(dataSQTL_genotypes)
+#'  genotypes <- as.matrix(dataSQTL_genotypes[, -(1:4)])
+#'  
+#'  snp_id_genotypes <- dataSQTL_genotypes$snp_id
+#'  
+#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
+#'  IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+#'  names(snp_ranges) <- dataSQTL_genotypes$snp_id
+#'  
+#'  all(colnames(counts) == colnames(genotypes))
+#'  
+#'  sample_id <- colnames(counts)
+#'  
+#'  ### create dmSQTLdata object 
+#'  data <- dmSQTLdataFromRanges(counts, gene_id_counts, feature_id_counts, 
+#'  gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, 
+#'  window = 5e3)
+#'  
+#'  plotData(data)
+#'  
 #'  @export
 dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gene_id_genotypes, snp_id_genotypes, sample_id){
   
@@ -181,10 +218,7 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
 
 ##############################################################
 
-#'  Create \code{\linkS4class{dmSQTLdata}} object from tables of counts, 
-#'  genotypes and gene ranges
-#'  
-#'  @inheritParams dmSQTLdata
+#' @rdname dmSQTLdata
 #'  @param gene_ranges \code{\linkS4class{GRanges}} object with information 
 #'    about gene location.
 #'  @param genotypes A numeric matrix of unmatched genotypes. See Details.
@@ -192,44 +226,6 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
 #'    SNP location.
 #'  @param window Numeric. Size of a down and up stream window that is used to 
 #'    match SNPs to a gene. See details.
-#'  @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, 
-#'    genotypes and sample information.
-#'    @examples 
-#'    ### counts
-#'  head(dataSQTL_counts)
-#'  counts <- as.matrix(dataSQTL_counts[, -1])
-#'  
-#'  group_id <- dataSQTL_counts[,1]
-#'  group_split <- limma::strsplit2(group_id, ":")
-#'  gene_id_counts <- group_split[, 1]
-#'  feature_id_counts <- group_split[, 2]
-#'  
-#'  ### gene_ranges
-#'  dataSQTL_gene_ranges
-#'  gene_ranges <- dataSQTL_gene_ranges
-#'  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
-#'  
-#'  
-#'  ### genotypes
-#'  head(dataSQTL_genotypes)
-#'  genotypes <- as.matrix(dataSQTL_genotypes[, -(1:4)])
-#'  
-#'  snp_id_genotypes <- dataSQTL_genotypes$snp_id
-#'  
-#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
-#'  IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
-#'  names(snp_ranges) <- dataSQTL_genotypes$snp_id
-#'  
-#'  all(colnames(counts) == colnames(genotypes))
-#'  
-#'  sample_id <- colnames(counts)
-#'  
-#'  ### create dmSQTLdata object 
-#'  data <- dmSQTLdataFromRanges(counts, gene_id_counts, feature_id_counts, 
-#'  gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, 
-#'  window = 5e3)
-#'  
-#'  plotData(data)
 #'  
 #'  @export
 dmSQTLdataFromRanges <- function(counts, gene_id_counts, feature_id_counts, gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, window = 5e3){

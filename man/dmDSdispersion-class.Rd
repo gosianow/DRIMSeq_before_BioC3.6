@@ -50,4 +50,9 @@ Object that extends \code{dmDSdata} by adding dipsersion.
 
 \item{\code{genewise_dispersion}}{Numeric vector of estimated tagwise dispersion.}
 }}
+\examples{
+d <- dataDS_dmDSdispersion
+plotDispersion(d)
+plot(d)
+}
 

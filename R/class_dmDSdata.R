@@ -12,7 +12,7 @@ NULL
 
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
-          samples = "data.frame"))
+                        samples = "data.frame"))
 
 
 # setValidity("dmDSdata", function(object){
@@ -57,14 +57,14 @@ setMethod("samples<-", "dmDSdata", function(x, value){
   stopifnot( class( value$group ) %in% c("character", "factor"))
   
   if(class(value$group) == "character")
-  value$group <- factor(value$group, levels = unique(value$group))
+    value$group <- factor(value$group, levels = unique(value$group))
   else 
-  value$group <- factor(value$group)
+    value$group <- factor(value$group)
   
   if(class(value$sample_id) == "character")
-  value$sample_id <- factor(value$sample_id, levels = unique(value$sample_id))
+    value$sample_id <- factor(value$sample_id, levels = unique(value$sample_id))
   else 
-  value$sample_id <- factor(value$sample_id)
+    value$sample_id <- factor(value$sample_id)
   
   colnames(x@counts@unlistData) <- value$sample_id
   
@@ -81,7 +81,7 @@ setMethod("samples<-", "dmDSdata", function(x, value){
   }
   
   
-  })
+})
 
 
 
@@ -125,7 +125,7 @@ setMethod("[", "dmDSdata", function(x, i, j){
     samples$group <- factor(samples$group)
     rownames(samples) <- NULL
   }
-
+  
   # initialize(x, counts = counts, samples = samples)
   
   return(new("dmDSdata", counts = counts, samples = samples))
@@ -151,7 +151,7 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  head(dataDS_counts)
 #'  dataDS_metadata
 #'  
-#'  counts <- as.matrix(dataDS_counts[,-1])
+#'  counts <- dataDS_counts[,-1]
 #'  group_id <- dataDS_counts[,1]
 #'  group_split <- limma::strsplit2(group_id, ":")
 #'  gene_id_counts <- group_split[, 1]
@@ -159,7 +159,8 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  sample_id = dataDS_metadata$sample_id
 #'  group = dataDS_metadata$group
 #'  
-#'  data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+#'  d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+#'  
 #'  @export
 dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group){
   
@@ -178,24 +179,24 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   stopifnot(ncol(counts) == length(sample_id))
   
   if(class(gene_id_counts) == "character")
-  gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
+    gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
   else 
-  gene_id_counts <- factor(gene_id_counts)
+    gene_id_counts <- factor(gene_id_counts)
   
   if(class(group) == "character")
-  group <- factor(group, levels = unique(group))
+    group <- factor(group, levels = unique(group))
   else 
-  group <- factor(group)
+    group <- factor(group)
   
   if(class(sample_id) == "character")
-  sample_id <- factor(sample_id, levels = unique(sample_id))
+    sample_id <- factor(sample_id, levels = unique(sample_id))
   else 
-  sample_id <- factor(sample_id)
+    sample_id <- factor(sample_id)
   
   
   tbl <- table(group)
   if(all(tbl < 2))
-  stop("There must be at least one group with two replicates!")
+    stop("There must be at least one group with two replicates!")
   
   ### ordering
   or <- order(gene_id_counts)
@@ -214,7 +215,7 @@ dmDSdata <- function(counts, gene_id_counts, feature_id_counts, sample_id, group
   names(inds) <- feature_id_counts
   
   partitioning <- split(inds, gene_id_counts)
-
+  
   samples <- data.frame(sample_id = sample_id, group = group)
   
   data <- new("dmDSdata", counts = new("MatrixList", unlistData = counts, partitioning = partitioning), samples = samples)
@@ -251,6 +252,16 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #'   should be between 0 and 1.
 #' @param max_features Maximum number of features that should be kept per gene.
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
+#' @examples 
+#' dd <- dataDS_dmDSdata
+#' plotData(dd)
+#' 
+#' d <- dmFilter(dd)
+#' plotData(d)
+#' 
+#' d <- dmFilter(dd, max_features = 10)
+#' plotData(d)
+#' 
 #' @export
 setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
@@ -277,6 +288,10 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 #' @rdname plotData
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
+#' @examples 
+#' d <- dataDS_dmDSdata
+#' plotData(d)
+#' plot(d)
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
@@ -288,6 +303,10 @@ setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
 ##############################################################
 
 #' @rdname dmDSdata-class
+#' @examples 
+#' d <- dataDS_dmDSdata
+#' plot(d)
+#' plotData(d)
 #' @export
 setMethod("plot", "dmDSdata", function(x, out_dir = NULL){
   
