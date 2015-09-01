@@ -35,13 +35,15 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
         else
         dispersion_gene <- dispersion[gene]
         
-        main <- paste0(main, " / Dispersion = ", round(dispersion_gene, 2))
+        main <- paste0(main, ", Dispersion = ", round(dispersion_gene, 2))
         
       }
       
       if(!is.null(table)){
         
-        main <- paste0(main, "\n LR = ", round(table[gene, "lr"], 2) , " / P-value = ", sprintf("%.02e", table[gene, "pvalue"]), " / FDR = ", sprintf("%.02e", table[gene, "adj_pvalue"]))    
+        table_tmp <- table[table$gene_id == gene, ]
+        
+        main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
         
       }
     }

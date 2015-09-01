@@ -39,13 +39,15 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, samples, dispersi
         else
         dispersion_gene <- dispersion[[gene]][snp]
         
-        main <- paste0(main, " / Dispersion = ", round(dispersion_gene, 2))
+        main <- paste0(main, ", Dispersion = ", round(dispersion_gene, 2))
         
       }
       
       if(!is.null(table)){
         
-        main <- paste0(main, "\n LR = ", round(table[paste0(gene, ":", snp), "lr"], 2) , " / P-value = ", sprintf("%.02e", table[paste0(gene, ":", snp), "pvalue"]), " / FDR = ", sprintf("%.02e", table[paste0(gene, ":", snp), "adj_pvalue"]))    
+        table_tmp <- table[table$gene_id == gene & table$snp_id == snp, ]
+        
+        main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
         
       }
       

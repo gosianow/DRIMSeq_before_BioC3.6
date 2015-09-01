@@ -15,7 +15,7 @@ dmDS_plotData <- function(counts, out_dir = NULL){
     ggtitle(main) +
     xlab("Number of features per gene") +
     ylab("Frequency") +
-    geom_histogram(binwidth = 1, fill = "forestgreen") +
+    geom_histogram(binwidth = 1, fill = "seagreen4") +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) 
   

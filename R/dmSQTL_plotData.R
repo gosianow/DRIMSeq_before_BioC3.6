@@ -11,7 +11,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
     ggtitle(paste0(length(tt), " genes \n ", sum(tt) , " features ")) +
     xlab("Number of features per gene") +
     ylab("Frequency") +
-    geom_histogram(binwidth = 1, fill = "forestgreen") +
+    geom_histogram(binwidth = 1, fill = "seagreen4") +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2))
   
@@ -37,7 +37,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
     ggtitle(paste0(length(tt), " genes \n ", sum(tt) , " features ")) +
     xlab("Number of SNPs per gene") +
     ylab("Frequency") +
-    geom_histogram(binwidth = 10, fill = "dodgerblue4") +
+    geom_histogram(binwidth = 10, fill = "royalblue4") +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
     coord_cartesian(xlim = c(1, max(tt) + 1))
   

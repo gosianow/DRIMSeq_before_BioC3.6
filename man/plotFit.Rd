@@ -9,9 +9,10 @@
 \alias{plotFit,dmSQTLfit-method}
 \title{Plot the estimated proportions.}
 \usage{
-\S4method{plotFit}{dmDSLRT}(x, gene_id, plot_type = c("barplot", "boxplot1",
-  "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE,
-  plot_null = TRUE, plot_main = TRUE, out_dir = NULL)
+\S4method{plotFit}{dmDSLRT}(x, compared_groups = 1, gene_id,
+  plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot",
+  "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE,
+  plot_main = TRUE, out_dir = NULL)
 
 plotFit(x, ...)
 
@@ -27,6 +28,8 @@ plotFit(x, ...)
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object or any that inherits from them.}
+
+\item{compared_groups}{numeric or character}
 
 \item{gene_id}{Vector of gene IDs to be plotted.}
 

@@ -1,12 +1,15 @@
 # Test DM on entire data set
 
-setwd("/home/gosia/R/multinomial_project/package_devel/DM")
+setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/simulations_sim5_drosophila_noDE_noNull/")
 
 library(DM)
+
+
 
 ########################################################
 # load metadata
 ########################################################
+
 
 # create metadata file
 metadata <- data.frame(sample_id = paste0("sample_",1:6), group=c(rep("C1", 3), rep("C2", 3)), stringsAsFactors = FALSE)
@@ -20,11 +23,11 @@ metadata
 # htseq counts
 ##############################################################################################################
 
-htseq <- read.table("data-raw/simulations_sim5_drosophila_noDE_noNull/2_counts/dexseq_nomerge/htseq_counts.txt", header = TRUE, as.is = TRUE)
+htseq <- read.table("2_counts/dexseq_nomerge/htseq_counts.txt", header = TRUE, as.is = TRUE)
 htseq <- htseq[!grepl(pattern = "_", htseq$group_id), ]
 
 
-counts <- as.matrix(htseq[,-1])
+counts <- htseq[,-1]
 group_id <- htseq[,1]
 group_split <- limma::strsplit2(group_id, ":")
 gene_id_counts <- group_split[, 1]
@@ -36,31 +39,65 @@ group = metadata$group
 
 data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
 
-# dmDSplotData(data)
-
-
-system.time(data_filt <- dmDSfilter(data))
-
-# system.time(data_filt <- myFilter(data@counts,data@samples))
+plotData(data)
+dev.off()
 
 
 
-dmDSplotData(data)
+system.time(data <- dmFilter(data))
+
+plotData(data)
+dev.off()
 
 
-data <- dmDSdispersion(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
 
-dmDSplotDispersion(data)
+data <- dmDispersion(data, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 15))
 
-
-data <- dmDSfit(data, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
-
-dmDSplotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
+plotDispersion(data)
+dev.off()
 
 
-data <- dmDStest(data)
 
-dmDSplotTest(data)
+data <- dmFit(data, BPPARAM = BiocParallel::MulticoreParam(workers = 15))
+
+
+plotFit(data, gene_id = "FBgn0001316", plot_type = "barplot")
+dev.off()
+
+
+# save(data, file = "data.Rdata")
+load("data.Rdata")
+
+
+data <- dmLRT(data, BPPARAM = BiocParallel::MulticoreParam(workers = 10))
+
+plotLRT(data, out_dir = "./")
+
+results <- results(data)
+
+plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./")
+
+
+
+
+
+
+data <- dmLRT(data, compared_groups = list(a = 1:2, b = 1:2), BPPARAM = BiocParallel::MulticoreParam(workers = 10))
+
+plotLRT(data, out_dir = "./")
+
+
+results <- results(data)
+
+plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./")
+
+
+
+
+
+
+
+
 
 
 
