@@ -22,7 +22,7 @@ BiocStyle::latex()
 
 <<setup_knitr, include=FALSE, cache=FALSE>>=
 library(knitr)
-opts_chunk$set(cache = TRUE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.cutoff = 60), out.width = "8cm", out.height = "8cm", fig.align = "center")
+opts_chunk$set(cache = FALSE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.cutoff = 60), out.width = "8cm", out.height = "8cm", fig.align = "center")
 @
 
 \section{Dirichlet-multinomial workflow to detect differentiall splicing (DS) in RNA-seq data}
@@ -30,7 +30,7 @@ opts_chunk$set(cache = TRUE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.
 Load \Rpackage{DM} package.
 
 <<library>>=
-library(DM)
+suppressPackageStartupMessages(library(DM))
 @
 
 
@@ -41,15 +41,14 @@ Create a \Rcode{dmDSdata} object that contains counts.
 counts <- dataDS_counts[,-1]
 group_id <- dataDS_counts[,1]
 group_split <- limma::strsplit2(group_id, ":")
-gene_id_counts <- group_split[, 1]
-feature_id_counts <- group_split[, 2]
+gene_id <- group_split[, 1]
+feature_id <- group_split[, 2]
 sample_id = dataDS_metadata$sample_id
 group = dataDS_metadata$group
 
 
-d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, 
-                 feature_id_counts = feature_id_counts, sample_id = sample_id, 
-                 group = group)
+d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, 
+sample_id = sample_id, group = group)
 
 plotData(d)
 
@@ -66,7 +65,7 @@ plotData(d)
 
 Estimate dispersion.
 
-<<dmDSdispersion>>=
+<<DSdmDispersion>>=
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
 plotDispersion(d)
 @
@@ -76,7 +75,7 @@ Estimate proportions.
 
 
 
-<<DSdmFit, out.width = "16cm", fig.width = 14>>=
+<<DSdmFit, out.width = "16cm", fig.width = 16>>=
 d <- dmFit(d)
 
 gene_id <- names(d)[1]
@@ -95,14 +94,13 @@ plotLRT(d)
 
 results <- results(d)
 
-gene_id <- results$gene_id[1]
-plotFit(d, gene_id = gene_id)
-
-
 @
 
 
-
+<<DSdmLRT_plotFit, out.width = "16cm", fig.width = 16>>=
+gene_id <- results$gene_id[1]
+plotFit(d, gene_id = gene_id)
+@
 
 
 

@@ -24,7 +24,15 @@ plotData(x, ...)
 Plots a histogram of number of features per gene.
 }
 \examples{
+### dmDSdata
+
 d <- dataDS_dmDSdata
+plotData(d)
+plot(d)
+
+### dmSQTLdata
+
+d <- dataSQTL_dmSQTLdata
 plotData(d)
 plot(d)
 }

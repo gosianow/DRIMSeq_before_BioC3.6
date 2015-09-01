@@ -50,6 +50,8 @@ Filtering of genes with low expression and features with low proportions.
 Parameters should be adjusted based on the sample size used for the analysis...
 }
 \examples{
+### dmDSdata
+
 dd <- dataDS_dmDSdata
 plotData(dd)
 
@@ -57,6 +59,14 @@ d <- dmFilter(dd)
 plotData(d)
 
 d <- dmFilter(dd, max_features = 10)
+plotData(d)
+
+### dmSQTLdata
+
+dd <- dataSQTL_dmSQTLdata
+plotData(dd)
+
+d <- dmFilter(dd)
 plotData(d)
 }
 

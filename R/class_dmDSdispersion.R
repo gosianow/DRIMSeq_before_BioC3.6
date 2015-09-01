@@ -245,10 +245,6 @@ setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
 ##############################################################
 
 #' @rdname dmDSdispersion-class
-#' @examples 
-#' d <- dataDS_dmDSdispersion
-#' plotDispersion(d)
-#' plot(d)
 #' @export
 setMethod("plot", "dmDSdispersion", function(x, out_dir = NULL){
   

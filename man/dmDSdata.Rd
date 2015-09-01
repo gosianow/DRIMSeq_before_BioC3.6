@@ -4,15 +4,15 @@
 \alias{dmDSdata}
 \title{Create dmDSdata object from a table of counts}
 \usage{
-dmDSdata(counts, gene_id_counts, feature_id_counts, sample_id, group)
+dmDSdata(counts, gene_id, feature_id, sample_id, group)
 }
 \arguments{
 \item{counts}{A numeric matrix or data.frame of counts. Rows represent features (exons,
   bins or transcripts), columns represent samples.}
 
-\item{gene_id_counts}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{gene_id}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}
 
-\item{feature_id_counts}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{feature_id}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
 
 \item{sample_id}{A vector of unique sample IDs of length corresponding to
   the number of columns in \code{counts}.}
@@ -33,11 +33,11 @@ head(dataDS_counts)
  counts <- dataDS_counts[,-1]
  group_id <- dataDS_counts[,1]
  group_split <- limma::strsplit2(group_id, ":")
- gene_id_counts <- group_split[, 1]
- feature_id_counts <- group_split[, 2]
+ gene_id <- group_split[, 1]
+ feature_id <- group_split[, 2]
  sample_id = dataDS_metadata$sample_id
  group = dataDS_metadata$group
 
- d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+ d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
 }
 

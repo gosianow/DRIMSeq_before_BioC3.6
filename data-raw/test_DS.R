@@ -30,14 +30,14 @@ htseq <- htseq[!grepl(pattern = "_", htseq$group_id), ]
 counts <- htseq[,-1]
 group_id <- htseq[,1]
 group_split <- limma::strsplit2(group_id, ":")
-gene_id_counts <- group_split[, 1]
-feature_id_counts <- group_split[, 2]
+gene_id <- group_split[, 1]
+feature_id <- group_split[, 2]
 sample_id = metadata$sample_id
 group = metadata$group
 
 
 
-data <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+data <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
 
 plotData(data)
 dev.off()

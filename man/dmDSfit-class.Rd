@@ -39,15 +39,4 @@ Object that extends \code{dmDSdispersion} class by adding fitting.
 
 \item{\code{fit_full}}{\code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and likelihoods.}
 }}
-\examples{
-d <- dataDS_dmDSdispersion
-
-# If possible, increase the number of workers
-d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-
-gene_id <- names(d)[1]
-
-plotFit(d, gene_id = gene_id)
-plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
-}
 

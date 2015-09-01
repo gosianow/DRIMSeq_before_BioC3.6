@@ -47,11 +47,13 @@ setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 #' @export
 setMethod("[", "dmSQTLdata", function(x, i, j){
   
-  counts <- x@counts[i, j]
-  genotypes <- x@genotypes[i, j]
-  samples <- x@samples
-  
-  if(!missing(j)){
+  if(missing(j)){
+    counts <- x@counts[i, ]
+    genotypes <- x@genotypes[i, ]
+    samples <- x@samples
+  }else{
+    counts <- x@counts[i, j]
+    genotypes <- x@genotypes[i, j]
     rownames(samples) <- samples$sample_id
     samples <- samples[j, ]
     samples$sample_id <- factor(samples$sample_id)
@@ -69,33 +71,28 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @inheritParams dmDSdata
 #'  @param genotypes A numeric matrix of matched genotypes. See Details.
 #'  @param gene_id_genotypes Vector of gene IDs that are matched with genotypes.
-#'  @param snp_id_genotypes Vector of SNP IDs that correspond to genotypes.
-#' @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, 
-#'    genotypes and sample information.
-#'    @examples 
-#'    ### counts
+#'  @param snp_id Vector of SNP IDs that correspond to genotypes.
+#'  @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample information.
+#'  @examples 
+#'  ### counts
 #'  head(dataSQTL_counts)
-#'  counts <- as.matrix(dataSQTL_counts[, -1])
 #'  
-#'  group_id <- dataSQTL_counts[,1]
-#'  group_split <- limma::strsplit2(group_id, ":")
-#'  gene_id_counts <- group_split[, 1]
-#'  feature_id_counts <- group_split[, 2]
+#'  counts <- dataSQTL_counts[, -(1:2)]
+#'  gene_id <- group_split[, 1]
+#'  feature_id <- group_split[, 2]
 #'  
 #'  ### gene_ranges
 #'  dataSQTL_gene_ranges
 #'  gene_ranges <- dataSQTL_gene_ranges
 #'  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
 #'  
-#'  
 #'  ### genotypes
 #'  head(dataSQTL_genotypes)
-#'  genotypes <- as.matrix(dataSQTL_genotypes[, -(1:4)])
+#'  genotypes <- dataSQTL_genotypes[, -(1:4)]
 #'  
-#'  snp_id_genotypes <- dataSQTL_genotypes$snp_id
+#'  snp_id <- dataSQTL_genotypes$snp_id
 #'  
-#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
-#'  IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
 #'  names(snp_ranges) <- dataSQTL_genotypes$snp_id
 #'  
 #'  all(colnames(counts) == colnames(genotypes))
@@ -103,79 +100,75 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  sample_id <- colnames(counts)
 #'  
 #'  ### create dmSQTLdata object 
-#'  data <- dmSQTLdataFromRanges(counts, gene_id_counts, feature_id_counts, 
-#'  gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, 
-#'  window = 5e3)
-#'  
-#'  plotData(data)
+#'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
 #'  
 #'  @export
-dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gene_id_genotypes, snp_id_genotypes, sample_id){
+dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id){
   
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
   stopifnot( mode( counts ) %in% c("numeric"))
   counts <- ceiling(counts)
   
-  stopifnot( class( gene_id_counts ) %in% c("character", "factor"))
-  stopifnot( class( feature_id_counts ) %in% c("character", "factor"))
-  stopifnot( length(gene_id_counts) == length( feature_id_counts ) )
+  stopifnot( class( gene_id ) %in% c("character", "factor"))
+  stopifnot( class( feature_id ) %in% c("character", "factor"))
+  stopifnot( length(gene_id) == length( feature_id ) )
   
   stopifnot( class( genotypes ) %in% c("matrix", "data.frame"))
   genotypes <- as.matrix(genotypes)
   stopifnot( mode( genotypes ) %in% c("numeric"))
   
   stopifnot( class( gene_id_genotypes ) %in% c("character", "factor"))
-  stopifnot( class( snp_id_genotypes ) %in% c("character", "factor"))
-  stopifnot( length(gene_id_genotypes) == length( snp_id_genotypes ) )
+  stopifnot( class( snp_id ) %in% c("character", "factor"))
+  stopifnot( length(gene_id_genotypes) == length( snp_id ) )
   
   stopifnot( class( sample_id ) %in% c("character", "factor"))
   
   ### keep genes that are in counts and in genotypes
   
-  genes2keep <- gene_id_counts %in% gene_id_genotypes
+  genes2keep <- gene_id %in% gene_id_genotypes
   counts <- counts[genes2keep, , drop = FALSE]
-  gene_id_counts <- gene_id_counts[genes2keep]
-  feature_id_counts <- feature_id_counts[genes2keep]
+  gene_id <- gene_id[genes2keep]
+  feature_id <- feature_id[genes2keep]
   
-  genes2keep <- gene_id_genotypes %in% gene_id_counts
+  genes2keep <- gene_id_genotypes %in% gene_id
   genotypes <- genotypes[genes2keep, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[genes2keep]
-  snp_id_genotypes <- snp_id_genotypes[genes2keep]
+  snp_id <- snp_id[genes2keep]
   
   
   
   ### order genes in counts and in genotypes
-  if(class(gene_id_counts) == "character")
-  gene_id_counts <- factor(gene_id_counts, levels = unique(gene_id_counts))
+  if(class(gene_id) == "character")
+  gene_id <- factor(gene_id, levels = unique(gene_id))
   
-  order_counts <- order(gene_id_counts)
+  order_counts <- order(gene_id)
   counts <- counts[order_counts, , drop = FALSE]
-  gene_id_counts <- gene_id_counts[order_counts]
-  feature_id_counts <- feature_id_counts[order_counts]
+  gene_id <- gene_id[order_counts]
+  feature_id <- feature_id[order_counts]
   
   
-  gene_id_genotypes <- factor(gene_id_genotypes, levels = levels(gene_id_counts))
+  gene_id_genotypes <- factor(gene_id_genotypes, levels = levels(gene_id))
 
   order_genotypes <- order(gene_id_genotypes)
   genotypes <- genotypes[order_genotypes, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[order_genotypes]
-  snp_id_genotypes <- snp_id_genotypes[order_genotypes]
+  snp_id <- snp_id[order_genotypes]
   
   
   colnames(counts) <- sample_id
-  rownames(counts) <- feature_id_counts
+  rownames(counts) <- feature_id
   
   colnames(genotypes) <- sample_id
-  rownames(genotypes) <- snp_id_genotypes
+  rownames(genotypes) <- snp_id
   
   
-  inds_counts <- 1:length(gene_id_counts)
-  names(inds_counts) <- feature_id_counts
-  partitioning_counts <- split(inds_counts, gene_id_counts)
+  inds_counts <- 1:length(gene_id)
+  names(inds_counts) <- feature_id
+  partitioning_counts <- split(inds_counts, gene_id)
   
   inds_genotypes <- 1:length(gene_id_genotypes)
-  names(inds_genotypes) <- snp_id_genotypes
+  names(inds_genotypes) <- snp_id
   partitioning_genotypes <- split(inds_genotypes, gene_id_genotypes)
   
   
@@ -201,11 +194,10 @@ dmSQTLdata <- function(counts, gene_id_counts, feature_id_counts, genotypes, gen
 #'    SNP location.
 #'  @param window Numeric. Size of a down and up stream window that is used to 
 #'    match SNPs to a gene. See details.
-#'  
 #'  @export
-dmSQTLdataFromRanges <- function(counts, gene_id_counts, feature_id_counts, gene_ranges, genotypes, snp_id_genotypes, snp_ranges, sample_id, window = 5e3){
+dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3){
   
-  rownames(genotypes) <- snp_id_genotypes
+  rownames(genotypes) <- snp_id
   gene_ranges <- GenomicRanges::resize(gene_ranges, GenomicRanges::width(gene_ranges) + 2 * window, fix = "center")
   
   ## Match genes and SNPs
@@ -215,11 +207,11 @@ dmSQTLdataFromRanges <- function(counts, gene_id_counts, feature_id_counts, gene
   s <- GenomicRanges::subjectHits(variantMatch)
   
   genotypes <- genotypes[s, ]
-  snp_id_genotypes <- snp_id_genotypes[s]
+  snp_id <- snp_id[s]
   gene_id_genotypes <- names(gene_ranges)[q]
   
   
-  data <- dmSQTLdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id_genotypes = snp_id_genotypes, sample_id = sample_id)
+  data <- dmSQTLdata(counts = counts, gene_id = gene_id, feature_id = feature_id, genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id = snp_id, sample_id = sample_id)
   
   return(data)
   

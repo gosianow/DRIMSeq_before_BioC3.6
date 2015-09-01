@@ -141,17 +141,6 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
 ##############################################################
 
 #' @rdname dmDSfit-class
-#' @examples 
-#' d <- dataDS_dmDSdispersion
-#' 
-#' # If possible, increase the number of workers
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#' 
-#' gene_id <- names(d)[1]
-#' 
-#' plotFit(d, gene_id = gene_id)
-#' plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
-#' 
 #' @export
 setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   

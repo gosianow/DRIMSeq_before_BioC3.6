@@ -39,9 +39,4 @@ Can be created with function \code{\link{dmDSdata}}.
 
 \item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
 }}
-\examples{
-d <- dataDS_dmDSdata
-plot(d)
-plotData(d)
-}
 

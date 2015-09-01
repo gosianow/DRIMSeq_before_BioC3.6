@@ -232,19 +232,6 @@ setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
 ##############################################################
 
 #' @rdname dmDSLRT-class
-#' @examples 
-#' d <- dataDS_dmDSdispersion
-#' 
-#' # If possible, increase the number of workers
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#' 
-#' d <- dmLRT(d)
-#' 
-#' results <- results(d)
-#' 
-#' plotLRT(d)
-#' plot(d)
-#' 
 #' @export
 setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
   

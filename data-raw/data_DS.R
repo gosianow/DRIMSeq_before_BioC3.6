@@ -1,7 +1,6 @@
 # Prepare data for examples and vignette 
 
-setwd("/home/gosia/R/multinomial_project/package_devel/DM/")
-
+setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/simulations_sim5_drosophila_noDE_noNull/")
 
 library(DM)
 
@@ -25,15 +24,15 @@ metadata
 # htseq counts
 ################################################################################
 
-htseq <- read.table("data-raw/simulations_sim5_drosophila_noDE_noNull/2_counts/dexseq_nomerge/htseq_counts.txt", header = TRUE, as.is = TRUE)
+htseq <- read.table("2_counts/dexseq_nomerge/htseq_counts.txt", header = TRUE, as.is = TRUE)
 htseq <- htseq[!grepl(pattern = "_", htseq$group_id), ]
 
 
 counts <- as.matrix(htseq[,-1])
 group_id <- htseq[,1]
 group_split <- limma::strsplit2(group_id, ":")
-gene_id_counts <- group_split[, 1]
-feature_id_counts <- group_split[, 2]
+gene_id <- group_split[, 1]
+feature_id <- group_split[, 2]
 sample_id = metadata$sample_id
 group = metadata$group
 
@@ -41,16 +40,11 @@ group = metadata$group
 
 
 ### sample only 100 random genes 
-
-length(unique(gene_id_counts))
-
-set.seed(1)
-genes_subset <- unique(gene_id_counts)[sample(length(unique(gene_id_counts)), size = 100, replace = FALSE)]
+# set.seed(1)
+# genes_subset <- unique(gene_id)[sample(length(unique(gene_id)), size = 100, replace = FALSE)]
 
 
-### sample 100 genes with 'nice' dipsersion
-
-d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
 
 plotData(d)
 dev.off()
@@ -60,13 +54,20 @@ d <- dmFilter(d, min_samps_gene_expr = 6)
 plotData(d)
 dev.off()
 
-d <- dmDispersion(d, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 20))
 
-plotDispersion(d)
-dev.off()
+### sample only 100 random genes
+set.seed(1)
+genes_subset <- names(d)[sample(length(d), size = 100, replace = FALSE)]
 
-genes_subset <- which(log10(d@genewise_dispersion) > 2 & log10(d@genewise_dispersion) < 6)
-length(genes_subset)
+
+
+# d <- dmDispersion(d, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 20))
+
+# plotDispersion(d)
+# dev.off()
+
+# genes_subset <- which(log10(d@genewise_dispersion) > 2 & log10(d@genewise_dispersion) < 6)
+# length(genes_subset)
 
 
 
@@ -76,7 +77,7 @@ length(genes_subset)
 
 
 
-dataDS_counts <- htseq[gene_id_counts %in% genes_subset, ]
+dataDS_counts <- htseq[gene_id %in% genes_subset, ]
 dataDS_metadata <- metadata
 
 
@@ -89,13 +90,13 @@ use_data(dataDS_counts, dataDS_metadata, overwrite = TRUE)
 counts <- as.matrix(dataDS_counts[,-1])
 group_id <- dataDS_counts[,1]
 group_split <- limma::strsplit2(group_id, ":")
-gene_id_counts <- group_split[, 1]
-feature_id_counts <- group_split[, 2]
+gene_id <- group_split[, 1]
+feature_id <- group_split[, 2]
 sample_id = dataDS_metadata$sample_id
 group = dataDS_metadata$group
 
 
-d <- dmDSdata(counts = counts, gene_id_counts = gene_id_counts, feature_id_counts = feature_id_counts, sample_id = sample_id, group = group)
+d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
 
 plotData(d)
 dev.off()
@@ -138,7 +139,7 @@ d <- dataDS_dmDSdata
 d <- dmFilter(d)
 
 # If possible, increase the number of workers
-d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
 
 ### End examples
 
