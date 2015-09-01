@@ -24,7 +24,11 @@ setGeneric("mean_expression", function(x, ...) standardGeneric("mean_expression"
 
 #' @rdname dmDSdispersion-class
 #' @export
-setMethod("mean_expression", "dmDSdispersion", function(x) x@mean_expression )
+setMethod("mean_expression", "dmDSdispersion", function(x){
+  
+  data.frame(gene_id = names(x@mean_expression), mean_expression = x@mean_expression, stringsAsFactors = FALSE, row.names = NULL)
+  
+  })
 
 
 #' @rdname dmDSdispersion-class
@@ -54,7 +58,11 @@ setGeneric("genewise_dispersion", function(x, ...) standardGeneric("genewise_dis
 
 #' @rdname dmDSdispersion-class
 #' @export
-setMethod("genewise_dispersion", "dmDSdispersion", function(x) x@genewise_dispersion )
+setMethod("genewise_dispersion", "dmDSdispersion", function(x){
+  
+  data.frame(gene_id = names(x@genewise_dispersion), genewise_dispersion = x@genewise_dispersion, stringsAsFactors = FALSE, row.names = NULL)
+  
+  })
 
 
 #' @rdname dmDSdispersion-class
@@ -66,9 +74,7 @@ setGeneric("genewise_dispersion<-", function(x, value) standardGeneric("genewise
 setMethod("genewise_dispersion<-", "dmDSdispersion", function(x, value){
   
   return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = value, counts = x@counts, samples = x@samples))
-  
-  # initialize(x, genewise_dispersion = value)
-  
+
   })
 
 
@@ -79,14 +85,7 @@ setMethod("show", "dmDSdispersion", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"mean_expression\":\n")
-  show_numeric(object@mean_expression)
-  
-  cat("\nSlot \"common_dispersion\":\n")
-  show_numeric(object@common_dispersion)
-  
-  cat("\nSlot \"genewise_dispersion\":\n")
-  show_numeric(object@genewise_dispersion)
+  cat("  mean_expression(), common_dispersion(), genewise_dispersion()\n")
   
 })
 

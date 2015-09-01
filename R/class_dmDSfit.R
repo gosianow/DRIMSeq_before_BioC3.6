@@ -12,17 +12,46 @@ setClass("dmDSfit",
          representation(dispersion = "character",
                         fit_full = "MatrixList"))
 
+
+################################################################################
+
+
+#' @rdname dmDSfit-class
+#' @export
+setGeneric("proportions", function(x, ...) standardGeneric("proportions"))
+
+#' @rdname dmDSfit-class
+#' @export
+setMethod("proportions", "dmDSfit", function(x){
+  
+  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, stringsAsFactors = FALSE, row.names = NULL)
+  
+    })
+
+
+#' @rdname dmDSfit-class
+#' @export
+setGeneric("statistics", function(x, ...) standardGeneric("statistics"))
+
+#' @rdname dmDSfit-class
+#' @export
+setMethod("statistics", "dmDSfit", function(x){
+  
+  df <- data.frame(gene_id = names(x@counts), x@fit_full@metadata, stringsAsFactors = FALSE, row.names = NULL)
+  colnames(df)[-1] <- paste0("lik_", colnames(x@fit_full@metadata))
+  return(df)
+  
+    })
+
+
+
 ################################################################################
 
 setMethod("show", "dmDSfit", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"dispersion\":\n")
-  print(object@dispersion)
-  
-  cat("\nSlot \"fit_full\":\n")
-  print(object@fit_full)
+  cat("  proportions(), statistics()\n")
   
   
 })

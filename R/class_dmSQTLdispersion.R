@@ -22,15 +22,6 @@ setMethod("show", "dmSQTLdispersion", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"mean_expression\":\n")
-  show_numeric(object@mean_expression)
-  
-  cat("\nSlot \"common_dispersion\":\n")
-  show_numeric(object@common_dispersion)
-  
-  cat("\nSlot \"genewise_dispersion\":\n")
-  show_numeric_list(object@genewise_dispersion)
-  
 })
 
 

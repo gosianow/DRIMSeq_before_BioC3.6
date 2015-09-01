@@ -33,8 +33,8 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticorePar
   
   table$adj_pvalue <- adj_pvalue
   
-  o <- order(table[, "pvalue"])  
-  table <- table[o,]
+  # o <- order(table[, "pvalue"])  
+  # table <- table[o,]
   
   time_end <- Sys.time()
   cat("Took ", as.numeric(time_end - time_start), " seconds.\n")

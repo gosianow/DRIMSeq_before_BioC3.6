@@ -11,8 +11,6 @@
 \alias{plot,dmDSdata,ANY-method}
 \alias{samples}
 \alias{samples,dmDSdata-method}
-\alias{samples<-}
-\alias{samples<-,dmDSdata-method}
 \title{Object that contains counts and sample information.}
 \usage{
 counts(x, ...)
@@ -22,10 +20,6 @@ counts(x, ...)
 samples(x, ...)
 
 \S4method{samples}{dmDSdata}(x)
-
-samples(x) <- value
-
-\S4method{samples}{dmDSdata}(x) <- value
 
 \S4method{names}{dmDSdata}(x)
 

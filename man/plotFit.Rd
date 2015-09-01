@@ -9,10 +9,10 @@
 \alias{plotFit,dmSQTLfit-method}
 \title{Plot the estimated proportions.}
 \usage{
-\S4method{plotFit}{dmDSLRT}(x, compared_groups = 1, gene_id,
-  plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot",
-  "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE,
-  plot_main = TRUE, out_dir = NULL)
+\S4method{plotFit}{dmDSLRT}(x, gene_id, plot_type = c("barplot", "boxplot1",
+  "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE,
+  plot_null = TRUE, compared_groups = 1, plot_main = TRUE,
+  out_dir = NULL)
 
 plotFit(x, ...)
 
@@ -29,8 +29,6 @@ plotFit(x, ...)
 \arguments{
 \item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object or any that inherits from them.}
 
-\item{compared_groups}{numeric or character}
-
 \item{gene_id}{Vector of gene IDs to be plotted.}
 
 \item{plot_type}{Character defining type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.}
@@ -38,6 +36,8 @@ plotFit(x, ...)
 \item{order}{Logical. Whether to plot the features ordered by their expression.}
 
 \item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
+
+\item{compared_groups}{numeric or character indicating the comparison that should be plotted.}
 
 \item{plot_main}{Logical. Whether to plot the plot title.}
 

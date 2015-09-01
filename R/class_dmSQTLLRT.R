@@ -26,12 +26,7 @@ setMethod("show", "dmSQTLLRT", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"fit_null\":\n")
-  show_MatrixList_list(object@fit_null)
-  
-  cat("\nSlot \"results\":\n")
-  show_matrix(object@results, nhead = 5, ntail = 5)
-  
+  cat("* data accessors: results()\n")
   
 })
 

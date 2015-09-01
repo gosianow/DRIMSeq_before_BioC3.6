@@ -16,6 +16,75 @@ setClass("dmDSLRT",
 
 ##############################################################
 
+#' @rdname dmDSfit-class
+#' @export
+setGeneric("proportions", function(x, ...) standardGeneric("proportions"))
+
+#' @rdname dmDSfit-class
+#' @export
+setMethod("proportions", "dmDSfit", function(x){
+  
+  nc <- length(x@compared_groups)
+  
+  if(nc == 1){
+    
+    prop_null <- x@fit_null@unlistData
+    
+  }else{
+    
+    prop_null <- do.call(cbind, lapply(x@fit_null, function(f) f@unlistData))
+    
+    if(is.null(names(x@compared_groups)))
+    suffix <- 1:nc
+    else
+    suffix <- names(x@compared_groups)
+    
+    colnames(prop_null) <- paste0("null_", suffix)
+    
+  } 
+  
+  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, prop_null, stringsAsFactors = FALSE, row.names = NULL)
+  
+})
+
+
+#' @rdname dmDSfit-class
+#' @export
+setGeneric("statistics", function(x, ...) standardGeneric("statistics"))
+
+#' @rdname dmDSfit-class
+#' @export
+setMethod("statistics", "dmDSfit", function(x){
+  
+  nc <- length(x@compared_groups)
+  
+  if(nc == 1){
+    
+    stats_null <- x@fit_null@metadata
+    
+  }else{
+    
+    stats_null <- do.call(cbind, lapply(x@fit_null, function(f) f@metadata))
+    
+    if(is.null(names(x@compared_groups)))
+    suffix <- 1:nc
+    else
+    suffix <- names(x@compared_groups)
+    
+    colnames(stats_null) <- paste0(colnames(stats_null), "_null_", rep(suffix, each = 2))
+    
+  } 
+  
+  
+  df <- data.frame(gene_id = names(x@counts), x@fit_full@metadata, stats_null, stringsAsFactors = FALSE, row.names = NULL)
+  colnames(df)[2:(ncol(x@fit_full@metadata)+1)] <- paste0("lik_", colnames(x@fit_full@metadata))
+  
+  return(df)
+  
+})
+
+
+
 #' @rdname dmDSLRT-class
 #' @export
 setGeneric("results", function(x, ...) standardGeneric("results"))
@@ -32,15 +101,7 @@ setMethod("show", "dmDSLRT", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"compared_groups\":\n")
-  print(object@compared_groups)
-  
-  cat("\nSlot \"fit_null\":\n")
-  show_MatrixList_list(fit_null)
-  
-  cat("\nSlot \"results\":\n")
-  show_matrix(object@results, nhead = 5, ntail = 5)
-  
+  cat("  results()\n")
   
 })
 

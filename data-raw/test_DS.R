@@ -51,7 +51,7 @@ dev.off()
 
 
 
-data <- dmDispersion(data, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 15))
+data <- dmDispersion(data, verbose = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 20))
 
 plotDispersion(data)
 dev.off()
@@ -86,8 +86,9 @@ data <- dmLRT(data, compared_groups = list(a = 1:2, b = 1:2), BPPARAM = BiocPara
 
 plotLRT(data, out_dir = "./")
 
-
 results <- results(data)
+
+
 
 plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./")
 
@@ -95,8 +96,14 @@ plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./")
 
 
 
+data <- dmLRT(data, compared_groups = list(a = 1:2), BPPARAM = BiocParallel::MulticoreParam(workers = 10))
+
+plotLRT(data, out_dir = "./k")
+
+results <- results(data)
 
 
+plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./k")
 
 
 

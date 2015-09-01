@@ -18,13 +18,6 @@ setMethod("show", "dmSQTLfit", function(object){
   
   callNextMethod(object)
   
-  cat("\nSlot \"dispersion\":\n")
-  print(object@dispersion)
-  
-  cat("\nSlot \"fit_full\":\n")
-  show_MatrixList_list(object@fit_full)
-  
-  
   })
 
 

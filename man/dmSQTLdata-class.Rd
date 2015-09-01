@@ -3,24 +3,12 @@
 \docType{class}
 \name{dmSQTLdata-class}
 \alias{[,dmSQTLdata,ANY,ANY-method}
-\alias{counts,dmSQTLdata-method}
 \alias{dmSQTLdata-class}
-\alias{genotypes}
-\alias{genotypes,dmSQTLdata-method}
 \alias{length,dmSQTLdata-method}
 \alias{names,dmSQTLdata-method}
 \alias{plot,dmSQTLdata,ANY-method}
-\alias{samples,dmSQTLdata-method}
 \title{Object that contains counts, genotypes and sample information.}
 \usage{
-\S4method{counts}{dmSQTLdata}(x)
-
-genotypes(x, ...)
-
-\S4method{genotypes}{dmSQTLdata}(x)
-
-\S4method{samples}{dmSQTLdata}(x)
-
 \S4method{names}{dmSQTLdata}(x)
 
 \S4method{length}{dmSQTLdata}(x)

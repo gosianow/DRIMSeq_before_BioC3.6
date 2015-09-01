@@ -30,7 +30,11 @@ setGeneric("counts", function(x, ...) standardGeneric("counts"))
 
 #' @rdname dmDSdata-class
 #' @export
-setMethod("counts", "dmDSdata", function(x) x@counts )
+setMethod("counts", "dmDSdata", function(x){
+  
+  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@counts@unlistData, stringsAsFactors = FALSE)
+  
+  })
 
 
 #' @rdname dmDSdata-class
@@ -43,59 +47,15 @@ setMethod("samples", "dmDSdata", function(x) x@samples )
 
 
 
-#' @rdname dmDSdata-class
-#' @export
-setGeneric("samples<-", function(x, value) standardGeneric("samples<-"))
-
-#' @rdname dmDSdata-class
-#' @export
-setMethod("samples<-", "dmDSdata", function(x, value){
-  
-  stopifnot( ncol(x@counts) == nrow(value) )
-  stopifnot( c("sample_id", "group") %in% colnames(value))
-  stopifnot( class( value$sample_id ) %in% c("character", "factor"))
-  stopifnot( class( value$group ) %in% c("character", "factor"))
-  
-  if(class(value$group) == "character")
-    value$group <- factor(value$group, levels = unique(value$group))
-  else 
-    value$group <- factor(value$group)
-  
-  if(class(value$sample_id) == "character")
-    value$sample_id <- factor(value$sample_id, levels = unique(value$sample_id))
-  else 
-    value$sample_id <- factor(value$sample_id)
-  
-  colnames(x@counts@unlistData) <- value$sample_id
-  
-  rownames(value) <- NULL
-  
-  if(!all(value$group == x@samples$group)){
-    
-    return(new("dmDSdata", counts = x@counts, samples = value))
-    
-  }else{
-    
-    return(initialize(x, samples = value))
-    
-  }
-  
-  
-})
-
-
-
 ##############################################################
 
 setMethod("show", "dmDSdata", function(object){
   
   cat("An object of class", class(object), "\n")
   
-  cat("Slot \"counts\":\n")
-  print(object@counts)
+  cat("with", length(object), "genes and", ncol(object@counts), "samples\n")
   
-  cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples, nhead = 5, ntail = 5)
+  cat("* data accessors: counts(), samples()\n")
   
 })
 
@@ -104,7 +64,6 @@ setMethod("show", "dmDSdata", function(object){
 #' @rdname dmDSdata-class
 #' @export
 setMethod("names", "dmDSdata", function(x) names(x@counts) )
-
 
 #' @rdname dmDSdata-class
 #' @export
@@ -125,8 +84,6 @@ setMethod("[", "dmDSdata", function(x, i, j){
     samples$group <- factor(samples$group)
     rownames(samples) <- NULL
   }
-  
-  # initialize(x, counts = counts, samples = samples)
   
   return(new("dmDSdata", counts = counts, samples = samples))
   

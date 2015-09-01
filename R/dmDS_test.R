@@ -23,8 +23,8 @@ dmDS_test <- function(stats_full, stats_null){
   
   table <- data.frame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, stringsAsFactors = FALSE)
 
-  o <- order(table[, "pvalue"])
-  table <- table[o,]
+  # o <- order(table[, "pvalue"])
+  # table <- table[o,]
 
   time_end <- Sys.time()
   cat("Took ", as.numeric(time_end - time_start), " seconds.\n")

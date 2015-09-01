@@ -18,24 +18,6 @@ setClass("dmSQTLdata",
 
 ##############################################################
 
-#' @rdname dmSQTLdata-class
-#' @export
-setMethod("counts", "dmSQTLdata", function(x) x@counts )
-
-
-#' @rdname dmSQTLdata-class
-#' @export
-setGeneric("genotypes", function(x, ...) standardGeneric("genotypes"))
-
-#' @rdname dmSQTLdata-class
-#' @export
-setMethod("genotypes", "dmSQTLdata", function(x) x@genotypes )
-
-
-
-#' @rdname dmSQTLdata-class
-#' @export
-setMethod("samples", "dmSQTLdata", function(x) x@samples )
 
 
 ##############################################################
@@ -44,14 +26,7 @@ setMethod("show", "dmSQTLdata", function(object){
   
   cat("An object of class", class(object), "\n")
   
-  cat("Slot \"counts\":\n")
-  print(object@counts)
-  
-  cat("\nSlot \"genotypes\":\n")
-  print(object@genotypes)
-  
-  cat("\nSlot \"samples\":\n")
-  show_matrix(object@samples)
+  cat("with", length(object), "genes and", ncol(object@counts), "samples\n")
   
 })
 
