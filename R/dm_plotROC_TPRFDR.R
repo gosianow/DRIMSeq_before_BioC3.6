@@ -214,7 +214,7 @@ plot_TPRFDR <- function(data_TPRFDR, split_levels, plot_levels, facet_levels, pl
 
   ggp <- ggplot(data = TPRFDR, aes_string(x = "FDR", y = "TPR", group = plot_levels, colour = plot_levels)) +
   theme_bw() +
-  xlab("Achieved FDR") +
+  xlab("FDR") +
   geom_line(size = 1.5, na.rm=TRUE) +
   geom_vline(aes(xintercept = threshold), linetype = "dashed") + 
   geom_point(size = pointsize + 1, shape = 19, na.rm=TRUE) + 
