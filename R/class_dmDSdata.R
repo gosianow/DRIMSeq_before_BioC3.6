@@ -32,7 +32,7 @@ setGeneric("counts", function(x, ...) standardGeneric("counts"))
 #' @export
 setMethod("counts", "dmDSdata", function(x){
   
-  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@counts@unlistData, stringsAsFactors = FALSE)
+  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@counts@unlistData, stringsAsFactors = FALSE, row.names = NULL)
   
   })
 

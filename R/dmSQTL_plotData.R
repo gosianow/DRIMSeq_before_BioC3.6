@@ -18,7 +18,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
   
   
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "DM_hist_features.pdf"))
+  pdf(paste0(out_dir, "hist_features.pdf"))
   
   print(ggp)
   
@@ -45,7 +45,7 @@ dmSQTL_plotData <- function(counts, genotypes, out_dir = NULL){
   
   
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "DM_hist_snps.pdf"))
+  pdf(paste0(out_dir, "hist_snps.pdf"))
   
   print(ggp)
   

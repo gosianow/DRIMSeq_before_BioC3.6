@@ -39,28 +39,11 @@ dmDS_plotDataInfo <- function(info, ds_info, out_dir = NULL){
   
   
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "DM_hist_ds_info.pdf"))
+  pdf(paste0(out_dir, "hist_ds_info.pdf"))
   print(ggp)
   if(!is.null(out_dir))
   dev.off()
   
-  
-  # colors <- c("darkred", "darkred", rep("grey", 200))
-  # names(colors) <- c("NoGene", "0", 1:200)
-  # colors <- colors[names(tas)]
-  
-  # if(!is.null(out_dir))
-  # pdf(paste0(out_dir, "DM_hist_ds_info.pdf"), width = 7, height = 7)
-  # opar <- par() 
-  # par(mar = c(5, 5, 4, 2) + 0.1, mgp = c(3, 1, 0)) # c(5, 4, 4, 2) + 0.1 # c(bottom, left, top, right)
-    
-  # xx <- barplot(tas, xlab = "Number of DS features left within DS gene", ylab = "Number of DS genes", col = colors, cex.lab=1.5)
-  # text(x = xx, y = as.numeric(tas), label = as.numeric(tas), pos = 3)
-    
-  # par(mar = opar$mar, mgp = opar$mgp) 
-  # if(!is.null(out_dir))
-  # dev.off()
-    
     
 }
 

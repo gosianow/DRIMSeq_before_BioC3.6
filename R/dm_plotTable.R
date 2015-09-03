@@ -14,7 +14,7 @@ dm_plotTable <- function(pvalues, name = "pvalue", out_dir = NULL){
   
   
   if(!is.null(out_dir))
-  pdf(paste0(out_dir, "DM_hist_", name, ".pdf"))
+  pdf(paste0(out_dir, "hist_", name, ".pdf"))
   
   print(ggp)
   
