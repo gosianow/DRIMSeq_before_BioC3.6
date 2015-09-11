@@ -261,7 +261,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
              
              moderation <- colMeans(loglik)
              
-             loglik <- sweep(loglik, 1, priorN * moderation, FUN = "+")
+             loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
              
              },
              

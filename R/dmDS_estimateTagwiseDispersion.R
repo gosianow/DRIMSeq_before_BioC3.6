@@ -184,7 +184,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
               
               moderation <- colMeans(loglik)
               
-              loglik <- sweep(loglik, 1, priorN * moderation, FUN = "+")
+              loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
               
             },
             
