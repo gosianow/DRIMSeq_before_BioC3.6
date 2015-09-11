@@ -75,6 +75,9 @@ plotLRT(data, out_dir = "./")
 
 results <- results(data)
 
+
+
+
 plotFit(data, gene_id = results$gene_id[1:5], out_dir = "./")
 
 

@@ -6,28 +6,33 @@ NULL
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   ### calculate cpm
-  counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts@unlistData), partitioning = counts@partitioning)
+  counts_cpm <- new("MatrixList", unlistData = DM:::dm_cpm(counts@unlistData), partitioning = counts@partitioning)
   
   inds <- which(width(counts) > 1)
   
+  min_samps_feature_prop2 <- max(2, min_samps_feature_prop)
+  
   counts_new <- lapply(inds, function(g){
-    # g = "ENSG00000162542"
+    # g = 117
     # print(g)
     expr_cpm_gene <- counts_cpm[[g]]
     expr_gene <- counts[[g]]
     
-    ### no genes with one transcript
-    if(dim(expr_gene)[1] == 1)
-      return(NULL)
+    # ### no genes with one transcript
+    # if(dim(expr_gene)[1] == 1)
+    #   return(NULL)
     
     ### genes with min expression
-    if(! sum(colSums(expr_cpm_gene) > min_gene_expr) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_cpm_gene) >= min_gene_expr) >= min_samps_gene_expr )
       return(NULL)
     
     samps2keep <- colSums(expr_cpm_gene) != 0 & !is.na(expr_cpm_gene[1, ])
     
+    if(sum(samps2keep) < min_samps_feature_prop2)
+      return(NULL)
+    
     prop <- prop.table(expr_gene[, samps2keep], 2) 
-    trans2keep <- rowSums(prop > min_feature_prop) >= min_samps_feature_prop
+    trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
     ### no genes with one transcript
     if(sum(trans2keep) <= 1)

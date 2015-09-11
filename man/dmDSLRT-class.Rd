@@ -4,10 +4,16 @@
 \name{dmDSLRT-class}
 \alias{dmDSLRT-class}
 \alias{plot,dmDSLRT,ANY-method}
+\alias{proportions,dmDSLRT-method}
 \alias{results}
 \alias{results,dmDSLRT-method}
+\alias{statistics,dmDSLRT-method}
 \title{Object that extends \code{dmDSfit} by adding the test results.}
 \usage{
+\S4method{proportions}{dmDSLRT}(x)
+
+\S4method{statistics}{dmDSLRT}(x)
+
 results(x, ...)
 
 \S4method{results}{dmDSLRT}(x)

@@ -16,13 +16,9 @@ setClass("dmDSLRT",
 
 ##############################################################
 
-#' @rdname dmDSfit-class
+#' @rdname dmDSLRT-class
 #' @export
-setGeneric("proportions", function(x, ...) standardGeneric("proportions"))
-
-#' @rdname dmDSfit-class
-#' @export
-setMethod("proportions", "dmDSfit", function(x){
+setMethod("proportions", "dmDSLRT", function(x){
   
   nc <- length(x@compared_groups)
   
@@ -48,13 +44,9 @@ setMethod("proportions", "dmDSfit", function(x){
 })
 
 
-#' @rdname dmDSfit-class
+#' @rdname dmDSLRT-class
 #' @export
-setGeneric("statistics", function(x, ...) standardGeneric("statistics"))
-
-#' @rdname dmDSfit-class
-#' @export
-setMethod("statistics", "dmDSfit", function(x){
+setMethod("statistics", "dmDSLRT", function(x){
   
   nc <- length(x@compared_groups)
   

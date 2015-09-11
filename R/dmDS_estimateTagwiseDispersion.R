@@ -57,12 +57,18 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
             return(NA) 
           
           
-          if(disp_init_weirMoM)
-            disp_init <- dm_weirMoM(y = counts[[g]], se=FALSE)
+          if(disp_init_weirMoM){
+            disp_init_tmp <- dm_weirMoM(y = counts[[g]], se=FALSE)
+            if(is.na(disp_init_tmp))
+              disp_init_tmp <- disp_init
+          }else{
+            disp_init_tmp <- disp_init
+          }
+
           
           optimum <- NA
           
-          try( optimum <- optim(par = disp_init, fn = dm_profileLikTagwise, gr = NULL, 
+          try( optimum <- optim(par = disp_init_tmp, fn = dm_profileLikTagwise, gr = NULL, 
                                 y = counts[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, 
                                 disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
                                 method = "L-BFGS-B", lower = 1e-2, upper = 1e+10, control = list(fnscale = -1, factr = disp_tol))$par , silent = TRUE)
@@ -86,17 +92,22 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
           # g = 1
           
           ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
-          if(is.null(dm_profileLikTagwise(gamma0 = disp_interval[1] + (1-(sqrt(5) - 1)/2)*(disp_interval[2]-disp_interval[1]), y = counts[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
+          if(is.na(dm_profileLikTagwise(gamma0 = disp_interval[1] + (1-(sqrt(5) - 1)/2)*(disp_interval[2]-disp_interval[1]), y = counts[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
             return(NA) 
           
           ui <- 1
           ci <- 1e-8
           
-          if(disp_init_weirMoM)
-            disp_init <- dm_weirMoM(y = counts[[g]], se=FALSE)
+          if(disp_init_weirMoM){
+            disp_init_tmp <- dm_weirMoM(y = counts[[g]], se=FALSE)
+            if(is.na(disp_init_tmp))
+              disp_init_tmp <- disp_init
+          }else{
+            disp_init_tmp <- disp_init
+          }
           
           
-          optimum <- constrOptim(theta = disp_init, dm_profileLikTagwise, grad = NULL, method = "Nelder-Mead",
+          optimum <- constrOptim(theta = disp_init_tmp, dm_profileLikTagwise, grad = NULL, method = "Nelder-Mead",
                                  ui=ui, ci=ci, control=list(fnscale = -1, reltol = disp_tol), 
                                  y = counts[[g]], ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
           

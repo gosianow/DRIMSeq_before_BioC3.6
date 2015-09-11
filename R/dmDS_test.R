@@ -10,7 +10,7 @@ dmDS_test <- function(stats_full, stats_null){
   ## calculate lr
   cat("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
-    
+  
   lr <- 2*(rowSums(stats_full) - stats_null[, "lik"])
   
   nrgroups <- ncol(stats_full)
@@ -25,6 +25,8 @@ dmDS_test <- function(stats_full, stats_null){
 
   # o <- order(table[, "pvalue"])
   # table <- table[o,]
+  
+  rownames(table) <- NULL
 
   time_end <- Sys.time()
   cat("Took ", as.numeric(time_end - time_start), " seconds.\n")

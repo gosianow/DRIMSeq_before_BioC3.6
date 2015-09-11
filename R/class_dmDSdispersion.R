@@ -145,7 +145,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
     mean_expression <- numeric()
   }
   
-  if(common_dispersion || (genewise_dispersion && disp_mode == "grid")){
+  if(common_dispersion){
     common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     common_dispersion <- numeric()
@@ -154,8 +154,8 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   
   if(genewise_dispersion){
     
-    if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
+    if(length(common_dispersion)){
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init !")
       disp_init <- common_dispersion
     }
     
@@ -182,7 +182,7 @@ setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE,
     mean_expression <- x@mean_expression
   }
   
-  if(common_dispersion || (genewise_dispersion && disp_mode == "grid")){
+  if(common_dispersion){
     common_dispersion <- dmDS_estimateCommonDispersion(counts = x@counts, samples = x@samples, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   }else{
     common_dispersion <- x@common_dispersion
@@ -191,8 +191,8 @@ setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE,
   
   if(genewise_dispersion){
     
-    if(disp_mode == "grid" && length(common_dispersion)){
-      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init in 'grid' mode !")
+    if(length(common_dispersion)){
+      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init !")
       disp_init <- common_dispersion
     }
     

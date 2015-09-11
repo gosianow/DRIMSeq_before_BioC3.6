@@ -26,7 +26,7 @@ dm_weirMoM <- function(y, se=FALSE){
 #   else MoM.wh
   
   if(MoM.wh <= 0)
-    MoM.wh <- 0.5 # MoM.wh <- 0.005
+    return(NA)
   
   return((1-MoM.wh)/MoM.wh)
   

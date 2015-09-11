@@ -1,5 +1,7 @@
 #' @import ggplot2
 
+# genewise_dispersion = x@genewise_dispersion; mean_expression = x@mean_expression; nr_features = width(x@counts); common_dispersion = x@common_dispersion
+
 dmSQTL_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features, common_dispersion = numeric(), out_dir = NULL){
   
   w <- sapply(genewise_dispersion, length)

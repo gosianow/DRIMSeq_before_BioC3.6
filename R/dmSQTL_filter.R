@@ -17,6 +17,7 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
   counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
   
   inds <- which(width(counts) > 1)
+  min_samps_feature_prop2 <- max(2, min_samps_feature_prop)
   
   counts_new <- lapply(inds, function(g){
     # g = 1
@@ -24,18 +25,21 @@ dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, 
     expr_cpm_gene <- counts_cpm[[g]]
     expr_gene <- counts[[g]]
     
-    ### no genes with one transcript
-    if(dim(expr_gene)[1] == 1)
-    return(NULL)
+    # ### no genes with one transcript
+    # if(dim(expr_gene)[1] == 1)
+    # return(NULL)
     
     ### genes with min expression
-    if(! sum(colSums(expr_cpm_gene) > min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_cpm_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
     return(NULL)
     
-    samps2keep <- colSums(expr_cpm_gene) > min_gene_expr & !is.na(expr_cpm_gene[1, ])
+    samps2keep <- colSums(expr_cpm_gene) >= min_gene_expr & !is.na(expr_cpm_gene[1, ])
+    
+    if(sum(samps2keep) < min_samps_feature_prop2)
+      return(NULL)
     
     prop <- prop.table(expr_gene[, samps2keep], 2) 
-    trans2keep <- rowSums(prop > min_feature_prop) >= min_samps_feature_prop
+    trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
     ### no genes with one transcript
     if(sum(trans2keep) <= 1)
