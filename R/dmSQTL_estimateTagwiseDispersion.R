@@ -249,10 +249,12 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         
         if(disp_moderation != "none"){
           
-          ### FIX IT!
-          nlibs <- ncol(snps)
-          ngroups <- 2
-          priorN <- disp_prior_df/(nlibs - ngroups) ### analogy to edgeR
+          # ### FIX IT!
+          # nlibs <- ncol(snps)
+          # ngroups <- 2
+          # priorN <- disp_prior_df/(nlibs - ngroups) ### analogy to edgeR
+          
+          priorN <- disp_prior_df
           
           switch(
             disp_moderation, 

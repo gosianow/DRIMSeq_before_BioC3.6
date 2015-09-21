@@ -43,7 +43,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: liks
            rownames(stats) <- names(counts)
            
-           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
+           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pis and liks
            
            if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            

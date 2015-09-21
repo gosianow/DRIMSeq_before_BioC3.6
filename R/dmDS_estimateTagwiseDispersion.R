@@ -174,8 +174,8 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
           
           nlibs <- length(group)
           
-          priorN <- disp_prior_df/(nlibs - ngroups) ### analogy to edataR
-          
+          # priorN <- disp_prior_df/(nlibs - ngroups) ### analogy to edgeR
+          priorN <- disp_prior_df
           
           switch(
             disp_moderation, 

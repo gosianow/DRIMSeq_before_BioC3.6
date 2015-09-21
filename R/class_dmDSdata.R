@@ -75,15 +75,20 @@ setMethod("length", "dmDSdata", function(x) length(x@counts) )
 setMethod("[", "dmDSdata", function(x, i, j){
   
   if(missing(j)){
+    
   counts <- x@counts[i, ]
   samples <- x@samples
+  
   }else{
+    
     counts <- x@counts[i, j]
+    samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, ]
     samples$sample_id <- factor(samples$sample_id)
     samples$group <- factor(samples$group)
     rownames(samples) <- NULL
+    
   }
   
   return(new("dmDSdata", counts = counts, samples = samples))
@@ -125,7 +130,7 @@ dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
   stopifnot(class(counts) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
   stopifnot(mode(counts) %in% "numeric")
-  counts <- ceiling(counts)
+  # counts <- ceiling(counts)
   
   stopifnot( class( gene_id ) %in% c("character", "factor"))
   stopifnot( class( feature_id ) %in% c("character", "factor"))

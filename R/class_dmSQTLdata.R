@@ -48,16 +48,21 @@ setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 setMethod("[", "dmSQTLdata", function(x, i, j){
   
   if(missing(j)){
+    
     counts <- x@counts[i, ]
     genotypes <- x@genotypes[i, ]
     samples <- x@samples
+    
   }else{
+    
     counts <- x@counts[i, j]
     genotypes <- x@genotypes[i, j]
+    samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, ]
     samples$sample_id <- factor(samples$sample_id)
     rownames(samples) <- NULL
+    
   }
 
   return(new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples))
@@ -108,7 +113,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
   stopifnot( mode( counts ) %in% c("numeric"))
-  counts <- ceiling(counts)
+  # counts <- ceiling(counts)
   
   stopifnot( class( gene_id ) %in% c("character", "factor"))
   stopifnot( class( feature_id ) %in% c("character", "factor"))

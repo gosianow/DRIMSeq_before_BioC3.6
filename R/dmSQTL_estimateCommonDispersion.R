@@ -10,9 +10,10 @@ dmSQTL_estimateCommonDispersion <- function(counts, genotypes, disp_adjust = TRU
 	
 	### keep only one SNP per gene
   inds <- 1:length(genotypes)
-  names(inds) <- names(genotypes)
-	genotypes <- MatrixList(lapply(inds, function(g){ genotypes[[g]][1, , drop = FALSE]}))
-	
+  # names(inds) <- names(genotypes)
+	# genotypes <- MatrixList(lapply(inds, function(g){ genotypes[[g]][1, , drop = FALSE]}))
+  genotypes <- new("MatrixList", unlistData = matrix(1, nrow = length(genotypes), ncol = ncol(genotypes)), partitioning = split(inds, factor(names(genotypes), levels = names(genotypes))) )
+  
   time <- system.time(optimum <- optimize(f = dmSQTL_profileLikCommon, interval = disp_interval,
                   counts = counts, genotypes = genotypes, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM,
                   maximum = TRUE, tol = disp_tol) )

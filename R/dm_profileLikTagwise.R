@@ -10,7 +10,7 @@ dm_profileLikTagwise <- function(gamma0, y, ngroups, lgroups, igroups, disp_adju
 
   fit <- dm_fitOneGeneManyGroups(y = y, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose) ### return NA when at least one group has not enough of data 
   
-  # if(sum(!is.na(fit$stats)) < 2)
+  # if(sum(!is.na(fit$stats)) < 2) ### do not check if you want to use one group (e.g. null group in sqtl) for disp. est.
   # return(NA)
   
   lik <- sum(fit$stats, na.rm = TRUE)

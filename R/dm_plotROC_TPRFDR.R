@@ -40,6 +40,7 @@ calculate_ROCx <- function(results, status){
       ord <- order(pvs, decreasing = FALSE)
       sts <- sts[ord]
       pvs <- pvs[ord]
+      apvs <- apvs[ord]
       
       TPRv <- cumsum(sts) / P
       FPRv <- cumsum(!sts) / N
@@ -93,7 +94,7 @@ plot_ROCx <- function(data_ROCx, split_levels, plot_levels, facet_levels, plot_c
   theme_bw() +
   geom_line(size = 1.5, na.rm=TRUE) +
   theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
-  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), nrow = 2)) +
+  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) +
   geom_point(data = X, aes_string(x = "FPR", y = "TPR", group = plot_levels, colour = plot_levels), size = 8, shape = "X", na.rm=TRUE) 
   
   if(xylim_one)
@@ -210,7 +211,7 @@ plot_TPRFDR <- function(data_TPRFDR, split_levels, plot_levels, facet_levels, pl
   
   TPRFDR$white <- ifelse(TPRFDR$FDR <= TPRFDR$threshold, NA, TPRFDR$TPR)
   
-  pointsize <- 4
+  pointsize <- 2.5
 
   ggp <- ggplot(data = TPRFDR, aes_string(x = "FDR", y = "TPR", group = plot_levels, colour = plot_levels)) +
   theme_bw() +
@@ -220,7 +221,7 @@ plot_TPRFDR <- function(data_TPRFDR, split_levels, plot_levels, facet_levels, pl
   geom_point(size = pointsize + 1, shape = 19, na.rm=TRUE) + 
   geom_point(aes_string(y = "white"), size = pointsize, shape = 21, fill = "white", na.rm=TRUE) + 
   theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
-  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), nrow = 2)) 
+  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) 
   
   if(xylim_one)
   ggp <- ggp + coord_cartesian(xlim = c(-0.1, 1.1), ylim = c(-0.1, 1.1))
