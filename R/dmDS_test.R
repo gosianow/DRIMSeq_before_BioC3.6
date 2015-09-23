@@ -3,7 +3,7 @@
 #######################################################
 
 
-# stats_full = x@fit_full@metadata; stats_null = x@fit_null@metadata
+# stats_full = x@fit_full@metadata; stats_null = x@fit_null[[1]]@metadata
 
 dmDS_test <- function(stats_full, stats_null){
 
@@ -13,9 +13,12 @@ dmDS_test <- function(stats_full, stats_null){
   
   lr <- 2*(rowSums(stats_full) - stats_null[, "lik"])
   
-  nrgroups <- ncol(stats_full)
-  
+  nrgroups <- rowSums(!is.na(stats_full))
+
   df <- (nrgroups - 1)*stats_null[, "df"]
+  
+  df[nrgroups == 0] <- NA 
+  lr[nrgroups == 0] <- NA 
   
   pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
   

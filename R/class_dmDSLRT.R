@@ -238,7 +238,7 @@ setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
 #' @rdname plotFit
 #' @param compared_groups numeric or character indicating the comparison that should be plotted.
 #' @export
-setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   

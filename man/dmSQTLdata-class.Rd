@@ -25,7 +25,9 @@ Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdata
 \describe{
 \item{\code{counts}}{\code{\linkS4class{MatrixList}}  of counts.}
 
-\item{\code{genotypes}}{\code{\linkS4class{MatrixList}} with genotypes.}
+\item{\code{genotypes}}{\code{\linkS4class{MatrixList}} with unique genotypes.}
+
+\item{\code{blocks}}{\code{\linkS4class{MatrixList}} with blocks of genotypes.}
 
 \item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}).}
 }}

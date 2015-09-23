@@ -16,7 +16,7 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
@@ -25,7 +25,7 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
@@ -36,18 +36,16 @@ dmDispersion(x, ...)
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
   disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
 
 \S4method{dmDispersion}{dmSQTLdispersion}(x, mean_expression = FALSE,
   common_dispersion = FALSE, genewise_dispersion = TRUE,
-  disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim",
-  "grid")[4], disp_interval = c(0, 10000), disp_tol = 1e-08,
-  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21,
-  disp_grid_range = c(-10, 10), disp_moderation = c("none", "common",
-  "trended")[1], disp_prior_df = 10, disp_span = 0.3,
-  prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
-  prop_tol = 1e-12, verbose = FALSE,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+  disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 10000),
+  disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
+  disp_grid_length = 21, disp_grid_range = c(-10, 10),
+  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.}
@@ -89,6 +87,8 @@ dmDispersion(x, ...)
 \item{verbose}{Logical.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
+
+\item{speed}{Logical. Whether to calculate one dipserion per gene...}
 }
 \value{
 Returns the \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.

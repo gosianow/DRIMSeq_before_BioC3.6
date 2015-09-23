@@ -10,8 +10,7 @@
 dmFit(x, ...)
 
 \S4method{dmFit}{dmDSdispersion}(x, dispersion = "genewise_dispersion",
-  prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2],
-  prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmFit}{dmSQTLdispersion}(x, dispersion = "genewise_dispersion",

@@ -7,20 +7,29 @@
 \alias{[,MatrixList,ANY,ANY-method}
 \alias{[[,MatrixList,ANY,ANY-method}
 \alias{colnames,MatrixList-method}
+\alias{colnames<-,MatrixList-method}
 \alias{dim,MatrixList-method}
 \alias{length,MatrixList-method}
 \alias{names,MatrixList-method}
+\alias{names<-,MatrixList-method}
 \alias{ncol,MatrixList-method}
 \alias{nrow,MatrixList-method}
 \alias{rownames,MatrixList-method}
+\alias{rownames<-,MatrixList-method}
 \alias{width,MatrixList-method}
 \title{MatrixList container}
 \usage{
 \S4method{names}{MatrixList}(x)
 
+\S4method{names}{MatrixList}(x) <- value
+
 \S4method{rownames}{MatrixList}(x)
 
+\S4method{rownames}{MatrixList}(x) <- value
+
 \S4method{colnames}{MatrixList}(x)
+
+\S4method{colnames}{MatrixList}(x) <- value
 
 \S4method{length}{MatrixList}(x)
 

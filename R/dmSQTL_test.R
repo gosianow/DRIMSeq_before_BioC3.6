@@ -1,6 +1,8 @@
 #######################################################
 #  group testing
 #######################################################
+# fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
+
 
 dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -12,13 +14,16 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticorePar
   gene_list <- names(fit_full)
   
   table_list <- BiocParallel::bplapply(inds, function(g){
-    # g = "ENSG00000131037.8"
+    # g = 662
     
     lr <- 2*(rowSums(fit_full[[g]]@metadata, na.rm = TRUE) - fit_null[[g]]@metadata[, "lik"])
     
-    nrgroups <- apply(fit_full[[g]]@metadata, 1, function(r){ sum(!is.na(r)) })
+    nrgroups <- rowSums(!is.na(fit_full[[g]]@metadata))
     
-    df <- (nrgroups - 1)*fit_null[[g]]@metadata[, "df"]
+    df <- (nrgroups - 1)*fit_null[[g]]@metadata[, "df"] ### negative when NAs in all groups in lik
+    
+    df[nrgroups == 0] <- NA 
+    lr[nrgroups == 0] <- NA 
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     

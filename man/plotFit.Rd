@@ -9,10 +9,9 @@
 \alias{plotFit,dmSQTLfit-method}
 \title{Plot the estimated proportions.}
 \usage{
-\S4method{plotFit}{dmDSLRT}(x, gene_id, plot_type = c("barplot", "boxplot1",
-  "boxplot2", "lineplot", "ribbonplot")[1], order = TRUE, plot_full = TRUE,
-  plot_null = TRUE, compared_groups = 1, plot_main = TRUE,
-  out_dir = NULL)
+\S4method{plotFit}{dmDSLRT}(x, gene_id, plot_type = "barplot", order = TRUE,
+  plot_full = TRUE, plot_null = TRUE, compared_groups = 1,
+  plot_main = TRUE, out_dir = NULL)
 
 plotFit(x, ...)
 

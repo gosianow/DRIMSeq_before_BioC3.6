@@ -114,6 +114,21 @@ setMethod("names", "MatrixList", function(x){
   
   })
 
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("names<-", "MatrixList", function(x, value){
+  
+  names(x@partitioning) <- value
+  x
+  
+  # partitioning <- x@partitioning
+  # names(partitioning) <- value
+  # return(new("MatrixList", unlistData = x@unlistData, partitioning = partitioning, metadata = x@metadata))
+  
+})
+
+
 #' @rdname MatrixList-class
 #' @export
 setMethod("rownames", "MatrixList", function(x){
@@ -122,12 +137,29 @@ setMethod("rownames", "MatrixList", function(x){
   
 })
 
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("rownames<-", "MatrixList", function(x, value){
+  
+  rownames(x@unlistData) <- value
+  x
+})
+
 #' @rdname MatrixList-class
 #' @export
 setMethod("colnames", "MatrixList", function(x){
   
   colnames(x@unlistData)
   
+})
+
+#' @rdname MatrixList-class
+#' @export
+setMethod("colnames<-", "MatrixList", function(x, value){
+  
+  colnames(x@unlistData) <- value
+  x
 })
 
 

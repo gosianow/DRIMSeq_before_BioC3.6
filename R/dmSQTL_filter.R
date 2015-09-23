@@ -1,9 +1,9 @@
 #' @include dm_cpm.R
 NULL
 
-# counts = x@counts; genotypes = x@genotypes; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
+# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
 
-dmSQTL_filter <- function(counts, genotypes, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
 
 ########################################################
 # filtering on counts 
@@ -75,7 +75,7 @@ counts_new <- MatrixList(counts_new)
 ########################################################
 
 genotypes <- genotypes[inds[NULLs]]
-
+blocks <- blocks[inds[NULLs], ]
 
 genotypes_new <- BiocParallel::bplapply(1:length(counts_new), function(g){ 
   # g = 1
@@ -124,9 +124,26 @@ genotypes_new <- genotypes_new[NULLs]
 genotypes_new <- MatrixList(genotypes_new)
 counts_new <- counts_new[NULLs]
 
-data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, samples = samples)
+blocks <- blocks[NULLs, ]
 
-# all(names(data@counts) == names(data@genotypes))
+
+########################################################
+# filtering on blocks
+########################################################
+
+inds <- 1:length(genotypes_new)
+
+blocks_new <- MatrixList(lapply(inds, function(b){
+  # b = 1
+  
+  blocks[[b]][blocks[[b]][, "block_id"] %in% rownames(genotypes_new[[b]]), , drop = FALSE]
+  
+  }))
+
+names(blocks_new) <- names(genotypes_new)
+
+
+data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, blocks = blocks_new, samples = samples)
 
 return(data)
 

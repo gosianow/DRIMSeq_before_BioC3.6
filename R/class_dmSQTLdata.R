@@ -8,11 +8,13 @@ NULL
 #' Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdataFromRanges}}.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}}  of counts.
-#' @slot genotypes \code{\linkS4class{MatrixList}} with genotypes.
+#' @slot genotypes \code{\linkS4class{MatrixList}} with unique genotypes.
+#' @slot blocks \code{\linkS4class{MatrixList}} with blocks of genotypes.
 #' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}). 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
+                        blocks = "MatrixList",
                         samples = "data.frame"))
 
 
@@ -51,12 +53,14 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
     
     counts <- x@counts[i, ]
     genotypes <- x@genotypes[i, ]
+    blocks <- x@blocks[i, ]
     samples <- x@samples
     
   }else{
     
     counts <- x@counts[i, j]
     genotypes <- x@genotypes[i, j]
+    blocks <- x@blocks[i, ]
     samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, ]
@@ -65,7 +69,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
     
   }
 
-  return(new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples))
+  return(new("dmSQTLdata", counts = counts, genotypes = genotypes, blocks = blocks, samples = samples))
   
 })
 
@@ -108,7 +112,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
 #'  
 #'  @export
-dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id){
+dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
@@ -181,9 +185,49 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   
   genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = partitioning_genotypes)
   
+  ### keep unique genotypes and create info about blocs
+  
+  inds <- 1:length(genotypes)
+  
+  blocks <- MatrixList(BiocParallel::bplapply(inds, function(g){
+    # g = 1
+    
+    genotypes_df <- data.frame(t(genotypes[[g]]))
+    
+    matching_snps <- match(genotypes_df, genotypes_df)
+
+    # blocks_tmp <- split(colnames(genotypes_df), matching_snps)
+    # names(blocks_tmp) <- paste0("block", 1:length(blocks_tmp))
+    
+    oo <- order(matching_snps, decreasing = FALSE)
+    
+    block_id <- paste0("block_", as.numeric(factor(matching_snps)))
+    snp_id <- colnames(genotypes_df)
+    
+    blocks_tmp <- cbind(block_id, snp_id)
+    
+    return(blocks_tmp[oo, , drop = FALSE])
+
+    }, BPPARAM = BPPARAM))
+
+  names(blocks) <- names(genotypes)
+
+
+  genotypes_u <- MatrixList(BiocParallel::bplapply(inds, function(g){
+    # g = 1
+    
+    genotypes_tmp <- unique(genotypes[[g]])
+    rownames(genotypes_tmp) <- paste0("block_", 1:nrow(genotypes_tmp))
+    return(genotypes_tmp)
+
+    }, BPPARAM = BPPARAM))
+  
+  names(genotypes_u) <- names(genotypes)
+  
+  
   samples <- data.frame(sample_id = sample_id)
   
-  data <- new("dmSQTLdata", counts = counts, genotypes = genotypes, samples = samples)
+  data <- new("dmSQTLdata", counts = counts, genotypes = genotypes_u, blocks = blocks, samples = samples)
   
   return(data)
   
@@ -200,7 +244,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 #'  @param window Numeric. Size of a down and up stream window that is used to 
 #'    match SNPs to a gene. See details.
 #'  @export
-dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3){
+dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   rownames(genotypes) <- snp_id
   gene_ranges <- GenomicRanges::resize(gene_ranges, GenomicRanges::width(gene_ranges) + 2 * window, fix = "center")
@@ -216,7 +260,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
   gene_id_genotypes <- names(gene_ranges)[q]
   
   
-  data <- dmSQTLdata(counts = counts, gene_id = gene_id, feature_id = feature_id, genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id = snp_id, sample_id = sample_id)
+  data <- dmSQTLdata(counts = counts, gene_id = gene_id, feature_id = feature_id, genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id = snp_id, sample_id = sample_id, BPPARAM = BPPARAM)
   
   return(data)
   
@@ -234,7 +278,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
+  data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
   
   return(data_filtered)
   
@@ -249,7 +293,7 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_ge
 #' @export
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
-  dmSQTL_plotData(counts = x@counts, genotypes = x@genotypes, out_dir = out_dir)
+  dmSQTL_plotData(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, out_dir = out_dir)
   
 })
 

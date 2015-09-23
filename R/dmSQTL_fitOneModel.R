@@ -27,7 +27,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            if(verbose) cat("* Fitting full model.. \n")
            
            time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
-             # g = 1; y = counts[[g]]; snps = genotypes[[g]]
+             # g = 662
              
              y = counts[[g]]
              n_y <- nrow(y)
@@ -39,10 +39,9 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              stats <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, lgroups_g))
              
              for(i in 1:n_snps){          
-              # i = 1
-              
-              # print(i)
-              
+              # i = 29
+              print(i)
+
               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
               yg <- y[, !NAs]             
               group <- snps[i, !NAs]
@@ -63,12 +62,13 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               
              }
              
-             partitioning <- split(1:nrow(pi), factor(rep(names_snps, each = n_y), levels = names_snps))
+             partitioning <- split(1:nrow(pi), factor(rep(1:n_snps, each = n_y)))
+             names(partitioning) <- names_snps
              
              ff <- new("MatrixList", unlistData = pi, partitioning = partitioning, metadata = stats)
              
-             return(ff)
              
+             return(ff)
               
            }, BPPARAM = BPPARAM))
            
@@ -112,7 +112,8 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               
              }
              
-             partitioning <- split(1:nrow(pi), factor(rep(names_snps, each = n_y), levels = names_snps))
+             partitioning <- split(1:nrow(pi), factor(rep(1:n_snps, each = n_y)))
+             names(partitioning) <- names_snps
              
              ff <- new("MatrixList", unlistData = pi, partitioning = partitioning, metadata = stats)
              

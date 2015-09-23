@@ -6,10 +6,11 @@
 \title{Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes}
 \usage{
 dmSQTLdata(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id,
-  sample_id)
+  sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
-  snp_id, snp_ranges, sample_id, window = 5000)
+  snp_id, snp_ranges, sample_id, window = 5000,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{counts}{A numeric matrix or data.frame of counts. Rows represent features (exons,

@@ -301,7 +301,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
 
 
   cat("Took ", time["elapsed"], " seconds.\n")
-  if(verbose) cat("*** Genewise dispersion: ", head(dispersion[[1]]), "... \n")
+  if(verbose) cat("*** Genewise dispersion: ", head(unlist(dispersion[1:6])), "... \n")
   
   return(dispersion)
   

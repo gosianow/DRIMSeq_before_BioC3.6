@@ -32,6 +32,7 @@ setMethod("show", "dmSQTLLRT", function(object){
 
 
 ################################################################################
+# prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 #' @rdname dmLRT
 #' @export
@@ -41,7 +42,32 @@ setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol
   
   results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, BPPARAM = BPPARAM)
   
-  return(new("dmSQTLLRT", fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, samples = x@samples))
+  colnames(results)[colnames(results) == "snp_id"] <- "block_id" 
+  
+  
+  results_spl <- split(results, factor(results$gene_id, levels = names(x@blocks)))
+  
+  inds <- 1:length(results_spl)
+  
+  results_new <- lapply(inds, function(i){
+    # i = 1
+    
+    res <- results_spl[[i]]
+    blo <- x@blocks[[i]]
+    
+    matching <- match(blo[, "block_id"], res[, "block_id"])
+    snp_id <- blo[, "snp_id"]
+    
+    res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue")])
+    
+    return(res_new)
+
+    })
+  
+  results_new <- do.call(rbind, results_new)
+  
+  
+  return(new("dmSQTLLRT", fit_null = fit_null, results = results_new, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
   
   
 })
@@ -53,7 +79,7 @@ setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol
 #' @export
 setMethod("plotLRT", "dmSQTLLRT", function(x, out_dir = NULL){
   
-  dm_plotTable(pvalues = x@results$pvalue, out_dir = out_dir)
+  dm_plotTable(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"], out_dir = out_dir)
   
 })
 
@@ -77,7 +103,7 @@ setMethod("plotFit", "dmSQTLLRT", function(x, gene_id, snp_id, plot_type = "boxp
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   
-  dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = x@fit_null, table = x@results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
+  dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = x@fit_null, table = x@results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
   
   
 })
