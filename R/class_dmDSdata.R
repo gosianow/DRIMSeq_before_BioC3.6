@@ -3,23 +3,40 @@ NULL
 
 
 ##############################################################
-#' Object that contains counts and sample information.
+#' dmDSdata object
 #' 
-#' Can be created with function \code{\link{dmDSdata}}.
+#' dmDSdata contains counts of genomic features, such as exons or transcrips, and sample information needed for differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 #' 
-#' @slot counts \code{\linkS4class{MatrixList}} of counts.
-#' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
+#' @slot counts A \code{\linkS4class{MatrixList}} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. 'MatrixList' is partitioned in a way that each submatrix contains counts for a single gene.
+#' @slot samples A data.frame with information about samples. It must contain columns with unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
 
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
                         samples = "data.frame"))
 
 
-# setValidity("dmDSdata", function(object){
 
-#   # has to return TRUE when valid object!
-
-#   })
+setValidity("dmDSdata", function(object){
+  # has to return TRUE when valid object!
+  
+  if(ncol(object@counts) == nrow(object@samples))
+    out <- TRUE
+  else 
+    return(paste0("Unequal number of samples in 'counts' and 'samples' ", ncol(object@counts), " and ", nrow(object@samples)))
+  
+  if(c("sample_id", "group") %in% colnames(object@samples))
+    out <- TRUE
+  else
+    return(paste0("'samples' must contain 'sample_id' amd 'group' variables"))
+  
+  if(length(unique(object@samples$sample_id)) == nrow(object@samples))
+    out <- TRUE
+  else
+    return("There must be a unique 'sample_id' for each sample")
+  
+  return(out)
+  
+})
 
 
 ##############################################################
@@ -34,7 +51,7 @@ setMethod("counts", "dmDSdata", function(x){
   
   data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@counts@unlistData, stringsAsFactors = FALSE, row.names = NULL)
   
-  })
+})
 
 
 #' @rdname dmDSdata-class
@@ -76,9 +93,9 @@ setMethod("[", "dmDSdata", function(x, i, j){
   
   if(missing(j)){
     
-  counts <- x@counts[i, ]
-  samples <- x@samples
-  
+    counts <- x@counts[i, ]
+    samples <- x@samples
+    
   }else{
     
     counts <- x@counts[i, j]

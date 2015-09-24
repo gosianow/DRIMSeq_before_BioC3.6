@@ -28,7 +28,7 @@ setMethod("mean_expression", "dmDSdispersion", function(x){
   
   data.frame(gene_id = names(x@mean_expression), mean_expression = x@mean_expression, stringsAsFactors = FALSE, row.names = NULL)
   
-  })
+})
 
 
 #' @rdname dmDSdispersion-class
@@ -50,7 +50,7 @@ setMethod("common_dispersion<-", "dmDSdispersion", function(x, value){
   
   return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = value, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
   
-  })
+})
 
 #' @rdname dmDSdispersion-class
 #' @export
@@ -62,7 +62,7 @@ setMethod("genewise_dispersion", "dmDSdispersion", function(x){
   
   data.frame(gene_id = names(x@genewise_dispersion), genewise_dispersion = x@genewise_dispersion, stringsAsFactors = FALSE, row.names = NULL)
   
-  })
+})
 
 
 #' @rdname dmDSdispersion-class
@@ -74,8 +74,8 @@ setGeneric("genewise_dispersion<-", function(x, value) standardGeneric("genewise
 setMethod("genewise_dispersion<-", "dmDSdispersion", function(x, value){
   
   return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = value, counts = x@counts, samples = x@samples))
-
-  })
+  
+})
 
 
 
@@ -233,9 +233,9 @@ setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   
   if(!length(x@genewise_dispersion) == length(x@counts))
-  stop("Genewise dispersion must be estimated for each gene!")
+    stop("Genewise dispersion must be estimated for each gene!")
   if(!length(x@genewise_dispersion) == length(x@mean_expression))
-  stop("Mean expression must be estimated for each gene!")
+    stop("Mean expression must be estimated for each gene!")
   
   dmDS_plotDispersion(genewise_dispersion = x@genewise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   

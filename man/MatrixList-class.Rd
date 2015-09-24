@@ -17,7 +17,7 @@
 \alias{rownames,MatrixList-method}
 \alias{rownames<-,MatrixList-method}
 \alias{width,MatrixList-method}
-\title{MatrixList container}
+\title{MatrixList object}
 \usage{
 \S4method{names}{MatrixList}(x)
 
@@ -47,16 +47,25 @@
 
 \S4method{[}{MatrixList,ANY,ANY}(x, i, j)
 }
+\arguments{
+\item{x}{MatrixList object.}
+
+\item{value}{Values used for the replacement of corresponding attributes.}
+
+\item{i,j}{Indexes of MatrixList to be subsampled.}
+
+\item{name}{Name of submatrix to be accessed.}
+}
 \description{
-MatrixList container
+A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix. Below, you can find a list of methods that are available for MatrixList object.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{unlistData}}{Matrix data}
+\item{\code{unlistData}}{A matrix which is a row binding of all the stored matrices.}
 
-\item{\code{partitioning}}{List with indexes of each submatrix}
+\item{\code{partitioning}}{A list of indexes which defines the row partitioning of 'unlistData' matrix into the original submatrices.}
 
-\item{\code{metadata}}{Matrix of additional information}
+\item{\code{metadata}}{A matrix of additional information where each row corresponds to one of the submatrices.}
 }}
 

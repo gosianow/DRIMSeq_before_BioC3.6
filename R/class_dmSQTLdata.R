@@ -78,17 +78,16 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes
 #'  
 #'  @inheritParams dmDSdata
-#'  @param genotypes A numeric matrix of matched genotypes. See Details.
+#'  @param genotypes A numeric matrix of matched genotypes, or a numeric matrix of unmatched genotypes. See Details.
 #'  @param gene_id_genotypes Vector of gene IDs that are matched with genotypes.
 #'  @param snp_id Vector of SNP IDs that correspond to genotypes.
+#' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #'  @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample information.
 #'  @examples 
 #'  ### counts
-#'  head(dataSQTL_counts)
-#'  
 #'  counts <- dataSQTL_counts[, -(1:2)]
-#'  gene_id <- group_split[, 1]
-#'  feature_id <- group_split[, 2]
+#'  gene_id <- dataSQTL_counts[, 1]
+#'  feature_id <- dataSQTL_counts[, 2]
 #'  
 #'  ### gene_ranges
 #'  dataSQTL_gene_ranges
@@ -101,6 +100,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  
 #'  snp_id <- dataSQTL_genotypes$snp_id
 #'  
+#' ### snp_ranges with names!
 #'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
 #'  names(snp_ranges) <- dataSQTL_genotypes$snp_id
 #'  
@@ -109,7 +109,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  sample_id <- colnames(counts)
 #'  
 #'  ### create dmSQTLdata object 
-#'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
+#'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #'  
 #'  @export
 dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -238,7 +238,6 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 #' @rdname dmSQTLdata
 #'  @param gene_ranges \code{\linkS4class{GRanges}} object with information 
 #'    about gene location.
-#'  @param genotypes A numeric matrix of unmatched genotypes. See Details.
 #'  @param snp_ranges \code{\linkS4class{GRanges}} object with information about
 #'    SNP location.
 #'  @param window Numeric. Size of a down and up stream window that is used to 
@@ -273,8 +272,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @rdname dmFilter
 #' @inheritParams dmFilter
 #' @param minor_allel_freq Number of samples that the minor allel must be present in.
-#' @param BPPARAM Parallelization method used by
-#'   \code{\link[BiocParallel]{bplapply}}.
+#' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   

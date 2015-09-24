@@ -1,4 +1,5 @@
 #' @importFrom methods setClass setGeneric setMethod initialize
+#' @importFrom BiocGenerics width
 NULL
 
 #' DM: A package to fit Dirichlet-multinomial model

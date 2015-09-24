@@ -37,8 +37,7 @@ should be between 0 and 1.}
 
 \item{minor_allel_freq}{Number of samples that the minor allel must be present in.}
 
-\item{BPPARAM}{Parallelization method used by
-\code{\link[BiocParallel]{bplapply}}.}
+\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
 Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.

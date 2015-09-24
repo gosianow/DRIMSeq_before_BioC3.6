@@ -61,7 +61,7 @@ plot_venn <- function(data_venn, plot_results, split_levels, plot_levels, plot_c
   venn <- VennDiagram::venn.diagram(data_venn_tmp, filename = NULL, fill = colors, col = colors, cex=cex, cat.cex=cat.cex, lwd=lwd, lty=lty, alpha=alpha, margin = margin, scaled = FALSE)
   
   
-  return(grid.draw(venn))
+  return(grid::grid.draw(venn))
   
   
 }

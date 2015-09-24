@@ -11,7 +11,7 @@
 \alias{plot,dmDSdata,ANY-method}
 \alias{samples}
 \alias{samples,dmDSdata-method}
-\title{Object that contains counts and sample information.}
+\title{dmDSdata object}
 \usage{
 counts(x, ...)
 
@@ -30,13 +30,13 @@ samples(x, ...)
 \S4method{plot}{dmDSdata,ANY}(x, out_dir = NULL)
 }
 \description{
-Can be created with function \code{\link{dmDSdata}}.
+dmDSdata contains counts of genomic features, such as exons or transcrips, and sample information needed for differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{counts}}{\code{\linkS4class{MatrixList}} of counts.}
+\item{\code{counts}}{A \code{\linkS4class{MatrixList}} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. 'MatrixList' is partitioned in a way that each submatrix contains counts for a single gene.}
 
-\item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
+\item{\code{samples}}{A data.frame with information about samples. It must contain columns with unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
 }}
 

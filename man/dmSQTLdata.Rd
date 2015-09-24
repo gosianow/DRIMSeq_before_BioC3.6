@@ -20,7 +20,7 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
 
 \item{feature_id}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
 
-\item{genotypes}{A numeric matrix of matched genotypes. See Details.}
+\item{genotypes}{A numeric matrix of matched genotypes, or a numeric matrix of unmatched genotypes. See Details.}
 
 \item{gene_id_genotypes}{Vector of gene IDs that are matched with genotypes.}
 
@@ -28,6 +28,8 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
 
 \item{sample_id}{A vector of unique sample IDs of length corresponding to
   the number of columns in \code{counts}.}
+
+\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 
 \item{gene_ranges}{\code{\linkS4class{GRanges}} object with information
   about gene location.}
@@ -37,8 +39,6 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
 
 \item{window}{Numeric. Size of a down and up stream window that is used to
   match SNPs to a gene. See details.}
-
-\item{genotypes}{A numeric matrix of unmatched genotypes. See Details.}
 }
 \value{
 Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample information.
@@ -48,11 +48,9 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched 
 }
 \examples{
 ### counts
- head(dataSQTL_counts)
-
  counts <- dataSQTL_counts[, -(1:2)]
- gene_id <- group_split[, 1]
- feature_id <- group_split[, 2]
+ gene_id <- dataSQTL_counts[, 1]
+ feature_id <- dataSQTL_counts[, 2]
 
  ### gene_ranges
  dataSQTL_gene_ranges
@@ -65,6 +63,7 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched 
 
  snp_id <- dataSQTL_genotypes$snp_id
 
+### snp_ranges with names!
  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
  names(snp_ranges) <- dataSQTL_genotypes$snp_id
 
@@ -73,6 +72,6 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched 
  sample_id <- colnames(counts)
 
  ### create dmSQTLdata object
- d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
+ d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 

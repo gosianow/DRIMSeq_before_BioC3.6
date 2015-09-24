@@ -47,11 +47,11 @@ window <- 5e3
 
 
 ########################################################
-# Find subset
+# Find subset - genes with little number of snps
 ########################################################
 
 
-do <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
+do <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
 
 plotData(do, out_dir = "./")
 
@@ -59,6 +59,8 @@ dof <- dmFilter(do, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_featu
 
 plotData(dof, out_dir = "./")
 
+
+### take 50 genes
 oo <- order(width(dof@genotypes), decreasing = FALSE)
 
 genes_subset <- names(dof)[oo][1:50]
@@ -67,6 +69,7 @@ genes_subset <- names(dof)[oo][1:50]
 ds <- do[genes_subset, ]
 
 plotData(ds, out_dir = "./")
+
 
 ########################################################
 # Get the basic components
@@ -91,7 +94,7 @@ use_data(dataSQTL_gene_ranges, overwrite = TRUE)
 
 ## genotypes
 
-snp_id <- unique(rownames(ds@genotypes))
+snp_id <- unique(ds@blocks@unlistData[, "snp_id"])
 
 dataSQTL_genotypes <- data.frame(genotypes_raw[genotypes_raw$snpId %in% snp_id, ], row.names = NULL, stringsAsFactors = FALSE)
 colnames(dataSQTL_genotypes)[4] <- "snp_id"
@@ -107,8 +110,8 @@ use_data(dataSQTL_genotypes, overwrite = TRUE)
 head(dataSQTL_counts)
 
 counts <- dataSQTL_counts[, -(1:2)]
-gene_id <- group_split[, 1]
-feature_id <- group_split[, 2]
+gene_id <- dataSQTL_counts[, 1]
+feature_id <- dataSQTL_counts[, 2]
 
 ### gene_ranges
 dataSQTL_gene_ranges
@@ -121,6 +124,7 @@ genotypes <- dataSQTL_genotypes[, -(1:4)]
 
 snp_id <- dataSQTL_genotypes$snp_id
 
+### snp_ranges with names!
 snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
 names(snp_ranges) <- dataSQTL_genotypes$snp_id
 
@@ -129,7 +133,7 @@ all(colnames(counts) == colnames(genotypes))
 sample_id <- colnames(counts)
 
 ### create dmSQTLdata object 
-d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3)
+d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 
 dataSQTL_dmSQTLdata <- d
@@ -149,7 +153,8 @@ dev.off()
 
 dd <- dataSQTL_dmSQTLdata
 plotData(dd)
-d <- dmSQTLfilter(d)
+
+d <- dmFilter(d)
 plotData(d)
 
 

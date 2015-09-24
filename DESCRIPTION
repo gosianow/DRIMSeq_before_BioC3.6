@@ -1,8 +1,8 @@
 Package: DM
 Type: Package
 Title: What the package does (short line)
-Version: 0.2.4
-Date: 2015-09-21
+Version: 0.2.5
+Date: 2015-09-23
 Author: Malgorzata Nowicka, Mark Robinson
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
@@ -16,7 +16,8 @@ Imports:
     GenomicRanges,
     ggplot2,
     reshape2,
-    VennDiagram
+    VennDiagram,
+    grid
 LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr

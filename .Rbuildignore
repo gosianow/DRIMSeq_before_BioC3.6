@@ -3,3 +3,8 @@
 ^vignettes/figure$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^.git$
+^.*\.toc$
+^.*\.aux$
+^.*\.log$
+^.*\.out$
