@@ -7,7 +7,7 @@ NULL
 #' 
 #' dmDSdata contains counts of genomic features, such as exons or transcrips, and sample information needed for differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 #' 
-#' @slot counts A \code{\linkS4class{MatrixList}} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. 'MatrixList' is partitioned in a way that each submatrix contains counts for a single gene.
+#' @slot counts A \linkS4class{MatrixList} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. MatrixList is partitioned in a way that each submatrix contains counts for a single gene.
 #' @slot samples A data.frame with information about samples. It must contain columns with unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
 
 setClass("dmDSdata", 
@@ -41,24 +41,25 @@ setValidity("dmDSdata", function(object){
 
 ##############################################################
 
-#' @rdname dmDSdata-class
-#' @export
-setGeneric("counts", function(x, ...) standardGeneric("counts"))
 
 #' @rdname dmDSdata-class
+#' @param object dmDSdata object.
 #' @export
-setMethod("counts", "dmDSdata", function(x){
+setMethod("counts", "dmDSdata", function(object, ...){
   
-  data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@counts@unlistData, stringsAsFactors = FALSE, row.names = NULL)
+  data.frame(gene_id = rep(names(object@counts), width(object@counts)), feature_id = rownames(object@counts@unlistData), object@counts@unlistData, stringsAsFactors = FALSE, row.names = NULL)
   
 })
 
 
 #' @rdname dmDSdata-class
+#' @param x Object to extract the \code{samples} slot from.
+#' @param ... Other parameters that can be used for the extraction of desired attributes.
 #' @export
 setGeneric("samples", function(x, ...) standardGeneric("samples"))
 
 #' @rdname dmDSdata-class
+#' @param x dmDSdata object.
 #' @export
 setMethod("samples", "dmDSdata", function(x) x@samples )
 
@@ -88,6 +89,7 @@ setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
 #' @rdname dmDSdata-class
+#' @param i,j Indexes defining which genes (i) and which samples (j) should be subsetted. 
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
   

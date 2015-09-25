@@ -57,7 +57,7 @@
 \item{name}{Name of submatrix to be accessed.}
 }
 \description{
-A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix. Below, you can find a list of methods that are available for MatrixList object.
+A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
 }
 \section{Slots}{
 

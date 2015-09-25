@@ -5,7 +5,7 @@ NULL
 
 #' MatrixList object
 #' 
-#' A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix. Below, you can find a list of methods that are available for MatrixList object. 
+#' A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
 #' 
 #' @slot unlistData A matrix which is a row binding of all the stored matrices.
 #' @slot partitioning A list of indexes which defines the row partitioning of 'unlistData' matrix into the original submatrices.
@@ -149,10 +149,6 @@ setMethod("names<-", "MatrixList", function(x, value){
   names(x@partitioning) <- value
   x
   
-  # partitioning <- x@partitioning
-  # names(partitioning) <- value
-  # return(new("MatrixList", unlistData = x@unlistData, partitioning = partitioning, metadata = x@metadata))
-  
 })
 
 
@@ -256,7 +252,7 @@ setMethod("$", "MatrixList", function(x, name){
 ##############################################################
 
 #' @rdname MatrixList-class
-#' @param i,j Indexes of MatrixList to be subsampled.
+#' @param i,j Indexes defining which 
 #' @export
 setMethod("[", "MatrixList", function(x, i, j){
   

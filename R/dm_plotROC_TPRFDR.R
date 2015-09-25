@@ -8,7 +8,7 @@
 #' @param status data.frame with "gene_id" and "status" columns. "status" must consists of 0 and 1 (or FALSE, TRUE)
 #' @export
 calculate_ROCx <- function(results, status){
-
+  
   status <- status[complete.cases(status[, c("gene_id", "status")]), , drop = FALSE]
   
   P <- sum(status$status == 1)
@@ -36,7 +36,7 @@ calculate_ROCx <- function(results, status){
       pvs <- sc$pvalue[!NAs]
       apvs <- sc$adj_pvalue[!NAs]
       sts <- sc$status[!NAs]
-
+      
       ord <- order(pvs, decreasing = FALSE)
       sts <- sts[ord]
       pvs <- pvs[ord]
@@ -53,11 +53,11 @@ calculate_ROCx <- function(results, status){
       
     }
     
-
+    
   }
   
   return(list(ROClist = ROClist, Xlist = Xlist))
-   
+  
 }
 
 
@@ -88,34 +88,34 @@ plot_ROCx <- function(data_ROCx, split_levels, plot_levels, facet_levels, plot_c
   
   X <- do.call(rbind, Xlist)
   ROC <- do.call(rbind, ROClist)
-    
-    
+  
+  
   ggp <- ggplot(data = ROC, aes_string(x = "FPR", y = "TPR", group = plot_levels, colour = plot_levels)) +
-  theme_bw() +
-  geom_line(size = 1.5, na.rm=TRUE) +
-  theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
-  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) +
-  geom_point(data = X, aes_string(x = "FPR", y = "TPR", group = plot_levels, colour = plot_levels), size = 8, shape = "X", na.rm=TRUE) 
+    theme_bw() +
+    geom_line(size = 1.5, na.rm=TRUE) +
+    theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
+    guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) +
+    geom_point(data = X, aes_string(x = "FPR", y = "TPR", group = plot_levels, colour = plot_levels), size = 8, shape = "X", na.rm=TRUE) 
   
   if(xylim_one)
-  ggp <- ggp + coord_cartesian(xlim = c(-0.1, 1.1), ylim = c(-0.1, 1.1))
-      
+    ggp <- ggp + coord_cartesian(xlim = c(-0.1, 1.1), ylim = c(-0.1, 1.1))
+  
   if(!is.null(plot_colors) && nlevels(ROC[, plot_levels]) == length(plot_colors))     
     ggp <- ggp + scale_color_manual(values = plot_colors)
   else
     ggp <- ggp + scale_color_manual(values = colorb(nlevels(TPRFDR[, plot_levels])))
-      
+  
   if(length(facet_levels) == 1)
     ggp <- ggp + facet_wrap(reformulate(facet_levels[1]))
-      
+  
   if(length(facet_levels) == 2)
     ggp <- ggp + facet_grid(reformulate(facet_levels[1], facet_levels[2]))
-
-    
+  
+  
   # pdf("./ROC.pdf")
-   
+  
   print(ggp)
-
+  
   # dev.off()
   
   
@@ -133,11 +133,11 @@ plot_ROCx <- function(data_ROCx, split_levels, plot_levels, facet_levels, plot_c
 #' @param status data.frame with "gene_id" and "status" columns. "status" must consists of 0 and 1 (or FALSE, TRUE)
 #' @export
 calculate_TPRFDR <- function(results, status, thresholds = c(0.01, 0.05, 0.1)){
-
+  
   status <- status[complete.cases(status[, c("gene_id", "status")]), , drop = FALSE]
   
   TPRFDRlist <- list()
-
+  
   for(m in 1:length(results)){
     # m = 1
     # print(m)
@@ -146,14 +146,14 @@ calculate_TPRFDR <- function(results, status, thresholds = c(0.01, 0.05, 0.1)){
       
       message("No 'adj_pvalue' column in results ", m)
       TPRFDRlist[[m]] <- data.frame(threshold = NA, FDR = NA, TPR = NA)
-
+      
       
     }else{
       
       sc <- merge(status, results[[m]], by = "gene_id", all.x = TRUE)
       
       # mm <- match(status$gene_id, results[[m]]$gene_id)
-       
+      
       apvs <- sc$adj_pvalue
       apvs[is.na(apvs)] <- 1
       sts <- sc$status
@@ -179,7 +179,7 @@ calculate_TPRFDR <- function(results, status, thresholds = c(0.01, 0.05, 0.1)){
       
     }
     
-
+    
   }
   
   return(TPRFDRlist)
@@ -206,45 +206,45 @@ plot_TPRFDR <- function(data_TPRFDR, split_levels, plot_levels, facet_levels, pl
     
   })
   
-
+  
   TPRFDR <- do.call(rbind, TPRFDRlist)
   
   TPRFDR$white <- ifelse(TPRFDR$FDR <= TPRFDR$threshold, NA, TPRFDR$TPR)
   
   pointsize <- 2.5
-
+  
   ggp <- ggplot(data = TPRFDR, aes_string(x = "FDR", y = "TPR", group = plot_levels, colour = plot_levels)) +
-  theme_bw() +
-  xlab("FDR") +
-  geom_line(size = 1.5, na.rm=TRUE) +
-  geom_vline(aes(xintercept = threshold), linetype = "dashed") + 
-  geom_point(size = pointsize + 1, shape = 19, na.rm=TRUE) + 
-  geom_point(aes_string(y = "white"), size = pointsize, shape = 21, fill = "white", na.rm=TRUE) + 
-  theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
-  guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) 
+    theme_bw() +
+    xlab("FDR") +
+    geom_line(size = 1.5, na.rm=TRUE) +
+    geom_vline(aes_string(xintercept = "threshold"), linetype = "dashed") + 
+    geom_point(size = pointsize + 1, shape = 19, na.rm=TRUE) + 
+    geom_point(aes_string(y = "white"), size = pointsize, shape = 21, fill = "white", na.rm=TRUE) + 
+    theme(axis.text=element_text(size = 16), axis.title = element_text(size = 18, face = "bold"), legend.position = "bottom", legend.title = element_blank(), legend.text = element_text(size = 12), strip.text = element_text(size = 12)) +
+    guides(colour = guide_legend(override.aes = list(size = 1.5, shape = NA), ncol = 3)) 
   
   if(xylim_one)
-  ggp <- ggp + coord_cartesian(xlim = c(-0.1, 1.1), ylim = c(-0.1, 1.1))
-      
+    ggp <- ggp + coord_cartesian(xlim = c(-0.1, 1.1), ylim = c(-0.1, 1.1))
+  
   if(!is.null(plot_colors) && nlevels(TPRFDR[, plot_levels]) == length(plot_colors))   
     ggp <- ggp + scale_color_manual(values = plot_colors)
   else
     ggp <- ggp + scale_color_manual(values = colorb(nlevels(TPRFDR[, plot_levels])))
-      
+  
   if(length(facet_levels) == 1)
     ggp <- ggp + facet_wrap(reformulate(facet_levels[1]))
-      
+  
   if(length(facet_levels) == 2)
     ggp <- ggp + facet_grid(reformulate(facet_levels[1], facet_levels[2]))
-
-    
+  
+  
   # pdf("./TPRFDR.pdf")
-   
+  
   print(ggp)
-
+  
   # dev.off()
   
-
+  
 }
 
 

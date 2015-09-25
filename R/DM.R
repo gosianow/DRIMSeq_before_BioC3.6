@@ -1,5 +1,7 @@
 #' @importFrom methods setClass setGeneric setMethod initialize
-#' @importFrom BiocGenerics width
+#' @importFrom BiocGenerics width counts
+#' @import ggplot2
+#' @importFrom reshape2 melt
 NULL
 
 #' DM: A package to fit Dirichlet-multinomial model

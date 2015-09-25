@@ -3,7 +3,6 @@
 \docType{class}
 \name{dmDSdata-class}
 \alias{[,dmDSdata,ANY,ANY-method}
-\alias{counts}
 \alias{counts,dmDSdata-method}
 \alias{dmDSdata-class}
 \alias{length,dmDSdata-method}
@@ -13,9 +12,7 @@
 \alias{samples,dmDSdata-method}
 \title{dmDSdata object}
 \usage{
-counts(x, ...)
-
-\S4method{counts}{dmDSdata}(x)
+\S4method{counts}{dmDSdata}(object, ...)
 
 samples(x, ...)
 

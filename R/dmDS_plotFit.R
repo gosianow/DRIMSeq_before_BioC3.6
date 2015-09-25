@@ -3,8 +3,8 @@
 
 
 dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), proportions_full = NULL, proportions_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(proportions_full), FALSE, TRUE), plot_null = ifelse(is.null(proportions_null), FALSE, TRUE), plot_main = TRUE, out_dir = NULL){
-
-
+  
+  
   for(i in 1:length(gene_id)){
     # i = 1
     cat(paste0("Plot gene ", i, ": ", gene_id[i], "\n"))
@@ -31,9 +31,9 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
       if(length(dispersion) > 0){
         
         if(length(dispersion) == 1)
-        dispersion_gene <- dispersion
+          dispersion_gene <- dispersion
         else
-        dispersion_gene <- dispersion[gene]
+          dispersion_gene <- dispersion[gene]
         
         main <- paste0(main, ", Dispersion = ", round(dispersion_gene, 2))
         
@@ -47,34 +47,34 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
         
       }
     }
-
+    
     
     pi_full <- NULL
     pi_null <- NULL
     
     if(plot_full)
-    pi_full <- proportions_full[[gene]]
+      pi_full <- proportions_full[[gene]]
     if(plot_null)
-    pi_null <- proportions_null[[gene]]
-
-
+      pi_null <- proportions_null[[gene]]
+    
+    
     ggp <- dm_plotProportion(counts = counts_gene, group = group, sample_id = sample_id, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
-
-
-
+    
+    
+    
     if(!is.null(out_dir))
-    pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
+      pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
     
     print(ggp)
     
     if(!is.null(out_dir))
-    dev.off()
-
-
+      dev.off()
+    
+    
   }
-
-
-
+  
+  
+  
 }
 
 
