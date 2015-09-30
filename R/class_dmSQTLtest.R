@@ -1,4 +1,4 @@
-#' @include class_dmSQTLfit.R
+#' @include class_dmSQTLfit.R class_dmDStest.R
 NULL
 
 ################################################################################
@@ -7,22 +7,22 @@ NULL
 #' 
 #' @slot fit_null list
 #' @slot results data.frame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
-setClass("dmSQTLLRT", 
+setClass("dmSQTLtest", 
          contains = "dmSQTLfit",
          representation(fit_null = "list",
           results = "data.frame"))
 
 ##############################################################
 
-#' @rdname dmSQTLLRT-class
+#' @rdname dmSQTLtest-class
 #' @export
-setMethod("results", "dmSQTLLRT", function(x) x@results )
+setMethod("results", "dmSQTLtest", function(x) x@results )
 
 
 
 ################################################################################
 
-setMethod("show", "dmSQTLLRT", function(object){
+setMethod("show", "dmSQTLtest", function(object){
   
   callNextMethod(object)
   
@@ -34,9 +34,9 @@ setMethod("show", "dmSQTLLRT", function(object){
 ################################################################################
 # prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
-#' @rdname dmLRT
+#' @rdname dmTest
 #' @export
-setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
@@ -67,7 +67,7 @@ setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol
   results_new <- do.call(rbind, results_new)
   
   
-  return(new("dmSQTLLRT", fit_null = fit_null, results = results_new, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
+  return(new("dmSQTLtest", fit_null = fit_null, results = results_new, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
   
   
 })
@@ -75,31 +75,21 @@ setMethod("dmLRT", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol
 
 ################################################################################
 
-#' @rdname plotLRT
+#' @rdname plotTest
 #' @export
-setMethod("plotLRT", "dmSQTLLRT", function(x, out_dir = NULL){
+setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
   
   dm_plotTable(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"], out_dir = out_dir)
   
 })
 
 
-##############################################################
-
-#' @rdname dmSQTLLRT-class
-#' @export
-setMethod("plot", "dmSQTLLRT", function(x, out_dir = NULL){
-  
-  plotLRT(x, out_dir = out_dir)
-  
-})
-
 
 ################################################################################
 
 #' @rdname plotFit
 #' @export
-setMethod("plotFit", "dmSQTLLRT", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   

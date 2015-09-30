@@ -5,7 +5,7 @@
 \alias{plotDispersion}
 \alias{plotDispersion,dmDSdispersion-method}
 \alias{plotDispersion,dmSQTLdispersion-method}
-\title{Plot the dispersion - mean trend.}
+\title{Dispersion versus mean expression plot}
 \usage{
 plotDispersion(x, ...)
 
@@ -14,18 +14,24 @@ plotDispersion(x, ...)
 \S4method{plotDispersion}{dmSQTLdispersion}(x, out_dir = NULL)
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object or any that inherits from it.}
+\item{x}{\code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.}
 
-\item{...}{Plotting parameters.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
 \description{
-Plot the dispersion - mean trend.
+Dispersion versus mean expression plot
 }
 \examples{
 d <- dataDS_dmDSdispersion
 plotDispersion(d)
 plot(d)
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
 }
 

@@ -5,7 +5,7 @@
 \alias{dmFit}
 \alias{dmFit,dmDSdispersion-method}
 \alias{dmFit,dmSQTLdispersion-method}
-\title{Estimating the proportions and likelihoods of Dirichlet-multinomial.}
+\title{Estimate the proportions of Dirichlet-multinomial model}
 \usage{
 dmFit(x, ...)
 
@@ -18,22 +18,22 @@ dmFit(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object or any that inherits from them.}
+\item{x}{\code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.}
 
-\item{...}{Parameters needed for the proportion estimation.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
 \item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}}
 
-\item{prop_mode}{Optimization method used to estimate the proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
 
-\item{prop_tol}{The desired accuracy when estimating dispersion.}
+\item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical.}
+\item{verbose}{Logical. Wheter to display more progress messages.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
 \description{
-Estimating the proportions and likelihoods of Dirichlet-multinomial.
+Estimate the proportions of Dirichlet-multinomial model
 }
 \examples{
 d <- dataDS_dmDSdispersion

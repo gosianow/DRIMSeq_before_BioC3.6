@@ -5,7 +5,7 @@
 \alias{plotData}
 \alias{plotData,dmDSdata-method}
 \alias{plotData,dmSQTLdata-method}
-\title{Plot the data information.}
+\title{Plot data summary}
 \usage{
 plotData(x, ...)
 
@@ -14,14 +14,14 @@ plotData(x, ...)
 \S4method{plotData}{dmSQTLdata}(x, out_dir = NULL)
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object with data.}
+\item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.}
 
-\item{...}{Plotting parameters.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
 \description{
-Plots a histogram of number of features per gene.
+Plot a histogram of the number of features per gene. Additionally, for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
 }
 \examples{
 ### dmDSdata
@@ -29,11 +29,16 @@ Plots a histogram of number of features per gene.
 d <- dataDS_dmDSdata
 plotData(d)
 plot(d)
-
 ### dmSQTLdata
 
 d <- dataSQTL_dmSQTLdata
 plotData(d)
 plot(d)
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
 }
 

@@ -4,8 +4,10 @@
 \name{MatrixList-class}
 \alias{$,MatrixList-method}
 \alias{MatrixList-class}
-\alias{[,MatrixList,ANY,ANY-method}
+\alias{[,MatrixList,ANY-method}
+\alias{[,MatrixList-method}
 \alias{[[,MatrixList,ANY,ANY-method}
+\alias{[[,MatrixList-method}
 \alias{colnames,MatrixList-method}
 \alias{colnames<-,MatrixList-method}
 \alias{dim,MatrixList-method}
@@ -41,31 +43,42 @@
 
 \S4method{ncol}{MatrixList}(x)
 
-\S4method{[[}{MatrixList,ANY,ANY}(x, i)
+\S4method{[[}{MatrixList,ANY,ANY}(x, i, j)
 
 \S4method{$}{MatrixList}(x, name)
 
-\S4method{[}{MatrixList,ANY,ANY}(x, i, j)
+\S4method{[}{MatrixList,ANY}(x, i, j)
 }
 \arguments{
 \item{x}{MatrixList object.}
 
-\item{value}{Values used for the replacement of corresponding attributes.}
-
-\item{i,j}{Indexes of MatrixList to be subsampled.}
-
-\item{name}{Name of submatrix to be accessed.}
+\item{value,i,j,name}{Parameters used for subsetting and assigning new attributes to x. See Details.}
 }
 \description{
-A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
+A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
+}
+\details{
+\itemize{
+  \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
+  \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData matrix.
+  \item \code{length(x)}: Get the number of matrices in a list.
+  \item \code{width(x)}: Get the number of rows of each of the matrices.
+  \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get dimentions, number of rows or number of columns of unlistData matrix.
+  \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
+  \item \code{x$name}: Shortcut for \code{x[['name']]}.
+  \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{unlistData}}{A matrix which is a row binding of all the stored matrices.}
+\item{\code{unlistData}}{Matrix which is a row binding of all the matrices in a list.}
 
-\item{\code{partitioning}}{A list of indexes which defines the row partitioning of 'unlistData' matrix into the original submatrices.}
+\item{\code{partitioning}}{List of indexes which defines the row partitioning of 'unlistData' matrix into the original matrices.}
 
-\item{\code{metadata}}{A matrix of additional information where each row corresponds to one of the submatrices.}
+\item{\code{metadata}}{Matrix of additional information where each row corresponds to one of the matrices in a list.}
 }}
+\author{
+Malgorzata Nowicka
+}
 

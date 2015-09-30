@@ -103,7 +103,7 @@ plot_ROCx <- function(data_ROCx, split_levels, plot_levels, facet_levels, plot_c
   if(!is.null(plot_colors) && nlevels(ROC[, plot_levels]) == length(plot_colors))     
     ggp <- ggp + scale_color_manual(values = plot_colors)
   else
-    ggp <- ggp + scale_color_manual(values = colorb(nlevels(TPRFDR[, plot_levels])))
+    ggp <- ggp + scale_color_manual(values = colorb(nlevels(ROC[, plot_levels])))
   
   if(length(facet_levels) == 1)
     ggp <- ggp + facet_wrap(reformulate(facet_levels[1]))

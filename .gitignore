@@ -8,4 +8,5 @@ data-raw/*
 vignettes/*
 !vignettes/*.Rnw
 !vignettes/*.Rmd
+!vignettes/*.pdf
 !vignettes/figure

@@ -3,11 +3,15 @@ NULL
 
 ##############################################################
 
-#' Object that extends \code{dmSQTLdata} by adding dipsersion.
+#' dmSQTLdispersion object
+#' 
+#' dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) ratios for each gene-SNP pair in the sQTL analysis. Result of \code{\link{dmDispersion}}.
 #' 
 #' @slot mean_expression Numeric vector of mean gene expression.
-#' @slot common_dispersion Numeric.
-#' @slot genewise_dispersion List of estimated tagwise dispersion per gene and genotype.
+#' @slot common_dispersion Numeric value of estimated common dispersion.
+#' @slot genewise_dispersion List of estimated gene-wise dispersions. Each element of this list is a vector of dispersions estimated for all the genotype blocks assigned to a given gene.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}}
 setClass("dmSQTLdispersion", 
          contains = "dmSQTLdata",
          representation(mean_expression = "numeric", 
@@ -30,9 +34,9 @@ setMethod("show", "dmSQTLdispersion", function(object){
 
 
 #' @rdname dmDispersion
-#' @param speed Logical. Whether to calculate one dipserion per gene...
+#' @param speed Logical. If \code{TRUE}, there will be only one dipsersion calculated per gene and it will be assigned to all the blocks matched with this gene. If \code{FALSE}, dispersion is calculated per each gene-block. Such calculation may take a long time, since there can be hundreds of SNPs/blocks per gene.
 #' @export
-setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE){
+setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE){
   
   if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
@@ -93,7 +97,7 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
 
 #' @rdname dmDispersion
 #' @export
-setMethod("dmDispersion", "dmSQTLdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode =  "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers=1), speed = TRUE){
+setMethod("dmDispersion", "dmSQTLdispersion", function(x, mean_expression = FALSE, common_dispersion = FALSE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode =  "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE){
   
   if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
@@ -157,17 +161,6 @@ setMethod("dmDispersion", "dmSQTLdispersion", function(x, mean_expression = FALS
 setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   
   dmSQTL_plotDispersion(genewise_dispersion = x@genewise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
-  
-})
-
-
-##############################################################
-
-#' @rdname dmSQTLdispersion-class
-#' @export
-setMethod("plot", "dmSQTLdispersion", function(x, out_dir = NULL){
-  
-  plotDispersion(x, out_dir = out_dir)
   
 })
 

@@ -5,11 +5,29 @@ NULL
 
 #' MatrixList object
 #' 
-#' A MatrixList object is a 'list' container for matrices which have the same number of columns but varying number of rows. Columns of these matrices may or may not have the same interpretation. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
+#' A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
 #' 
-#' @slot unlistData A matrix which is a row binding of all the stored matrices.
-#' @slot partitioning A list of indexes which defines the row partitioning of 'unlistData' matrix into the original submatrices.
-#' @slot metadata A matrix of additional information where each row corresponds to one of the submatrices.
+#' @details 
+#' 
+#' \itemize{
+#'   \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
+#'   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData matrix.
+#'   \item \code{length(x)}: Get the number of matrices in a list.
+#'   \item \code{width(x)}: Get the number of rows of each of the matrices.
+#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get dimentions, number of rows or number of columns of unlistData matrix.
+#'   \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
+#'   \item \code{x$name}: Shortcut for \code{x[['name']]}.
+#'   \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j. 
+#' }
+#' 
+#' 
+#' @param x MatrixList object.
+#' @param value,i,j,name Parameters used for subsetting and assigning new attributes to x. See Details.
+#' 
+#' @slot unlistData Matrix which is a row binding of all the matrices in a list.
+#' @slot partitioning List of indexes which defines the row partitioning of 'unlistData' matrix into the original matrices.
+#' @slot metadata Matrix of additional information where each row corresponds to one of the matrices in a list.
+#' @author Malgorzata Nowicka
 setClass("MatrixList", 
          representation(unlistData = "matrix", 
                         partitioning = "list", 
@@ -132,8 +150,8 @@ setMethod("show", "MatrixList", function(object){
 
 ##############################################################
 
+
 #' @rdname MatrixList-class
-#' @param x MatrixList object.
 #' @export
 setMethod("names", "MatrixList", function(x){
   
@@ -162,7 +180,6 @@ setMethod("rownames", "MatrixList", function(x){
 
 
 #' @rdname MatrixList-class
-#' @param value Values used for the replacement of corresponding attributes.   
 #' @export
 setMethod("rownames<-", "MatrixList", function(x, value){
   
@@ -231,16 +248,20 @@ setMethod("ncol", "MatrixList", function(x){
 })
 
 
+#' @aliases [[,MatrixList-method
 #' @rdname MatrixList-class
 #' @export
-setMethod("[[", "MatrixList", function(x, i){
+setMethod("[[", signature(x = "MatrixList"), function(x, i, j){
   
-  x@unlistData[x@partitioning[[i]], , drop = FALSE]
+  if(!missing(j))
+    return(x@unlistData[x@partitioning[[i]], j , drop = FALSE])
+  else
+    return(x@unlistData[x@partitioning[[i]], , drop = FALSE])
   
 })
 
+
 #' @rdname MatrixList-class
-#' @param name Name of submatrix to be accessed.
 #' @export
 setMethod("$", "MatrixList", function(x, name){
   
@@ -251,10 +272,10 @@ setMethod("$", "MatrixList", function(x, name){
 
 ##############################################################
 
+#' @aliases [,MatrixList-method
 #' @rdname MatrixList-class
-#' @param i,j Indexes defining which 
 #' @export
-setMethod("[", "MatrixList", function(x, i, j){
+setMethod("[", signature(x = "MatrixList"), function(x, i, j){
   
   if(!missing(i)){
     

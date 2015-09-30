@@ -5,11 +5,26 @@ NULL
 ##############################################################
 #' dmDSdata object
 #' 
-#' dmDSdata contains counts of genomic features, such as exons or transcrips, and sample information needed for differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+#' dmDSdata contains expression, in counts, of genomic features such as exons or transcrips and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 #' 
-#' @slot counts A \linkS4class{MatrixList} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. MatrixList is partitioned in a way that each submatrix contains counts for a single gene.
-#' @slot samples A data.frame with information about samples. It must contain columns with unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).
-
+#' @details 
+#' 
+#' \itemize{
+#'  \item \code{counts(object)}: Get a data.frame with counts.
+#'  \item \code{samples(x)}: Get a data.frame with the sample information.
+#'   \item \code{names(x)}: Get the gene names.
+#'   \item \code{length(x)}: Get the number of genes.
+#'   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j. 
+#' }
+#' 
+#' @param object,x dmDSdata object.
+#' @param i,j Parameters used for subsetting. See Details.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' 
+#' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
+#' @slot samples data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
                         samples = "data.frame"))
@@ -24,7 +39,7 @@ setValidity("dmDSdata", function(object){
   else 
     return(paste0("Unequal number of samples in 'counts' and 'samples' ", ncol(object@counts), " and ", nrow(object@samples)))
   
-  if(c("sample_id", "group") %in% colnames(object@samples))
+  if(all(c("sample_id", "group") %in% colnames(object@samples)))
     out <- TRUE
   else
     return(paste0("'samples' must contain 'sample_id' amd 'group' variables"))
@@ -43,9 +58,8 @@ setValidity("dmDSdata", function(object){
 
 
 #' @rdname dmDSdata-class
-#' @param object dmDSdata object.
 #' @export
-setMethod("counts", "dmDSdata", function(object, ...){
+setMethod("counts", "dmDSdata", function(object){
   
   data.frame(gene_id = rep(names(object@counts), width(object@counts)), feature_id = rownames(object@counts@unlistData), object@counts@unlistData, stringsAsFactors = FALSE, row.names = NULL)
   
@@ -53,13 +67,11 @@ setMethod("counts", "dmDSdata", function(object, ...){
 
 
 #' @rdname dmDSdata-class
-#' @param x Object to extract the \code{samples} slot from.
-#' @param ... Other parameters that can be used for the extraction of desired attributes.
 #' @export
 setGeneric("samples", function(x, ...) standardGeneric("samples"))
 
+
 #' @rdname dmDSdata-class
-#' @param x dmDSdata object.
 #' @export
 setMethod("samples", "dmDSdata", function(x) x@samples )
 
@@ -88,8 +100,8 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
+#' @aliases [,dmDSdata-method
 #' @rdname dmDSdata-class
-#' @param i,j Indexes defining which genes (i) and which samples (j) should be subsetted. 
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
   
@@ -118,18 +130,19 @@ setMethod("[", "dmDSdata", function(x, i, j){
 
 ##############################################################
 
-#'  Create dmDSdata object from a table of counts
+#'  Create dmDSdata object
 #'  
-#'  @param counts A numeric matrix or data.frame of counts. Rows represent features (exons,
-#'    bins or transcripts), columns represent samples.
-#'  @param gene_id Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.
-#'  @param feature_id Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.
-#'  @param sample_id A vector of unique sample IDs of length corresponding to
-#'    the number of columns in \code{counts}.
-#'  @param group A vector that defines the goupping of samples.
-#'  @return Returns \code{dmDSdata} object containing counts and sample 
-#'    information \code{\linkS4class{dmDSdata}}.
+#'  Constructor function for a \code{\linkS4class{dmDSdata}} object. 
+#'  
+#'  @param counts Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+#'    exonic bins or transcripts. Columns represent samples.
+#'  @param gene_id Vector of gene IDs corresponding to \code{counts}.
+#'  @param feature_id Vector of feature IDs corresponding to \code{counts}.
+#'  @param sample_id Vector of unique sample IDs corresponding to the columns in \code{counts}.
+#'  @param group Vector that defines the goupping of samples.
+#'  @return Returns \linkS4class{dmDSdata} object.
 #'  @examples
+#'  ### Create 'dmDSdata' object from table of counts for exonic bins for 100 genes
 #'  head(dataDS_counts)
 #'  dataDS_metadata
 #'  
@@ -143,6 +156,10 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  
 #'  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
 #'  
+#'  length(d)
+#'  
+#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#'  @author Malgorzata Nowicka
 #'  @export
 dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
   
@@ -209,14 +226,13 @@ dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
 
 ##############################################################
 
-#' Filtering.
+#' Filtering
 #' 
-#' Filtering of genes with low expression and features with low proportions.
-#' 
-#' Parameters should be adjusted based on the sample size used for the analysis...
+#' Filtering of genes and features with too low expression. Additionally, for the dmSQTLdata object, filtering of genotypes with too low frequency.
 #' 
 #' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
-#' @param ... Filtering parameters.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' @author Malgorzata Nowicka
 #' @export
 setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
@@ -224,35 +240,35 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
 ##############################################################
 
-#' @rdname dmFilter
-#' @param min_samps_gene_expr Minimal number of samples where the genes should 
-#'   be expressed.
+#' @details 
+#' Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
+#' 
+#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the mininal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
+#' 
+#' @param min_samps_gene_expr Minimal number of samples where genes should 
+#'   be expressed. See Details.
 #' @param min_gene_expr Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.
-#' @param min_samps_feature_prop Minimal number of samples where the features
-#'   should be expressed.
+#' @param min_samps_feature_prop Minimal number of samples where features
+#'   should be expressed. See details.
 #' @param min_feature_prop Minimal proportion for feature expression. This value
 #'   should be between 0 and 1.
-#' @param max_features Maximum number of features that should be kept per gene.
+#' @param max_features Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept. 
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @examples 
-#' ### dmDSdata
+#' ### Filtering the dmDSdata object
 #'
 #' dd <- dataDS_dmDSdata
 #' plotData(dd)
 #' 
 #' d <- dmFilter(dd)
+#' 
 #' plotData(d)
 #' 
 #' d <- dmFilter(dd, max_features = 10)
 #' plotData(d)
 #' 
-#' ### dmSQTLdata
-#'
-#' dd <- dataSQTL_dmSQTLdata
-#' plotData(dd)
-#' 
-#' d <- dmFilter(dd)
-#' plotData(d)
+#' @seealso \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
@@ -265,19 +281,18 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_
 
 ##############################################################
 
-#' Plot the data information.
+#' Plot data summary
 #' 
-#' Plots a histogram of number of features per gene.
+#' Plot a histogram of the number of features per gene. Additionally, for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
 #' 
-#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object with data.
-#' @param ... Plotting parameters.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
+#' @param ... Other parameters that can be defined by methods using this generic.
 #' @export
 setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 
 ##############################################################
 
-#' @rdname plotData
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
 #' @examples 
 #' ### dmDSdata
@@ -285,30 +300,16 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' d <- dataDS_dmDSdata
 #' plotData(d)
 #' plot(d)
-#'
-#' ### dmSQTLdata
-#'
-#' d <- dataSQTL_dmSQTLdata
-#' plotData(d)
-#' plot(d)
+
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
+#' @rdname plotData
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
   dmDS_plotData(counts = x@counts, out_dir = out_dir)
   
 })
-
-
-##############################################################
-
-#' @rdname dmDSdata-class
-#' @export
-setMethod("plot", "dmDSdata", function(x, out_dir = NULL){
-  
-  plotData(x, out_dir = out_dir)
-  
-})
-
 
 
 

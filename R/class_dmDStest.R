@@ -7,7 +7,7 @@ NULL
 #' 
 #' @slot fit_null list of null models defined by contrasts.
 #' @slot results data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
-setClass("dmDSLRT", 
+setClass("dmDStest", 
          contains = "dmDSfit",
          representation(compared_groups = "list",
           fit_null = "list",
@@ -16,9 +16,9 @@ setClass("dmDSLRT",
 
 ##############################################################
 
-#' @rdname dmDSLRT-class
+#' @rdname dmDStest-class
 #' @export
-setMethod("proportions", "dmDSLRT", function(x){
+setMethod("proportions", "dmDStest", function(x){
   
   nc <- length(x@compared_groups)
   
@@ -44,9 +44,9 @@ setMethod("proportions", "dmDSLRT", function(x){
 })
 
 
-#' @rdname dmDSLRT-class
+#' @rdname dmDStest-class
 #' @export
-setMethod("statistics", "dmDSLRT", function(x){
+setMethod("statistics", "dmDStest", function(x){
   
   nc <- length(x@compared_groups)
   
@@ -77,19 +77,19 @@ setMethod("statistics", "dmDSLRT", function(x){
 
 
 
-#' @rdname dmDSLRT-class
+#' @rdname dmDStest-class
 #' @export
 setGeneric("results", function(x, ...) standardGeneric("results"))
 
-#' @rdname dmDSLRT-class
+#' @rdname dmDStest-class
 #' @export
-setMethod("results", "dmDSLRT", function(x) x@results )
+setMethod("results", "dmDStest", function(x) x@results )
 
 
 
 ################################################################################
 
-setMethod("show", "dmDSLRT", function(object){
+setMethod("show", "dmDStest", function(object){
   
   callNextMethod(object)
   
@@ -104,27 +104,28 @@ setMethod("show", "dmDSLRT", function(object){
 #' @param x \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 #' @param ... Parameters needed for the likelihood ratio test.
 #' @export
-setGeneric("dmLRT", function(x, ...) standardGeneric("dmLRT"))
+setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
 
 ################################################################################
 
-#' @rdname dmLRT
+
 #' @inheritParams dmFit
 #' @param compared_groups vector or a list of vectors.
-#' @return This function returns a \code{\linkS4class{dmDSLRT}} or \code{\linkS4class{dmSQTLLRT}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @return This function returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' @examples 
 #' d <- dataDS_dmDSdispersion
 #' 
 #' # If possible, increase the number of workers
 #' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' 
-#' d <- dmLRT(d)
+#' d <- dmTest(d)
 #' 
 #' results <- results(d)
 #' 
+#' @rdname dmTest
 #' @export
-setMethod("dmLRT", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   if(!is.list(compared_groups))
   compared_groups <- list(compared_groups)
@@ -176,7 +177,7 @@ setMethod("dmLRT", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)
     results <- tables[[1]]
     
   
-  return(new("dmDSLRT", compared_groups = compared_groups, fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full,  mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
+  return(new("dmDStest", compared_groups = compared_groups, fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full,  mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
   
   
 })
@@ -186,32 +187,18 @@ setMethod("dmLRT", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)
 
 #' Plot the histogram of p-values.
 #' 
-#' @param x \code{\linkS4class{dmDSLRT}} or \code{\linkS4class{dmSQTLLRT}} object.
-#' @param ... Plotting parameters.
+#' @param x \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @export
-setGeneric("plotLRT", function(x, ...) standardGeneric("plotLRT"))
+setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 
 
 
 ################################################################################
 
-#' @rdname plotLRT
-#' @inheritParams plotFit
-#' @examples 
-#' d <- dataDS_dmDSdispersion
-#' 
-#' # If possible, increase the number of workers
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#' 
-#' d <- dmLRT(d)
-#' 
-#' results <- results(d)
-#' 
-#' plotLRT(d)
-#' plot(d)
-#' 
+#' @inheritParams plotData
+#' @rdname plotTest
 #' @export
-setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
+setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
   
   col_pv <- colnames(x@results)[grepl("pvalue", colnames(x@results)) & !grepl("adj_pvalue", colnames(x@results))]
   
@@ -221,24 +208,13 @@ setMethod("plotLRT", "dmDSLRT", function(x, out_dir = NULL){
 })
 
 
-##############################################################
-
-#' @rdname dmDSLRT-class
-#' @export
-setMethod("plot", "dmDSLRT", function(x, out_dir = NULL){
-  
-  plotLRT(x, out_dir = out_dir)
-  
-})
-
-
 
 ################################################################################
 
+#' @param compared_groups Numeric or character indicating comparison that should be plotted.
 #' @rdname plotFit
-#' @param compared_groups numeric or character indicating the comparison that should be plotted.
 #' @export
-setMethod("plotFit", "dmDSLRT", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   

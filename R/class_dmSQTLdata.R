@@ -3,14 +3,27 @@ NULL
 
 ##############################################################
 
-#' Object that contains counts, genotypes and sample information.
+#' dmSQTLdata object
 #' 
-#' Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdataFromRanges}}.
+#' dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
 #' 
-#' @slot counts \code{\linkS4class{MatrixList}}  of counts.
-#' @slot genotypes \code{\linkS4class{MatrixList}} with unique genotypes.
-#' @slot blocks \code{\linkS4class{MatrixList}} with blocks of genotypes.
-#' @slot samples data.frame with information about samples. Contains unique sample names (\code{sample_id}). 
+#' @details 
+#' 
+#' \itemize{
+#'   \item \code{names(x)}: Get the gene names.
+#'   \item \code{length(x)}: Get the number of genes.
+#'   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts, genotypes and blocks corresponding to genes i and samples j. 
+#' }
+#' 
+#' @param x dmSQTLdata object.
+#' @param i,j Parameters used for subsetting. See Details.
+#' 
+#' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
+#' @slot genotypes MatrixList of unique genotypes. Rows correspond to blocks, columns to samples. Each matrix in this list is a collection of unique genotypes that are matched with a given gene.
+#' @slot blocks MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assignes them to blocks.
+#' @slot samples data.frame with information about samples. It contains unique sample names \code{sample_id}.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}} 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
@@ -45,6 +58,7 @@ setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 
 
+#' @aliases [,dmSQTLdata-method
 #' @rdname dmSQTLdata-class
 #' @export
 setMethod("[", "dmSQTLdata", function(x, i, j){
@@ -75,14 +89,19 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 
 ##############################################################
 
-#'  Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes
+#'  Create dmSQTLdata object 
+#'  
+#'  Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata requires that SNPs are already matched with the genes. dmSQTLdataFromRanges does the matching by assigning to a gene all the SNPs that are located in a given surrounding (\code{window}) of this gene.
+#'  
+#'  @details 
+#'  It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
 #'  
 #'  @inheritParams dmDSdata
-#'  @param genotypes A numeric matrix of matched genotypes, or a numeric matrix of unmatched genotypes. See Details.
-#'  @param gene_id_genotypes Vector of gene IDs that are matched with genotypes.
-#'  @param snp_id Vector of SNP IDs that correspond to genotypes.
-#' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
-#'  @return Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample information.
+#'  @param genotypes Numeric matrix with genotypes. Rows represent SNPs, columns represent samples. The genotype of each sample is coded in the following way: 0 for ref/ref, 1 for ref/not ref, 2 for not ref/not ref, -1 or \code{NA} for missing value.
+#'  @param gene_id_genotypes Vector of gene IDs corresponding to \code{genotypes}.
+#'  @param snp_id Vector of SNP IDs corresponding to \code{genotypes}.
+#'  @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
+#'  @return Returns a \code{\linkS4class{dmSQTLdata}} object.
 #'  @examples 
 #'  ### counts
 #'  counts <- dataSQTL_counts[, -(1:2)]
@@ -102,7 +121,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  
 #' ### snp_ranges with names!
 #'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
-#'  names(snp_ranges) <- dataSQTL_genotypes$snp_id
+#'  names(snp_ranges) <- dataSQTL_genotypes$snp_id ### DO NOT FORGET about names
 #'  
 #'  all(colnames(counts) == colnames(genotypes))
 #'  
@@ -110,7 +129,8 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  
 #'  ### create dmSQTLdata object 
 #'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#'  
+#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#'  @author Malgorzata Nowicka
 #'  @export
 dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -236,12 +256,9 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 ##############################################################
 
 #' @rdname dmSQTLdata
-#'  @param gene_ranges \code{\linkS4class{GRanges}} object with information 
-#'    about gene location.
-#'  @param snp_ranges \code{\linkS4class{GRanges}} object with information about
-#'    SNP location.
-#'  @param window Numeric. Size of a down and up stream window that is used to 
-#'    match SNPs to a gene. See details.
+#'  @param gene_ranges \code{\linkS4class{GRanges}} object with gene location.
+#'  @param snp_ranges \code{\linkS4class{GRanges}} object with SNP location.
+#'  @param window Size of a down and up stream window, which is defining the surrounding for a gene. Only SNPs that are located within a gene or its surrounding are considered in the sQTL analysis. 
 #'  @export
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -269,10 +286,24 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 
 ##############################################################
 
-#' @rdname dmFilter
-#' @inheritParams dmFilter
-#' @param minor_allel_freq Number of samples that the minor allel must be present in.
+
+#' @param minor_allel_freq Minimal number of samples for the minor allel presence.
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
+#' @details 
+#' 
+#' In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. Take into account that, for some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to consider and can be slightly lower than the total sample size. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allel_freq} should indicate the minimal number of samples for the minor allel frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allel_freq}.
+#' 
+#' 
+#' @examples 
+#' ### Filtering the dmSQTLdata object
+#'
+#' dd <- dataSQTL_dmSQTLdata
+#' plotData(dd)
+#' 
+#' d <- dmFilter(dd)
+#' plotData(d)
+#' 
+#' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -287,6 +318,13 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_ge
 
 ##############################################################
 
+
+#' @examples 
+#' ### dmSQTLdata
+#'
+#' d <- dataSQTL_dmSQTLdata
+#' plotData(d)
+#' plot(d)
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
@@ -295,17 +333,6 @@ setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
 })
 
-
-
-##############################################################
-
-#' @rdname dmSQTLdata-class
-#' @export
-setMethod("plot", "dmSQTLdata", function(x, out_dir = NULL){
-  
-  plotData(x, out_dir = out_dir)
-  
-})
 
 
 

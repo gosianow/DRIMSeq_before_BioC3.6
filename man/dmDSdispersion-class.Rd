@@ -13,8 +13,7 @@
 \alias{genewise_dispersion<-,dmDSdispersion-method}
 \alias{mean_expression}
 \alias{mean_expression,dmDSdispersion-method}
-\alias{plot,dmDSdispersion,ANY-method}
-\title{Object that extends \code{dmDSdata} by adding dipsersion.}
+\title{dmDSdispersion object}
 \usage{
 mean_expression(x, ...)
 
@@ -35,11 +34,23 @@ genewise_dispersion(x, ...)
 genewise_dispersion(x) <- value
 
 \S4method{genewise_dispersion}{dmDSdispersion}(x) <- value
+}
+\arguments{
+\item{x}{dmDSdispersion object.}
 
-\S4method{plot}{dmDSdispersion,ANY}(x, out_dir = NULL)
+\item{...}{Other parameters that can be defined by methods using this generic.}
+
+\item{value}{Values that replace current attributes.}
 }
 \description{
-Object that extends \code{dmDSdata} by adding dipsersion.
+dmDSdispersion extends the \code{\linkS4class{dmDSdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) ratios for each gene in the differential splicing analysis. Result of \code{\link{dmDispersion}}.
+}
+\details{
+\itemize{
+ \item \code{mean_expression(x)}: Get a data.frame with mean gene expression.
+ \item \code{common_dispersion(x), common_dispersion(x) <- value}: Get or set common dispersion. \code{value} must be numeric.
+  \item \code{genewise_dispersion(x), genewise_dispersion(x) <- value}: Get a data.frame with gene-wise dispersion or set new gene-wise dispersion. \code{value} must be a vector.
+}
 }
 \section{Slots}{
 
@@ -48,6 +59,12 @@ Object that extends \code{dmDSdata} by adding dipsersion.
 
 \item{\code{common_dispersion}}{Numeric value of estimated common dispersion.}
 
-\item{\code{genewise_dispersion}}{Numeric vector of estimated tagwise dispersion.}
+\item{\code{genewise_dispersion}}{Numeric vector of estimated gene-wise dispersions.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotDispersion}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+}
 

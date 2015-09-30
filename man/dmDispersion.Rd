@@ -7,7 +7,7 @@
 \alias{dmDispersion,dmDSdispersion-method}
 \alias{dmDispersion,dmSQTLdata-method}
 \alias{dmDispersion,dmSQTLdispersion-method}
-\title{Estimating the dispersion in Dirichlet-multinomial model.}
+\title{Estimate the dispersion of Dirichlet-multinomial model.}
 \usage{
 dmDispersion(x, ...)
 
@@ -34,7 +34,7 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 10000),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
 
@@ -43,63 +43,106 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 10000),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 10, disp_span = 0.3,
+  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.}
 
-\item{...}{Parameters needed for the dispersion estimation.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
 \item{mean_expression}{Logical. Whether to estimate the mean expression of genes.}
 
 \item{common_dispersion}{Logical. Whether to estimate the common dispersion.}
 
-\item{genewise_dispersion}{Logical. Whether to estimate the gene dispersion.}
+\item{genewise_dispersion}{Logical. Whether to estimate the gene-wise dispersion.}
 
-\item{disp_adjust}{Logical. Whether to use the adjusted or non-adjusted profile likelihood.}
+\item{disp_adjust}{Logical. Whether to use the Cox-Reid adjusted or non-adjusted profile likelihood.}
 
 \item{disp_mode}{Optimization method used to maximize the profile likelihood. Possible values are \code{"optimize", "optim", "constrOptim", "grid"}. See Details.}
 
-\item{disp_interval}{The \code{interval} used by \code{\link{optimize}} function that is used to search for the maximum. Valid when using \code{disp_mode = "optimize"}.}
+\item{disp_interval}{Numeric vector of lenght 2 defining the interval of possible values for the dispersion.}
 
 \item{disp_tol}{The desired accuracy when estimating dispersion.}
 
 \item{disp_init}{Initial dispersion.}
 
-\item{disp_init_weirMoM}{Logical. Whether to use the Weir moment estimator as an initial value for dispersion. If \code{TRUE}, the it overwrites the \code{disp_init} value.}
+\item{disp_init_weirMoM}{Logical. Whether to use the Weir moment estimator as an initial value for dispersion. If \code{TRUE}, then \code{disp_init} is replaced by Weir estimates.}
 
-\item{disp_grid_length}{Length of the search grid. Used when \code{disp_mode = "grid"}.}
+\item{disp_grid_length}{Length of the search grid.}
 
-\item{disp_grid_range}{Vector of ends of grid interval.}
+\item{disp_grid_range}{Vector giving the limits of grid interval.}
 
-\item{disp_moderation}{Dispersion moderation method. Applies only when \code{disp_mode = "grid"}.}
+\item{disp_moderation}{Dispersion moderation method. One can choose to shrink the dispersion estimates toward the common dispersion (\code{"common"}) or toward the (dispersion versus mean expression) trend (\code{"trended"})}
 
-\item{disp_prior_df}{Prior degrees of freedom used in moderation.}
+\item{disp_prior_df}{Degree of moderation (shrinkage).}
 
-\item{disp_span}{Value from 0 to 1 defining the percentage of genes used in smoothing sliding window when calculating the trend.}
+\item{disp_span}{Value from 0 to 1 defining the percentage of genes used in smoothing sliding window when calculating the dispersion versus mean expression trend.}
 
-\item{prop_mode}{Optimization method used to estimate the proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
 
-\item{prop_tol}{The desired accuracy when estimating dispersion.}
+\item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical.}
+\item{verbose}{Logical. Wheter to display more progress messages.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 
-\item{speed}{Logical. Whether to calculate one dipserion per gene...}
+\item{speed}{Logical. If \code{TRUE}, there will be only one dipsersion calculated per gene and it will be assigned to all the blocks matched with this gene. If \code{FALSE}, dispersion is calculated per each gene-block. Such calculation may take a long time, since there can be hundreds of SNPs/blocks per gene.}
 }
 \value{
 Returns the \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
 }
 \description{
-Function that is a wrapper for different optimazation methods used to estimate the dispersion parameters of Dirichlet-multinomial model with maximum likelihood. Parameters that are directly used in the dispersion estimation start with prefix \code{disp_} and the one that are used directly for the proportion estimation start with \code{prop_}.
+Maximum likelihood estimates of dispersion parameters in Dirichlet-multinomial model used in differentiall splicing or sQTL analysis.
+
+
 }
 \details{
-TODO: describe in detail all the methods...
+Parameters that are directly used in the dispersion estimation start with prefix \code{disp_}, and the one that are used directly for the proportion estimation start with \code{prop_}.
 
-disp_tol: The accuracy defined as \code{tol} in \code{\link{optimize}} when \code{disp_mode = "optimize"}, as \code{factr} in \code{\link{optim}} when \code{disp_mode = "optim"}, as \code{reltol} in \code{\link{constrOptim}} when \code{disp_mode = "constrOptim"}.
+
+There are 4 optimazation methods implemented within dmDispersion, i.e., \code{"optimize", "optim", "constrOptim", "grid"}, that can be used to estimate the gene-wise dispersion. Common dispersion is estimated with \code{"optimize"}.
+
+Arguments that are used by all the methods are:
+
+\itemize{
+  \item \code{disp_adjust}
+  \item \code{prop_mode}: Both \code{"constrOptim"} and \code{"constrOptimG"} use \code{\link{constrOptim}} function to maximize the likelihood of Dirichlet-multinomial proportions. The difference lays in the way the likelihood and score are computed. \code{"constrOptim"} uses the likelihood and score that are calculated based on the fact that x*Gamma(x) = Gamma(x+1). In \code{"constrOptimG"}, we compute them using \code{\link{lgamma}} function. We reccomend using the second approach, since it is much faster than the first one.
+  \item \code{prop_tol}: The accuracy for proportions estimation defined as \code{reltol} in \code{\link{constrOptim}}.
+}
+
+Only some of the rest of dispersion parameters in dmDispersion have an influence on the output for a given \code{disp_mode}:
+
+\code{"optimize"}, which uses \code{\link{optimize}} to maximize the profile likelihood.
+
+\itemize{
+  \item \code{disp_interval}: Passed as \code{interval}.
+  \item \code{disp_tol}: The accuracy defined as \code{tol}.
+}
+
+\code{"optim"}, which uses \code{\link{optim}} to maximize the profile likelihood.
+
+\itemize{
+ \item \code{disp_init} and \code{disp_init_weirMoM}: The initial value \code{par}.
+ \item \code{disp_tol}: The accuracy defined as \code{factr}.
+}
+
+\code{"constrOptim"}, which uses \code{\link{constrOptim}} to maximize the profile likelihood.
+
+\itemize{
+\item \code{disp_init} and \code{disp_init_weirMoM}: The initial value \code{theta}..
+  \item \code{disp_tol}: The accuracy defined as \code{reltol}.
+}
+
+\code{"grid"}, which uses the grid approach from \code{\link{edgeR}}.
+
+\itemize{
+  \item \code{disp_init}, \code{disp_grid_length}, \code{disp_grid_range}: Parameters used to construct the search grid \code{disp_init * 2^seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)}
+  \item \code{disp_moderation}: Dipsersion shrinkage is available only with \code{"grid"} method.
+  \item \code{disp_prior_df}: Used only when dispersion shrinkage is activated. Moderated likelihood is equal to \code{loglik + disp_prior_df * moderation}. Higher \code{disp_prior_df}, more shrinkage toward common or trended dispersion is applied.
+  \item \code{disp_span}: Used only when dispersion moderation toward trend is activated.
+}
 }
 \examples{
 d <- dataDS_dmDSdata
@@ -108,8 +151,12 @@ d <- dmFilter(d)
 # If possible, increase the number of workers
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
+#'
+}
+\author{
+Malgorzata Nowicka
 }
 \seealso{
-\code{\link[BiocParallel]{bplapply}}
+\code{\link{plotDispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
 }
 

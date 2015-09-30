@@ -3,12 +3,11 @@
 \docType{class}
 \name{dmDSfit-class}
 \alias{dmDSfit-class}
-\alias{plot,dmDSfit,ANY-method}
 \alias{proportions}
 \alias{proportions,dmDSfit-method}
 \alias{statistics}
 \alias{statistics,dmDSfit-method}
-\title{Object that extends \code{dmDSdispersion} class by adding fitting.}
+\title{dmDSfit object}
 \usage{
 proportions(x, ...)
 
@@ -17,18 +16,26 @@ proportions(x, ...)
 statistics(x, ...)
 
 \S4method{statistics}{dmDSfit}(x)
+}
+\arguments{
+\item{x}{dmDSdispersion object.}
 
-\S4method{plot}{dmDSfit,ANY}(x, gene_id, plot_type = "barplot",
-  order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL)
+\item{...}{Other parameters that can be defined by methods using this generic.}
 }
 \description{
-Object that extends \code{dmDSdispersion} class by adding fitting.
+dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proporion estimates needed for the differential splicing analysis. Feature ratios are estimated for each gene and each condition. Result of \code{\link{dmFit}}.
+}
+\details{
+\itemize{
+ \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for each condition.
+ \item \code{statistics(x)}: Get a data.frame with maximum log-likelihoods for each condition.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting: common_dispersion or genewise_dispersion.}
+\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.}
 
-\item{\code{fit_full}}{\code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and likelihoods.}
+\item{\code{fit_full}}{\code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the per gene-condition likelihoods are stored in \code{metadata} slot.}
 }}
 

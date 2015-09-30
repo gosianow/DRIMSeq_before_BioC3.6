@@ -2,33 +2,49 @@
 % Please edit documentation in R/class_dmSQTLdata.R
 \docType{class}
 \name{dmSQTLdata-class}
-\alias{[,dmSQTLdata,ANY,ANY-method}
+\alias{[,dmSQTLdata,ANY-method}
+\alias{[,dmSQTLdata-method}
 \alias{dmSQTLdata-class}
 \alias{length,dmSQTLdata-method}
 \alias{names,dmSQTLdata-method}
-\alias{plot,dmSQTLdata,ANY-method}
-\title{Object that contains counts, genotypes and sample information.}
+\title{dmSQTLdata object}
 \usage{
 \S4method{names}{dmSQTLdata}(x)
 
 \S4method{length}{dmSQTLdata}(x)
 
-\S4method{[}{dmSQTLdata,ANY,ANY}(x, i, j)
+\S4method{[}{dmSQTLdata,ANY}(x, i, j)
+}
+\arguments{
+\item{x}{dmSQTLdata object.}
 
-\S4method{plot}{dmSQTLdata,ANY}(x, out_dir = NULL)
+\item{i,j}{Parameters used for subsetting. See Details.}
 }
 \description{
-Can be created with function \code{\link{dmSQTLdata}} and \code{\link{dmSQTLdataFromRanges}}.
+dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
+}
+\details{
+\itemize{
+  \item \code{names(x)}: Get the gene names.
+  \item \code{length(x)}: Get the number of genes.
+  \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts, genotypes and blocks corresponding to genes i and samples j.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{counts}}{\code{\linkS4class{MatrixList}}  of counts.}
+\item{\code{counts}}{\code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.}
 
-\item{\code{genotypes}}{\code{\linkS4class{MatrixList}} with unique genotypes.}
+\item{\code{genotypes}}{MatrixList of unique genotypes. Rows correspond to blocks, columns to samples. Each matrix in this list is a collection of unique genotypes that are matched with a given gene.}
 
-\item{\code{blocks}}{\code{\linkS4class{MatrixList}} with blocks of genotypes.}
+\item{\code{blocks}}{MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assignes them to blocks.}
 
-\item{\code{samples}}{data.frame with information about samples. Contains unique sample names (\code{sample_id}).}
+\item{\code{samples}}{data.frame with information about samples. It contains unique sample names \code{sample_id}.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}}
+}
 

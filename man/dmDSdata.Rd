@@ -2,32 +2,31 @@
 % Please edit documentation in R/class_dmDSdata.R
 \name{dmDSdata}
 \alias{dmDSdata}
-\title{Create dmDSdata object from a table of counts}
+\title{Create dmDSdata object}
 \usage{
 dmDSdata(counts, gene_id, feature_id, sample_id, group)
 }
 \arguments{
-\item{counts}{A numeric matrix or data.frame of counts. Rows represent features (exons,
-  bins or transcripts), columns represent samples.}
+\item{counts}{Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+  exonic bins or transcripts. Columns represent samples.}
 
-\item{gene_id}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{gene_id}{Vector of gene IDs corresponding to \code{counts}.}
 
-\item{feature_id}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{feature_id}{Vector of feature IDs corresponding to \code{counts}.}
 
-\item{sample_id}{A vector of unique sample IDs of length corresponding to
-  the number of columns in \code{counts}.}
+\item{sample_id}{Vector of unique sample IDs corresponding to the columns in \code{counts}.}
 
-\item{group}{A vector that defines the goupping of samples.}
+\item{group}{Vector that defines the goupping of samples.}
 }
 \value{
-Returns \code{dmDSdata} object containing counts and sample
-   information \code{\linkS4class{dmDSdata}}.
+Returns \linkS4class{dmDSdata} object.
 }
 \description{
-Create dmDSdata object from a table of counts
+Constructor function for a \code{\linkS4class{dmDSdata}} object.
 }
 \examples{
-head(dataDS_counts)
+### Create 'dmDSdata' object from table of counts for exonic bins for 100 genes
+ head(dataDS_counts)
  dataDS_metadata
 
  counts <- dataDS_counts[,-1]
@@ -39,5 +38,13 @@ head(dataDS_counts)
  group = dataDS_metadata$group
 
  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
+
+ length(d)
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
 }
 

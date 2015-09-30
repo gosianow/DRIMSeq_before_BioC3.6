@@ -124,7 +124,6 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       
       grid={
         
-        ### genrate spline dispersion
         splinePts <- seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)
         splineDisp <- disp_init * 2^splinePts
         

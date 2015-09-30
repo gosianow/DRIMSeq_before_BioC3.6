@@ -3,10 +3,22 @@ NULL
 
 ################################################################################
 
-#' Object that extends \code{dmDSdispersion} class by adding fitting.
+#' dmDSfit object
 #' 
-#' @slot dispersion Character specifying which type of dispersion was used for fitting: common_dispersion or genewise_dispersion.
-#' @slot fit_full \code{\linkS4class{MatrixList}} object containing the per group proportions of feature expression and likelihoods.
+#' dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proporion estimates needed for the differential splicing analysis. Feature ratios are estimated for each gene and each condition. Result of \code{\link{dmFit}}.
+#' 
+#' @details 
+#' 
+#' \itemize{
+#'  \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for each condition.
+#'  \item \code{statistics(x)}: Get a data.frame with maximum log-likelihoods for each condition.
+#' }
+#' 
+#' @param x dmDSdispersion object.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' 
+#' @slot dispersion Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.
+#' @slot fit_full \code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the per gene-condition likelihoods are stored in \code{metadata} slot.
 setClass("dmDSfit", 
          contains = "dmDSdispersion",
          representation(dispersion = "character",
@@ -26,7 +38,7 @@ setMethod("proportions", "dmDSfit", function(x){
   
   data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, stringsAsFactors = FALSE, row.names = NULL)
   
-    })
+})
 
 
 #' @rdname dmDSfit-class
@@ -41,7 +53,7 @@ setMethod("statistics", "dmDSfit", function(x){
   colnames(df)[-1] <- paste0("lik_", colnames(x@fit_full@metadata))
   return(df)
   
-    })
+})
 
 
 
@@ -58,22 +70,24 @@ setMethod("show", "dmDSfit", function(object){
 
 ################################################################################
 
-#' Estimating the proportions and likelihoods of Dirichlet-multinomial.
+#' Estimate the proportions of Dirichlet-multinomial model
 #' 
-#' @param x \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object or any that inherits from them.
-#' @param ... Parameters needed for the proportion estimation.
+#' 
+#' 
+#' @param x \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
 #' @export
 setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 
 
 ################################################################################
 
-#' @rdname dmFit
+
 #' @inheritParams dmDispersion
 #' @param dispersion Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}
 #' @examples 
 #' d <- dataDS_dmDSdispersion
 #' d <- dmFit(d)
+#' @rdname dmFit
 #' @export
 setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -89,23 +103,24 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
 
 ################################################################################
 
-#' Plot the estimated proportions.
+#' Plot feature proportions
 #' 
-#' @param x \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object or any that inherits from them.
-#' @param ... Plotting parameters.
+#' Plot the observed and estimated feature ratios.
+#' 
+#' @param x \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 #' @export
 setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 
 
 ################################################################################
 
-#' @rdname plotFit
-#' @inheritParams plotDispersion
+#' @inheritParams plotData
 #' @param gene_id Vector of gene IDs to be plotted.
-#' @param plot_type Character defining type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
+#' @param plot_type Character defining the type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
-#' @param plot_main Logical. Whether to plot the plot title.
+#' @param plot_main Logical. Whether to plot a title with the information about the estimates.
+#' 
 #' @examples 
 #' d <- dataDS_dmDSdispersion
 #' 
@@ -115,17 +130,23 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' gene_id <- names(d)[1]
 #' 
 #' plotFit(d, gene_id = gene_id)
-#' plot(d, gene_id = gene_id, plot_type = "lineplot", plot_full = FALSE)
 #' 
+#' 
+#' ### Plot proportions of top 3 genes
 #' d <- dmLRT(d)
 #' 
-#' results <- results(d)
+#' res <- results(d)
+#' res <- res[order(res$pvalue, decreasing = FALSE), ]
 #' 
-#' gene_id <- results$gene_id[1:3]
+#' gene_id <- res$gene_id[1:3]
 #' 
-#' plotFit(d, gene_id = gene_id)
+#' plotFit(d, gene_id = gene_id, plot_type = "barplot")
+#' plotFit(d, gene_id = gene_id, plot_type = "lineplot")
+#' plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 #' 
-#' 
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotLRT}}
+#' @rdname plotFit
 #' @export
 setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
@@ -136,17 +157,6 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
   
 })
 
-
-
-##############################################################
-
-#' @rdname dmDSfit-class
-#' @export
-setMethod("plot", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
-  
-  plotFit(x, gene_id, plot_type = plot_type, order = order, plot_full = plot_full, plot_main = plot_main, out_dir = out_dir)
-  
-})
 
 
 

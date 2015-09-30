@@ -57,7 +57,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
 
          }, 
                  
-         constrOptimG={ ## for k-1 parameters with Gamma functions
+         constrOptimG = { ## for k-1 parameters with Gamma functions
            # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = T)
            
            ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
@@ -74,7 +74,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
          }, 
          
          FisherScoring={
-					 ### This mode is completely unprepared!!!
+					 ### This mode is completely unprepared!!! And slow.
 					 
 					 plot = FALSE
 					 epsilon = 1e-05

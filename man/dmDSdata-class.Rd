@@ -2,17 +2,17 @@
 % Please edit documentation in R/class_dmDSdata.R
 \docType{class}
 \name{dmDSdata-class}
-\alias{[,dmDSdata,ANY,ANY-method}
+\alias{[,dmDSdata,ANY-method}
+\alias{[,dmDSdata-method}
 \alias{counts,dmDSdata-method}
 \alias{dmDSdata-class}
 \alias{length,dmDSdata-method}
 \alias{names,dmDSdata-method}
-\alias{plot,dmDSdata,ANY-method}
 \alias{samples}
 \alias{samples,dmDSdata-method}
 \title{dmDSdata object}
 \usage{
-\S4method{counts}{dmDSdata}(object, ...)
+\S4method{counts}{dmDSdata}(object)
 
 samples(x, ...)
 
@@ -22,18 +22,38 @@ samples(x, ...)
 
 \S4method{length}{dmDSdata}(x)
 
-\S4method{[}{dmDSdata,ANY,ANY}(x, i, j)
+\S4method{[}{dmDSdata,ANY}(x, i, j)
+}
+\arguments{
+\item{object,x}{dmDSdata object.}
 
-\S4method{plot}{dmDSdata,ANY}(x, out_dir = NULL)
+\item{...}{Other parameters that can be defined by methods using this generic.}
+
+\item{i,j}{Parameters used for subsetting. See Details.}
 }
 \description{
-dmDSdata contains counts of genomic features, such as exons or transcrips, and sample information needed for differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+dmDSdata contains expression, in counts, of genomic features such as exons or transcrips and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+}
+\details{
+\itemize{
+ \item \code{counts(object)}: Get a data.frame with counts.
+ \item \code{samples(x)}: Get a data.frame with the sample information.
+  \item \code{names(x)}: Get the gene names.
+  \item \code{length(x)}: Get the number of genes.
+  \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{counts}}{A \code{\linkS4class{MatrixList}} of counts where rows correspond to genomic features, such as exons or transcripts, that are quantified. Columns correspond to samples. 'MatrixList' is partitioned in a way that each submatrix contains counts for a single gene.}
+\item{\code{counts}}{\code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.}
 
-\item{\code{samples}}{A data.frame with information about samples. It must contain columns with unique sample names (\code{sample_id}) and information about grouping into conditions (\code{group}).}
+\item{\code{samples}}{data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+}
 

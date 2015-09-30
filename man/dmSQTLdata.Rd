@@ -3,7 +3,7 @@
 \name{dmSQTLdata}
 \alias{dmSQTLdata}
 \alias{dmSQTLdataFromRanges}
-\title{Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes}
+\title{Create dmSQTLdata object}
 \usage{
 dmSQTLdata(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id,
   sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
@@ -13,38 +13,37 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
-\item{counts}{A numeric matrix or data.frame of counts. Rows represent features (exons,
-  bins or transcripts), columns represent samples.}
+\item{counts}{Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+  exonic bins or transcripts. Columns represent samples.}
 
-\item{gene_id}{Vector of gene IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{gene_id}{Vector of gene IDs corresponding to \code{counts}.}
 
-\item{feature_id}{Vector of feature IDs of lenght correspoding to the number of rows in \code{counts}.}
+\item{feature_id}{Vector of feature IDs corresponding to \code{counts}.}
 
-\item{genotypes}{A numeric matrix of matched genotypes, or a numeric matrix of unmatched genotypes. See Details.}
+\item{genotypes}{Numeric matrix with genotypes. Rows represent SNPs, columns represent samples. The genotype of each sample is coded in the following way: 0 for ref/ref, 1 for ref/not ref, 2 for not ref/not ref, -1 or \code{NA} for missing value.}
 
-\item{gene_id_genotypes}{Vector of gene IDs that are matched with genotypes.}
+\item{gene_id_genotypes}{Vector of gene IDs corresponding to \code{genotypes}.}
 
-\item{snp_id}{Vector of SNP IDs that correspond to genotypes.}
+\item{snp_id}{Vector of SNP IDs corresponding to \code{genotypes}.}
 
-\item{sample_id}{A vector of unique sample IDs of length corresponding to
-  the number of columns in \code{counts}.}
+\item{sample_id}{Vector of unique sample IDs corresponding to the columns in \code{counts}.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 
-\item{gene_ranges}{\code{\linkS4class{GRanges}} object with information
-  about gene location.}
+\item{gene_ranges}{\code{\linkS4class{GRanges}} object with gene location.}
 
-\item{snp_ranges}{\code{\linkS4class{GRanges}} object with information about
-  SNP location.}
+\item{snp_ranges}{\code{\linkS4class{GRanges}} object with SNP location.}
 
-\item{window}{Numeric. Size of a down and up stream window that is used to
-  match SNPs to a gene. See details.}
+\item{window}{Size of a down and up stream window, which is defining the surrounding for a gene. Only SNPs that are located within a gene or its surrounding are considered in the sQTL analysis.}
 }
 \value{
-Returns a \code{\linkS4class{dmSQTLdata}} object containing counts, genotypes and sample information.
+Returns a \code{\linkS4class{dmSQTLdata}} object.
 }
 \description{
-Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched genotypes
+Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata requires that SNPs are already matched with the genes. dmSQTLdataFromRanges does the matching by assigning to a gene all the SNPs that are located in a given surrounding (\code{window}) of this gene.
+}
+\details{
+It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
 }
 \examples{
 ### counts
@@ -65,7 +64,7 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched 
 
 ### snp_ranges with names!
  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
- names(snp_ranges) <- dataSQTL_genotypes$snp_id
+ names(snp_ranges) <- dataSQTL_genotypes$snp_id ### DO NOT FORGET about names
 
  all(colnames(counts) == colnames(genotypes))
 
@@ -73,5 +72,11 @@ Create \code{\linkS4class{dmSQTLdata}} object from tables of counts and matched 
 
  ### create dmSQTLdata object
  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
 }
 

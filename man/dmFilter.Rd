@@ -5,7 +5,7 @@
 \alias{dmFilter}
 \alias{dmFilter,dmDSdata-method}
 \alias{dmFilter,dmSQTLdata-method}
-\title{Filtering.}
+\title{Filtering}
 \usage{
 dmFilter(x, ...)
 
@@ -20,22 +20,22 @@ dmFilter(x, ...)
 \arguments{
 \item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.}
 
-\item{...}{Filtering parameters.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
-\item{min_samps_gene_expr}{Minimal number of samples where the genes should
-be expressed.}
+\item{min_samps_gene_expr}{Minimal number of samples where genes should
+be expressed. See Details.}
 
 \item{min_gene_expr}{Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.}
 
-\item{min_samps_feature_prop}{Minimal number of samples where the features
-should be expressed.}
+\item{min_samps_feature_prop}{Minimal number of samples where features
+should be expressed. See details.}
 
 \item{min_feature_prop}{Minimal proportion for feature expression. This value
 should be between 0 and 1.}
 
-\item{max_features}{Maximum number of features that should be kept per gene.}
+\item{max_features}{Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept.}
 
-\item{minor_allel_freq}{Number of samples that the minor allel must be present in.}
+\item{minor_allel_freq}{Minimal number of samples for the minor allel presence.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
@@ -43,29 +43,39 @@ should be between 0 and 1.}
 Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 }
 \description{
-Filtering of genes with low expression and features with low proportions.
+Filtering of genes and features with too low expression. Additionally, for the dmSQTLdata object, filtering of genotypes with too low frequency.
 }
 \details{
-Parameters should be adjusted based on the sample size used for the analysis...
+Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition.
+
+In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the mininal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
+
+In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. Take into account that, for some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to consider and can be slightly lower than the total sample size. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allel_freq} should indicate the minimal number of samples for the minor allel frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allel_freq}.
 }
 \examples{
-### dmDSdata
+### Filtering the dmDSdata object
 
 dd <- dataDS_dmDSdata
 plotData(dd)
 
 d <- dmFilter(dd)
+
 plotData(d)
 
 d <- dmFilter(dd, max_features = 10)
 plotData(d)
-
-### dmSQTLdata
+### Filtering the dmSQTLdata object
 
 dd <- dataSQTL_dmSQTLdata
 plotData(dd)
 
 d <- dmFilter(dd)
 plotData(d)
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
 }
 

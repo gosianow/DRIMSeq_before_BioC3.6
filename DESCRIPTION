@@ -8,6 +8,7 @@ Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Depends:
+    R (>= 3.2),
     BiocGenerics
 Imports:
     methods,
@@ -34,11 +35,11 @@ Collate:
     'class_dmDSdata.R'
     'class_dmDSdispersion.R'
     'class_dmDSfit.R'
-    'class_dmDSLRT.R'
+    'class_dmDStest.R'
     'class_dmSQTLdata.R'
     'class_dmSQTLdispersion.R'
     'class_dmSQTLfit.R'
-    'class_dmSQTLLRT.R'
+    'class_dmSQTLtest.R'
     'dmDS_adjustmentCommon.R'
     'dmDS_estimateCommonDispersion.R'
     'dmDS_estimateTagwiseDispersion.R'
