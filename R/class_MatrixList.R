@@ -14,7 +14,7 @@ NULL
 #'   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData matrix.
 #'   \item \code{length(x)}: Get the number of matrices in a list.
 #'   \item \code{width(x)}: Get the number of rows of each of the matrices.
-#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get dimentions, number of rows or number of columns of unlistData matrix.
+#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the dimensions, number of rows or number of columns of unlistData matrix.
 #'   \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
 #'   \item \code{x$name}: Shortcut for \code{x[['name']]}.
 #'   \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j. 
@@ -25,7 +25,7 @@ NULL
 #' @param value,i,j,name Parameters used for subsetting and assigning new attributes to x. See Details.
 #' 
 #' @slot unlistData Matrix which is a row binding of all the matrices in a list.
-#' @slot partitioning List of indexes which defines the row partitioning of 'unlistData' matrix into the original matrices.
+#' @slot partitioning List of indexes which defines the row partitioning of unlistData matrix into the original matrices.
 #' @slot metadata Matrix of additional information where each row corresponds to one of the matrices in a list.
 #' @author Malgorzata Nowicka
 setClass("MatrixList", 

@@ -37,7 +37,7 @@ dmSQTLdata contains genomic feature expression, in counts, genotypes and sample 
 
 \item{\code{genotypes}}{MatrixList of unique genotypes. Rows correspond to blocks, columns to samples. Each matrix in this list is a collection of unique genotypes that are matched with a given gene.}
 
-\item{\code{blocks}}{MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assignes them to blocks.}
+\item{\code{blocks}}{MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assigns them to blocks.}
 
 \item{\code{samples}}{data.frame with information about samples. It contains unique sample names \code{sample_id}.}
 }}
@@ -45,6 +45,6 @@ dmSQTLdata contains genomic feature expression, in counts, genotypes and sample 
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}}
+\code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 }
 

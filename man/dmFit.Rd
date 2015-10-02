@@ -5,7 +5,7 @@
 \alias{dmFit}
 \alias{dmFit,dmDSdispersion-method}
 \alias{dmFit,dmSQTLdispersion-method}
-\title{Estimate the proportions of Dirichlet-multinomial model}
+\title{Estimate proportions in Dirichlet-multinomial model}
 \usage{
 dmFit(x, ...)
 
@@ -22,21 +22,36 @@ dmFit(x, ...)
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 
-\item{dispersion}{Characted defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"}, \code{"common_dispersion"}}
+\item{dispersion}{Character defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"} or \code{"common_dispersion"}.}
 
-\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.}
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical. Wheter to display more progress messages.}
+\item{verbose}{Logical. Whether to display more progress messages.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
+\value{
+Returns a \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
+}
 \description{
-Estimate the proportions of Dirichlet-multinomial model
+Maximum likelihood estimates of genomic feature (for instance, transcript, exon, exonic bin) proportions in full Dirichlet-multinomial model used in differential splicing or sQTL analysis. Full model estimation means that proportions are estimated for every group/condition separately.
 }
 \examples{
+### Differential splicing analysis
+
 d <- dataDS_dmDSdispersion
-d <- dmFit(d)
+
+# If possible, increase the number of workers
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+plotFit(d, gene_id = names(d)[1])
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 }
 

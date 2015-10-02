@@ -19,13 +19,14 @@ dmDSdata(counts, gene_id, feature_id, sample_id, group)
 \item{group}{Vector that defines the goupping of samples.}
 }
 \value{
-Returns \linkS4class{dmDSdata} object.
+Returns a \linkS4class{dmDSdata} object.
 }
 \description{
 Constructor function for a \code{\linkS4class{dmDSdata}} object.
 }
 \examples{
-### Create 'dmDSdata' object from table of counts for exonic bins for 100 genes
+### Differential splicing analysis
+
  head(dataDS_counts)
  dataDS_metadata
 
@@ -37,14 +38,17 @@ Constructor function for a \code{\linkS4class{dmDSdata}} object.
  sample_id = dataDS_metadata$sample_id
  group = dataDS_metadata$group
 
- d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
+ d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id,
+ sample_id = sample_id, group = group)
 
  length(d)
+
+ plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

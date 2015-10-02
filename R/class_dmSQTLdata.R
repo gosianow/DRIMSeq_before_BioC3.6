@@ -20,10 +20,10 @@ NULL
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
 #' @slot genotypes MatrixList of unique genotypes. Rows correspond to blocks, columns to samples. Each matrix in this list is a collection of unique genotypes that are matched with a given gene.
-#' @slot blocks MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assignes them to blocks.
+#' @slot blocks MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assigns them to blocks.
 #' @slot samples data.frame with information about samples. It contains unique sample names \code{sample_id}.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}} 
+#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
@@ -82,7 +82,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
     rownames(samples) <- NULL
     
   }
-
+  
   return(new("dmSQTLdata", counts = counts, genotypes = genotypes, blocks = blocks, samples = samples))
   
 })
@@ -103,33 +103,41 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #'  @return Returns a \code{\linkS4class{dmSQTLdata}} object.
 #'  @examples 
-#'  ### counts
+#'  ### sQTL analysis
+#'  
+#'  # counts
 #'  counts <- dataSQTL_counts[, -(1:2)]
 #'  gene_id <- dataSQTL_counts[, 1]
 #'  feature_id <- dataSQTL_counts[, 2]
 #'  
-#'  ### gene_ranges
+#'  # gene_ranges
 #'  dataSQTL_gene_ranges
 #'  gene_ranges <- dataSQTL_gene_ranges
 #'  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
 #'  
-#'  ### genotypes
+#'  # genotypes
 #'  head(dataSQTL_genotypes)
 #'  genotypes <- dataSQTL_genotypes[, -(1:4)]
 #'  
 #'  snp_id <- dataSQTL_genotypes$snp_id
 #'  
-#' ### snp_ranges with names!
-#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+#' # snp_ranges with names!
+#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
+#'  IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
 #'  names(snp_ranges) <- dataSQTL_genotypes$snp_id ### DO NOT FORGET about names
 #'  
 #'  all(colnames(counts) == colnames(genotypes))
 #'  
 #'  sample_id <- colnames(counts)
 #'  
-#'  ### create dmSQTLdata object 
-#'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#'  # create dmSQTLdata object 
+#'  d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, 
+#'  genotypes, snp_id, snp_ranges, sample_id, window = 5e3, 
+#'  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#'  
+#'  plotData(d)
+#'  
+#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
 dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -169,7 +177,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   
   ### order genes in counts and in genotypes
   if(class(gene_id) == "character")
-  gene_id <- factor(gene_id, levels = unique(gene_id))
+    gene_id <- factor(gene_id, levels = unique(gene_id))
   
   order_counts <- order(gene_id)
   counts <- counts[order_counts, , drop = FALSE]
@@ -178,7 +186,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   
   
   gene_id_genotypes <- factor(gene_id_genotypes, levels = levels(gene_id))
-
+  
   order_genotypes <- order(gene_id_genotypes)
   genotypes <- genotypes[order_genotypes, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[order_genotypes]
@@ -215,7 +223,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
     genotypes_df <- data.frame(t(genotypes[[g]]))
     
     matching_snps <- match(genotypes_df, genotypes_df)
-
+    
     # blocks_tmp <- split(colnames(genotypes_df), matching_snps)
     # names(blocks_tmp) <- paste0("block", 1:length(blocks_tmp))
     
@@ -227,20 +235,20 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
     blocks_tmp <- cbind(block_id, snp_id)
     
     return(blocks_tmp[oo, , drop = FALSE])
-
-    }, BPPARAM = BPPARAM))
-
+    
+  }, BPPARAM = BPPARAM))
+  
   names(blocks) <- names(genotypes)
-
-
+  
+  
   genotypes_u <- MatrixList(BiocParallel::bplapply(inds, function(g){
     # g = 1
     
     genotypes_tmp <- unique(genotypes[[g]])
     rownames(genotypes_tmp) <- paste0("block_", 1:nrow(genotypes_tmp))
     return(genotypes_tmp)
-
-    }, BPPARAM = BPPARAM))
+    
+  }, BPPARAM = BPPARAM))
   
   names(genotypes_u) <- names(genotypes)
   
@@ -287,27 +295,17 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 ##############################################################
 
 
-#' @param minor_allel_freq Minimal number of samples for the minor allel presence.
+#' @param minor_allele_freq Minimal number of samples for the minor allele presence.
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' @details 
 #' 
-#' In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. Take into account that, for some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to consider and can be slightly lower than the total sample size. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allel_freq} should indicate the minimal number of samples for the minor allel frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allel_freq}.
-#' 
-#' 
-#' @examples 
-#' ### Filtering the dmSQTLdata object
-#'
-#' dd <- dataSQTL_dmSQTLdata
-#' plotData(dd)
-#' 
-#' d <- dmFilter(dd)
-#' plotData(d)
+#' In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. Take into account that, for some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to consider and can be slightly lower than the total sample size. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allele_freq} should indicate the minimal number of samples for the minor allele frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allele_freq}.
 #' 
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allel_freq = minor_allel_freq, BPPARAM = BPPARAM)
+  data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allele_freq = minor_allele_freq, BPPARAM = BPPARAM)
   
   return(data_filtered)
   
@@ -320,11 +318,11 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_ge
 
 
 #' @examples 
-#' ### dmSQTLdata
+#' ### sQTL analysis
 #'
 #' d <- dataSQTL_dmSQTLdata
 #' plotData(d)
-#' plot(d)
+#'
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){

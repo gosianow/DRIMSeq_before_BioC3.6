@@ -46,37 +46,44 @@ Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata r
 It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
 }
 \examples{
-### counts
+### sQTL analysis
+
+ # counts
  counts <- dataSQTL_counts[, -(1:2)]
  gene_id <- dataSQTL_counts[, 1]
  feature_id <- dataSQTL_counts[, 2]
 
- ### gene_ranges
+ # gene_ranges
  dataSQTL_gene_ranges
  gene_ranges <- dataSQTL_gene_ranges
  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
 
- ### genotypes
+ # genotypes
  head(dataSQTL_genotypes)
  genotypes <- dataSQTL_genotypes[, -(1:4)]
 
  snp_id <- dataSQTL_genotypes$snp_id
 
-### snp_ranges with names!
- snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+# snp_ranges with names!
+ snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr),
+ IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
  names(snp_ranges) <- dataSQTL_genotypes$snp_id ### DO NOT FORGET about names
 
  all(colnames(counts) == colnames(genotypes))
 
  sample_id <- colnames(counts)
 
- ### create dmSQTLdata object
- d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+ # create dmSQTLdata object
+ d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges,
+ genotypes, snp_id, snp_ranges, sample_id, window = 5e3,
+ BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

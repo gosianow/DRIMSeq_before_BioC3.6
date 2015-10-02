@@ -24,14 +24,15 @@ plotDispersion(x, ...)
 Dispersion versus mean expression plot
 }
 \examples{
+### Differential splicing analysis
+
 d <- dataDS_dmDSdispersion
 plotDispersion(d)
-plot(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
+\code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

@@ -3,10 +3,26 @@ NULL
 
 ################################################################################
 
-#' Object that extends \code{dmDSfit} by adding the test results.
+#' dmDStest object
 #' 
-#' @slot fit_null list of null models defined by contrasts.
+#' dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Result of \code{\link{dmTest}}.
+#' 
+#' @details 
+#' 
+#' \itemize{
+#'  \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
+#'  \item \code{statistics(x)}: Get a data.frame with full and null log-likelihoods and degrees of freedom.
+#'  \item \code{results(x)}: Get a data.frame with results.
+#' }
+#' 
+#' @param x dmDStest object.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' 
+#' @slot compared_groups List of vectors specifying which group comparisons are performed.
+#' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.
 #' @slot results data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotTest}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}
 setClass("dmDStest", 
          contains = "dmDSfit",
          representation(compared_groups = "list",
@@ -99,10 +115,12 @@ setMethod("show", "dmDStest", function(object){
 
 ################################################################################
 
-#' Likelihood ratio test between full and null model.
+#' Likelihood ratio test
+#' 
+#' First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled data. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 #' 
 #' @param x \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
-#' @param ... Parameters needed for the likelihood ratio test.
+#' @param ... Other parameters that can be defined by methods using this generic.
 #' @export
 setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
@@ -111,18 +129,28 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
 
 #' @inheritParams dmFit
-#' @param compared_groups vector or a list of vectors.
-#' @return This function returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @param compared_groups Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vectors should be levels or numbers of the levels of \code{samples(x)$group}.
+#' 
+#' @return Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @examples 
+#' ### Differential splicing analysis
+#' 
 #' d <- dataDS_dmDSdispersion
 #' 
 #' # If possible, increase the number of workers
 #' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' 
-#' d <- dmTest(d)
+#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' 
-#' results <- results(d)
+#' plotTest(d)
 #' 
+#' res <- results(d)
+#' res <- res[order(res$pvalue, decreasing = FALSE), ]
+#' 
+#' plotFit(d, gene_id = res$gene_id[1])
+#' 
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 #' @rdname dmTest
 #' @export
 setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -185,7 +213,7 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x
 
 ################################################################################
 
-#' Plot the histogram of p-values.
+#' Plot a histogram of p-values
 #' 
 #' @param x \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @export
@@ -196,6 +224,14 @@ setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 ################################################################################
 
 #' @inheritParams plotData
+#' @examples
+#' ### Differential splicing analysis
+#' 
+#' d <- dataDS_dmDStest
+#' plotTest(d)
+#' 
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}
 #' @rdname plotTest
 #' @export
 setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
@@ -212,6 +248,7 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
 ################################################################################
 
 #' @param compared_groups Numeric or character indicating comparison that should be plotted.
+#' @param plot_null Logical. Whether to plot the proportions estimated by the null model.
 #' @rdname plotFit
 #' @export
 setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){

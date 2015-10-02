@@ -23,7 +23,7 @@ statistics(x, ...)
 \item{...}{Other parameters that can be defined by methods using this generic.}
 }
 \description{
-dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proporion estimates needed for the differential splicing analysis. Feature ratios are estimated for each gene and each condition. Result of \code{\link{dmFit}}.
+dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the differential splicing analysis. Feature ratios are estimated for each gene and each condition. Result of \code{\link{dmFit}}.
 }
 \details{
 \itemize{
@@ -36,6 +36,12 @@ dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full
 \describe{
 \item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.}
 
-\item{\code{fit_full}}{\code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the per gene-condition likelihoods are stored in \code{metadata} slot.}
+\item{\code{fit_full}}{\code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the full model likelihoods are stored in \code{metadata} slot.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotFit}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
+}
 

@@ -24,21 +24,19 @@ plotData(x, ...)
 Plot a histogram of the number of features per gene. Additionally, for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
 }
 \examples{
-### dmDSdata
+### Differential splicing analysis
 
 d <- dataDS_dmDSdata
 plotData(d)
-plot(d)
-### dmSQTLdata
+### sQTL analysis
 
 d <- dataSQTL_dmSQTLdata
 plotData(d)
-plot(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
+\code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

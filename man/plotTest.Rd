@@ -5,7 +5,7 @@
 \alias{plotTest}
 \alias{plotTest,dmDStest-method}
 \alias{plotTest,dmSQTLtest-method}
-\title{Plot the histogram of p-values.}
+\title{Plot a histogram of p-values}
 \usage{
 plotTest(x, ...)
 
@@ -21,6 +21,18 @@ plotTest(x, ...)
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
 \description{
-Plot the histogram of p-values.
+Plot a histogram of p-values
+}
+\examples{
+### Differential splicing analysis
+
+d <- dataDS_dmDStest
+plotTest(d)
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}
 }
 

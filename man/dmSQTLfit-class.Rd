@@ -3,15 +3,21 @@
 \docType{class}
 \name{dmSQTLfit-class}
 \alias{dmSQTLfit-class}
-\title{Object that extends \code{dmSQTLdispersion} by adding fitting.}
+\title{dmSQTLfit object}
 \description{
-Object that extends \code{dmSQTLdispersion} by adding fitting.
+dmSQTLfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the sQTL analysis. Feature ratios are estimated for each gene and each group that is defined by different SNPs/blocks. Result of dmFit.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting.}
+\item{\code{dispersion}}{Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.}
 
-\item{\code{fit_full}}{List of \code{\linkS4class{MatrixList}} objects. Each of them contains the per gene fitting results that include the group proportions (groups are defined by genotypes) of feature expression, full model likelihoods and degrees of freedom.}
+\item{\code{fit_full}}{List of \code{\linkS4class{MatrixList}} objects. Each element of this list contains the full model proportion estimates for all the blocks associated with a given gene. Columns of MatrixLists correspond to 3 genotypes (0,1,2). The full model likelihoods are stored in \code{metadata} slot.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotFit}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
+}
 

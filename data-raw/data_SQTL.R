@@ -1,6 +1,6 @@
 # Prepare data for examples and vignette 
 
-setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/geuvadis/")
+# setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/geuvadis/")
 
 library(DM)
 
@@ -12,12 +12,18 @@ library(devtools)
 ########################################################
 
 ## Input files: transcript expression, gene location and genotype information
-data_dir <- "data/"
+data_dir <- "data-raw/geuvadis/data/"
+
+
+counts_raw <- readLines(counts_path)
+tools::showNonASCII(counts_raw)
 
 
 ### read counts 
 counts_path <- paste0(data_dir, "expression/trExpCount_CEU.tsv")
 counts_raw <- read.table(counts_path, header = TRUE, as.is = TRUE)
+
+
 
 gene_id <- counts_raw$geneId
 feature_id <- counts_raw$trId
@@ -51,11 +57,11 @@ window <- 5e3
 ########################################################
 
 
-do <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 5))
+do <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 
 plotData(do, out_dir = "./")
 
-dof <- dmFilter(do, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 10))
+dof <- dmFilter(do, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 
 plotData(dof, out_dir = "./")
 
@@ -80,7 +86,14 @@ gene_id <- rep(names(ds@counts), width(ds@counts))
 feature_id <- rownames(ds@counts)
 counts <- ds@counts@unlistData
 
+
 dataSQTL_counts <- data.frame(gene_id = gene_id, transcript_id = feature_id, counts, row.names = NULL, stringsAsFactors = FALSE)
+
+tools::showNonASCII(colnames(dataSQTL_counts))
+
+for(i in 1:ncol(dataSQTL_counts))
+print(tools::showNonASCII(dataSQTL_counts[, i]))
+
 
 use_data(dataSQTL_counts, overwrite = TRUE)
 
@@ -133,12 +146,15 @@ all(colnames(counts) == colnames(genotypes))
 sample_id <- colnames(counts)
 
 ### create dmSQTLdata object 
-d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 
 
 dataSQTL_dmSQTLdata <- d
 
 use_data(dataSQTL_dmSQTLdata, overwrite = TRUE)
+
+
+
 
 
 d <- dataSQTL_dmSQTLdata
@@ -194,7 +210,7 @@ plotFit(data, gene_id, snp_id)
 
 ### test
 
-data <- dmLRT(data)
+data <- dmTest(data)
 
 plotLRT(data)
 

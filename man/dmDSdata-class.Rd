@@ -32,7 +32,7 @@ samples(x, ...)
 \item{i,j}{Parameters used for subsetting. See Details.}
 }
 \description{
-dmDSdata contains expression, in counts, of genomic features such as exons or transcrips and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 }
 \details{
 \itemize{
@@ -54,6 +54,6 @@ dmDSdata contains expression, in counts, of genomic features such as exons or tr
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+\code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 }
 

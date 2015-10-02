@@ -65,6 +65,6 @@ dmDSdispersion extends the \code{\linkS4class{dmDSdata}} by adding the dispersio
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotDispersion}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+\code{\link{plotDispersion}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 }
 

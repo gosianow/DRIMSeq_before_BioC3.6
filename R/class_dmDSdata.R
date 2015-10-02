@@ -5,7 +5,7 @@ NULL
 ##############################################################
 #' dmDSdata object
 #' 
-#' dmDSdata contains expression, in counts, of genomic features such as exons or transcrips and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+#' dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 #' 
 #' @details 
 #' 
@@ -24,7 +24,7 @@ NULL
 #' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
 #' @slot samples data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
                         samples = "data.frame"))
@@ -140,9 +140,10 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  @param feature_id Vector of feature IDs corresponding to \code{counts}.
 #'  @param sample_id Vector of unique sample IDs corresponding to the columns in \code{counts}.
 #'  @param group Vector that defines the goupping of samples.
-#'  @return Returns \linkS4class{dmDSdata} object.
+#'  @return Returns a \linkS4class{dmDSdata} object.
 #'  @examples
-#'  ### Create 'dmDSdata' object from table of counts for exonic bins for 100 genes
+#'  ### Differential splicing analysis
+#'  
 #'  head(dataDS_counts)
 #'  dataDS_metadata
 #'  
@@ -154,11 +155,14 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  sample_id = dataDS_metadata$sample_id
 #'  group = dataDS_metadata$group
 #'  
-#'  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
+#'  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, 
+#'  sample_id = sample_id, group = group)
 #'  
 #'  length(d)
 #'  
-#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#'  plotData(d)
+#'  
+#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
 dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
@@ -232,7 +236,6 @@ dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
 #' 
 #' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @param ... Other parameters that can be defined by methods using this generic.
-#' @author Malgorzata Nowicka
 #' @export
 setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
@@ -255,19 +258,19 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @param max_features Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept. 
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @examples 
-#' ### Filtering the dmDSdata object
+#' ### Differential splicing analysis
 #'
 #' dd <- dataDS_dmDSdata
 #' plotData(dd)
 #' 
 #' d <- dmFilter(dd)
-#' 
 #' plotData(d)
 #' 
 #' d <- dmFilter(dd, max_features = 10)
 #' plotData(d)
 #' 
-#' @seealso \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmLRT}}
+#' @seealso \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
@@ -295,14 +298,13 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
 #' @examples 
-#' ### dmDSdata
+#' ### Differential splicing analysis
 #'
 #' d <- dataDS_dmDSdata
 #' plotData(d)
-#' plot(d)
-
+#'
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
+#' @seealso \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
@@ -310,49 +312,6 @@ setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   dmDS_plotData(counts = x@counts, out_dir = out_dir)
   
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

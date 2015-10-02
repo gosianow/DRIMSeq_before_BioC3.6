@@ -26,7 +26,7 @@ plotFit(x, ...)
   out_dir = NULL)
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.}
+\item{x}{\code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} object.}
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 
@@ -38,33 +38,30 @@ plotFit(x, ...)
 
 \item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
 
-\item{plot_main}{Logical. Whether to plot a title with the information about the estimates.}
+\item{plot_main}{Logical. Whether to plot a title with the information about the Dirichlet-multinomial estimates.}
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 
+\item{plot_null}{Logical. Whether to plot the proportions estimated by the null model.}
+
 \item{compared_groups}{Numeric or character indicating comparison that should be plotted.}
+
+\item{snp_id}{Vector of SNP IDs to be plotted. \code{snp_id} must match \code{gene_id}.}
 }
 \description{
 Plot the observed and estimated feature ratios.
 }
 \examples{
-d <- dataDS_dmDSdispersion
+### Differential splicing analysis
 
-# If possible, increase the number of workers
-d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+# Plot proportions of top gene
 
-gene_id <- names(d)[1]
-
-plotFit(d, gene_id = gene_id)
-
-
-### Plot proportions of top 3 genes
-d <- dmLRT(d)
+d <- dataDS_dmDStest
 
 res <- results(d)
 res <- res[order(res$pvalue, decreasing = FALSE), ]
 
-gene_id <- res$gene_id[1:3]
+gene_id <- res$gene_id[1]
 
 plotFit(d, gene_id = gene_id, plot_type = "barplot")
 plotFit(d, gene_id = gene_id, plot_type = "lineplot")
@@ -74,6 +71,6 @@ plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotLRT}}
+\code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
 }
 

@@ -4,18 +4,34 @@
 \name{dmSQTLtest-class}
 \alias{dmSQTLtest-class}
 \alias{results,dmSQTLtest-method}
-\title{Object that extends \code{dmSQTLfit} by adding the test results.}
+\title{dmSQTLtest object}
 \usage{
 \S4method{results}{dmSQTLtest}(x)
 }
+\arguments{
+\item{x}{dmSQTLtest object.}
+
+\item{...}{Other parameters that can be defined by methods using this generic.}
+}
 \description{
-Object that extends \code{dmSQTLfit} by adding the test results.
+dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
+}
+\details{
+\itemize{
+ \item \code{results(x)}: Get a data.frame with results.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{fit_null}}{list}
+\item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.}
 
-\item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
+\item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotTest}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
+}
 

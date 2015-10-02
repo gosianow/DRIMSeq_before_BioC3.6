@@ -24,7 +24,7 @@ NULL
 #' @slot common_dispersion Numeric value of estimated common dispersion.
 #' @slot genewise_dispersion Numeric vector of estimated gene-wise dispersions.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSdispersion", 
          contains = "dmDSdata",
          representation(mean_expression = "numeric", 
@@ -108,22 +108,28 @@ setMethod("show", "dmDSdispersion", function(object){
 
 
 ##############################################################
-#' Estimate the dispersion of Dirichlet-multinomial model.
+#' Estimate dispersions in Dirichlet-multinomial model
 #' 
-#' Maximum likelihood estimates of dispersion parameters in Dirichlet-multinomial model used in differentiall splicing or sQTL analysis.
+#' Maximum likelihood estimates of dispersion parameters in Dirichlet-multinomial model used in differential splicing or sQTL analysis.
 #' 
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' @export
+setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
+
+
+##############################################################
+
 #' @details 
-#' 
 #' Parameters that are directly used in the dispersion estimation start with prefix \code{disp_}, and the one that are used directly for the proportion estimation start with \code{prop_}.
 #' 
-#' 
-#' There are 4 optimazation methods implemented within dmDispersion, i.e., \code{"optimize", "optim", "constrOptim", "grid"}, that can be used to estimate the gene-wise dispersion. Common dispersion is estimated with \code{"optimize"}.
+#' There are 4 optimization methods implemented within dmDispersion, i.e., \code{"optimize"}, \code{"optim"}, \code{"constrOptim"} and \code{"grid"}, that can be used to estimate the gene-wise dispersion. Common dispersion is estimated with \code{"optimize"}.
 #' 
 #' Arguments that are used by all the methods are: 
 #' 
 #' \itemize{
 #'   \item \code{disp_adjust}
-#'   \item \code{prop_mode}: Both \code{"constrOptim"} and \code{"constrOptimG"} use \code{\link{constrOptim}} function to maximize the likelihood of Dirichlet-multinomial proportions. The difference lays in the way the likelihood and score are computed. \code{"constrOptim"} uses the likelihood and score that are calculated based on the fact that x*Gamma(x) = Gamma(x+1). In \code{"constrOptimG"}, we compute them using \code{\link{lgamma}} function. We reccomend using the second approach, since it is much faster than the first one.
+#'   \item \code{prop_mode}: Both \code{"constrOptim"} and \code{"constrOptimG"} use \code{\link{constrOptim}} function to maximize the likelihood of Dirichlet-multinomial proportions. The difference lays in the way the likelihood and score are computed. \code{"constrOptim"} uses the likelihood and score that are calculated based on the fact that x*Gamma(x) = Gamma(x+1). In \code{"constrOptimG"}, we compute them using \code{\link{lgamma}} function. We recommend using the second approach, since it is much faster than the first one.
 #'   \item \code{prop_tol}: The accuracy for proportions estimation defined as \code{reltol} in \code{\link{constrOptim}}.
 #' }
 #' 
@@ -153,52 +159,49 @@ setMethod("show", "dmDSdispersion", function(object){
 #' \code{"grid"}, which uses the grid approach from \code{\link{edgeR}}.
 #' 
 #' \itemize{
-#'   \item \code{disp_init}, \code{disp_grid_length}, \code{disp_grid_range}: Parameters used to construct the search grid \code{disp_init * 2^seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)}
+#'   \item \code{disp_init}, \code{disp_grid_length}, \code{disp_grid_range}: Parameters used to construct the search grid \code{disp_init * 2^seq(from = disp_grid_range[1]}, \code{to = disp_grid_range[2]}, \code{length = disp_grid_length)}.
 #'   \item \code{disp_moderation}: Dipsersion shrinkage is available only with \code{"grid"} method. 
 #'   \item \code{disp_prior_df}: Used only when dispersion shrinkage is activated. Moderated likelihood is equal to \code{loglik + disp_prior_df * moderation}. Higher \code{disp_prior_df}, more shrinkage toward common or trended dispersion is applied.
 #'   \item \code{disp_span}: Used only when dispersion moderation toward trend is activated.
 #' }
 #' 
 #' 
-#' 
-#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.
-#' @param ... Other parameters that can be defined by methods using this generic.
-#' @export
-setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
-
-
-##############################################################
-
-#' 
 #' @param mean_expression Logical. Whether to estimate the mean expression of genes.
 #' @param common_dispersion Logical. Whether to estimate the common dispersion.
 #' @param genewise_dispersion Logical. Whether to estimate the gene-wise dispersion.
 #' @param disp_adjust Logical. Whether to use the Cox-Reid adjusted or non-adjusted profile likelihood.
 #' @param disp_mode Optimization method used to maximize the profile likelihood. Possible values are \code{"optimize", "optim", "constrOptim", "grid"}. See Details.
-#' @param  disp_interval Numeric vector of lenght 2 defining the interval of possible values for the dispersion. 
+#' @param  disp_interval Numeric vector of length 2 defining the interval of possible values for the dispersion. 
 #' @param disp_tol The desired accuracy when estimating dispersion.
-#' @param disp_init Initial dispersion.
+#' @param disp_init Initial dispersion. If \code{common_dispersion} is \code{TRUE}, then \code{disp_init} is overwritten by common dispersion estimate.
 #' @param disp_init_weirMoM Logical. Whether to use the Weir moment estimator as an initial value for dispersion. If \code{TRUE}, then \code{disp_init} is replaced by Weir estimates.
 #' @param  disp_grid_length Length of the search grid.
 #' @param  disp_grid_range Vector giving the limits of grid interval.
 #' @param disp_moderation Dispersion moderation method. One can choose to shrink the dispersion estimates toward the common dispersion (\code{"common"}) or toward the (dispersion versus mean expression) trend (\code{"trended"}) 
 #' @param disp_prior_df Degree of moderation (shrinkage).
 #' @param disp_span Value from 0 to 1 defining the percentage of genes used in smoothing sliding window when calculating the dispersion versus mean expression trend.
-#' @param prop_mode Optimization method used to estimate proportions. Possible values \code{"constrOptim", "constrOptimG"}.
+#' @param prop_mode Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.
 #' @param prop_tol The desired accuracy when estimating proportions.
-#' @param verbose Logical. Wheter to display more progress messages.
+#' @param verbose Logical. Whether to display more progress messages.
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' 
-#' @return Returns the \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
+#' @return Returns a \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
 #' @examples 
+#' ### Differential splicing analysis
+#' 
 #' d <- dataDS_dmDSdata
 #' d <- dmFilter(d)
 #' \dontrun{
 #' # If possible, increase the number of workers
 #' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' }
-#' #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDSLRT}}
+#' \dontshow{
+#' d <- dataDS_dmDSdispersion
+#' }
+#' plotDispersion(d)
+#' 
+#' @seealso \code{\link{plotDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' @author Malgorzata Nowicka
 #' @rdname dmDispersion
 #' @export
 setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -278,6 +281,7 @@ setMethod("dmDispersion", "dmDSdispersion", function(x, mean_expression = FALSE,
 #' Dispersion versus mean expression plot
 #' 
 #' @param x \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
+#' @param ... Other parameters that can be defined by methods using this generic.
 #' @export
 setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 
@@ -289,12 +293,13 @@ setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 
 #' @inheritParams plotData
 #' @examples 
+#' ### Differential splicing analysis
+#' 
 #' d <- dataDS_dmDSdispersion
 #' plotDispersion(d)
-#' plot(d)
 #' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotLRT}}
+#' @seealso \code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 #' 
 #' @rdname plotDispersion
 #' @export
@@ -308,44 +313,4 @@ setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   dmDS_plotDispersion(genewise_dispersion = x@genewise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = x@common_dispersion, out_dir = out_dir)
   
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

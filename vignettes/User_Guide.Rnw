@@ -87,18 +87,18 @@ plotFit(d, gene_id = gene_id, plot_type = "barplot")
 Use likelihood ratio to test for differential splicing.
 
 
-<<DSdmLRT>>=
-d <- dmLRT(d)
+<<DSdmTest>>=
+d <- dmTest(d)
 
-plotLRT(d)
+plotTest(d)
 
-results <- results(d)
+res <- results(d)
 
 @
 
 
 <<DSdmLRT_plotFit, out.width = "16cm", fig.width = 16>>=
-gene_id <- results$gene_id[1]
+gene_id <- res$gene_id[1]
 plotFit(d, gene_id = gene_id)
 @
 

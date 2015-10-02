@@ -11,7 +11,7 @@ NULL
 #' @slot common_dispersion Numeric value of estimated common dispersion.
 #' @slot genewise_dispersion List of estimated gene-wise dispersions. Each element of this list is a vector of dispersions estimated for all the genotype blocks assigned to a given gene.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLLRT}}
+#' @seealso \code{\link{plotDispersion}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLdispersion", 
          contains = "dmSQTLdata",
          representation(mean_expression = "numeric", 

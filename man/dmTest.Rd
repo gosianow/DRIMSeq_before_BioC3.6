@@ -5,7 +5,7 @@
 \alias{dmTest}
 \alias{dmTest,dmDSfit-method}
 \alias{dmTest,dmSQTLfit-method}
-\title{Likelihood ratio test between full and null model.}
+\title{Likelihood ratio test}
 \usage{
 dmTest(x, ...)
 
@@ -20,32 +20,45 @@ dmTest(x, ...)
 \arguments{
 \item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.}
 
-\item{...}{Parameters needed for the likelihood ratio test.}
+\item{...}{Other parameters that can be defined by methods using this generic.}
 
-\item{compared_groups}{vector or a list of vectors.}
+\item{compared_groups}{Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vectors should be levels or numbers of the levels of \code{samples(x)$group}.}
 
-\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim", "constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.}
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical. Wheter to display more progress messages.}
+\item{verbose}{Logical. Whether to display more progress messages.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
-This function returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object with an additional slot \code{table} which is sorted by significance and contains  \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 }
 \description{
-Likelihood ratio test between full and null model.
+First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled data. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 }
 \examples{
+### Differential splicing analysis
+
 d <- dataDS_dmDSdispersion
 
 # If possible, increase the number of workers
 d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-d <- dmTest(d)
+d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-results <- results(d)
+plotTest(d)
+
+res <- results(d)
+res <- res[order(res$pvalue, decreasing = FALSE), ]
+
+plotFit(d, gene_id = res$gene_id[1])
+}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 }
 

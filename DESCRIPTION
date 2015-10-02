@@ -1,12 +1,18 @@
 Package: DM
 Type: Package
-Title: What the package does (short line)
+Title: Differential splicing and sQTL analysis with Dirichlet-multinomial model
+    in RNA-seq
 Version: 0.2.5
 Date: 2015-09-23
-Author: Malgorzata Nowicka, Mark Robinson
+Author: Malgorzata Nowicka and Mark Robinson, both at University Zurich.
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
-Description: More about what it does (maybe more than one line)
-License: GPL (>= 2)
+Description: The package provides two frameworks. One for the differential
+    splicing analysis between different conditions and one for the sQTL analysis.
+    Both are based on modeling the ratios of genomic features (i.e., transcripts,
+    exons or exonic bins) with Dirichlet-multinomial distribution. The package also
+    makes available functions for visualization and exploration of the data and
+    results.
+License: GPL (>= 3)
 Depends:
     R (>= 3.2),
     BiocGenerics
@@ -67,13 +73,15 @@ Collate:
     'dm_FIMobsG.R'
     'dm_adjustmentOneGeneManyGroups.R'
     'dm_adjustmentOneGeneOneGroup.R'
+    'dm_colorb.R'
     'dm_estimateMeanExpression.R'
     'dm_fitOneGeneManyGroups.R'
     'dm_fitOneGeneOneGroup.R'
     'dm_lik.R'
     'dm_likG.R'
     'dm_plotProportion.R'
-    'dm_plotROC_TPRFDR.R'
+    'dm_plotROCx.R'
+    'dm_plotTPRFDR.R'
     'dm_plotTable.R'
     'dm_plotVenn.R'
     'dm_profileLikTagwise.R'

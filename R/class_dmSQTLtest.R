@@ -3,10 +3,23 @@ NULL
 
 ################################################################################
 
-#' Object that extends \code{dmSQTLfit} by adding the test results.
+#' dmSQTLtest object
 #' 
-#' @slot fit_null list
-#' @slot results data.frame with \code{gene_id} - gene IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
+#' 
+#' @details 
+#' 
+#' \itemize{
+#'  \item \code{results(x)}: Get a data.frame with results.
+#' }
+#' 
+#' @param x dmSQTLtest object.
+#' @param ... Other parameters that can be defined by methods using this generic.
+#' 
+#' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.
+#' @slot results data.frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotTest}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
 setClass("dmSQTLtest", 
          contains = "dmSQTLfit",
          representation(fit_null = "list",

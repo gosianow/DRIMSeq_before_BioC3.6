@@ -1,9 +1,9 @@
 #' @include dm_cpm.R
 NULL
 
-# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allel_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
+# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allele_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
 
-dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allel_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ########################################################
   # filtering on counts 
@@ -87,7 +87,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     genotypes_gene[, is.na(counts_gene[1,])] <- NA
     genotypes_gene[genotypes_gene == -1] <- NA
     
-    ##### Keep genotypes with at least minor_allel_freq number of variants per group; in other case replace them with NAs
+    ##### Keep genotypes with at least minor_allele_freq number of variants per group; in other case replace them with NAs
     genotypes_gene <- apply(genotypes_gene, 1, function(x){
       # x <- genotypes_gene[6,]
       
@@ -96,13 +96,13 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
       if( length(tt)==1 )
         return(NULL)
       if( length(tt)==2 ){
-        if(any(tt <= minor_allel_freq))
+        if(any(tt <= minor_allele_freq))
           return(NULL)
         return(x)
       }else{
-        if(sum(tt <= minor_allel_freq) >= 2)
+        if(sum(tt <= minor_allele_freq) >= 2)
           return(NULL)
-        x[x == names(tt[tt <= minor_allel_freq])] <- NA
+        x[x == names(tt[tt <= minor_allele_freq])] <- NA
         return(x)
       }    
     })

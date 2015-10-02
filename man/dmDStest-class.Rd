@@ -7,7 +7,7 @@
 \alias{results}
 \alias{results,dmDStest-method}
 \alias{statistics,dmDStest-method}
-\title{Object that extends \code{dmDSfit} by adding the test results.}
+\title{dmDStest object}
 \usage{
 \S4method{proportions}{dmDStest}(x)
 
@@ -17,14 +17,34 @@ results(x, ...)
 
 \S4method{results}{dmDStest}(x)
 }
+\arguments{
+\item{x}{dmDStest object.}
+
+\item{...}{Other parameters that can be defined by methods using this generic.}
+}
 \description{
-Object that extends \code{dmDSfit} by adding the test results.
+dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Result of \code{\link{dmTest}}.
+}
+\details{
+\itemize{
+ \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
+ \item \code{statistics(x)}: Get a data.frame with full and null log-likelihoods and degrees of freedom.
+ \item \code{results(x)}: Get a data.frame with results.
+}
 }
 \section{Slots}{
 
 \describe{
-\item{\code{fit_null}}{list of null models defined by contrasts.}
+\item{\code{compared_groups}}{List of vectors specifying which group comparisons are performed.}
+
+\item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.}
 
 \item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
+\author{
+Malgorzata Nowicka
+}
+\seealso{
+\code{\link{plotTest}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}
+}
 

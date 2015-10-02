@@ -3,10 +3,14 @@ NULL
 
 ################################################################################
 
-#' Object that extends \code{dmSQTLdispersion} by adding fitting.
+#' dmSQTLfit object
 #' 
-#' @slot dispersion Character specifying which type of dispersion was used for fitting.
-#' @slot fit_full List of \code{\linkS4class{MatrixList}} objects. Each of them contains the per gene fitting results that include the group proportions (groups are defined by genotypes) of feature expression, full model likelihoods and degrees of freedom.
+#' dmSQTLfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the sQTL analysis. Feature ratios are estimated for each gene and each group that is defined by different SNPs/blocks. Result of dmFit.
+#' 
+#' @slot dispersion Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.
+#' @slot fit_full List of \code{\linkS4class{MatrixList}} objects. Each element of this list contains the full model proportion estimates for all the blocks associated with a given gene. Columns of MatrixLists correspond to 3 genotypes (0,1,2). The full model likelihoods are stored in \code{metadata} slot.
+#' @author Malgorzata Nowicka
+#' @seealso \code{\link{plotFit}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLfit", 
          contains = "dmSQTLdispersion",
          representation(dispersion = "character",
@@ -40,6 +44,7 @@ setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_disper
 
 ################################################################################
 
+#' @param snp_id Vector of SNP IDs to be plotted. \code{snp_id} must match \code{gene_id}.
 #' @rdname plotFit
 #' @export
 setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
