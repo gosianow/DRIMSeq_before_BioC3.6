@@ -20,8 +20,11 @@ plotData(x, ...)
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
-\description{
+\value{
 Plot a histogram of the number of features per gene. Additionally, for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
+}
+\description{
+Plot data summary
 }
 \examples{
 ### Differential splicing analysis
@@ -37,6 +40,6 @@ plotData(d)
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+\code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

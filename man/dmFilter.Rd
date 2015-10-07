@@ -54,20 +54,21 @@ In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample 
 }
 \examples{
 ### Differential splicing analysis
+### Filtering
 
-dd <- dataDS_dmDSdata
-plotData(dd)
-
-d <- dmFilter(dd)
+d <- dataDS_dmDSdata
 plotData(d)
 
-d <- dmFilter(dd, max_features = 10)
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{dataDS_dmDSdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

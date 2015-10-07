@@ -40,18 +40,17 @@ Maximum likelihood estimates of genomic feature (for instance, transcript, exon,
 }
 \examples{
 ### Differential splicing analysis
+### Fit full model proportions
 
 d <- dataDS_dmDSdispersion
 
 # If possible, increase the number of workers
 d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-
-plotFit(d, gene_id = names(d)[1])
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
+\code{\link{dataDS_dmDSdispersion}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 }
 

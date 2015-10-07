@@ -7,7 +7,7 @@ NULL
 #' 
 #' A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
 #' 
-#' @details 
+#' @return  
 #' 
 #' \itemize{
 #'   \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
@@ -22,10 +22,11 @@ NULL
 #' 
 #' 
 #' @param x MatrixList object.
-#' @param value,i,j,name Parameters used for subsetting and assigning new attributes to x. See Details.
+#' @param value,i,j,name Parameters used for subsetting and assigning new attributes to x.
 #' 
 #' @slot unlistData Matrix which is a row binding of all the matrices in a list.
 #' @slot partitioning List of indexes which defines the row partitioning of unlistData matrix into the original matrices.
+#' 
 #' @slot metadata Matrix of additional information where each row corresponds to one of the matrices in a list.
 #' @author Malgorzata Nowicka
 setClass("MatrixList", 

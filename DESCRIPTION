@@ -12,6 +12,8 @@ Description: The package provides two frameworks. One for the differential
     exons or exonic bins) with Dirichlet-multinomial distribution. The package also
     makes available functions for visualization and exploration of the data and
     results.
+biocViews: SNP, AlternativeSplicing, DifferentialSplicing, Genetics, RNASeq,
+    MultipleComparison
 License: GPL (>= 3)
 Depends:
     R (>= 3.2),
@@ -21,6 +23,7 @@ Imports:
     BiocParallel,
     edgeR,
     GenomicRanges,
+    S4Vectors,
     ggplot2,
     reshape2,
     VennDiagram,
@@ -29,11 +32,11 @@ LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr
 Suggests:
-    S4Vectors,
     IRanges,
     limma,
     BiocStyle,
-    knitr
+    knitr,
+    testthat
 Collate:
     'DM.R'
     'class_show_utils.R'
@@ -68,9 +71,8 @@ Collate:
     'dmSQTL_plotFit.R'
     'dmSQTL_profileLikCommon.R'
     'dmSQTL_test.R'
-    'dm_FIMexp.R'
-    'dm_FIMobs.R'
-    'dm_FIMobsG.R'
+    'dm_FIM.R'
+    'dm_FisherScoring.R'
     'dm_adjustmentOneGeneManyGroups.R'
     'dm_adjustmentOneGeneOneGroup.R'
     'dm_colorb.R'
@@ -78,7 +80,6 @@ Collate:
     'dm_fitOneGeneManyGroups.R'
     'dm_fitOneGeneOneGroup.R'
     'dm_lik.R'
-    'dm_likG.R'
     'dm_plotProportion.R'
     'dm_plotROCx.R'
     'dm_plotTPRFDR.R'
@@ -87,5 +88,4 @@ Collate:
     'dm_profileLikTagwise.R'
     'dm_rdirichlet.R'
     'dm_score.R'
-    'dm_scoreG.R'
     'dm_weirMoM.R'

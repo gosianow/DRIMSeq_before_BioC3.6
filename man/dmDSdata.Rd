@@ -26,6 +26,7 @@ Constructor function for a \code{\linkS4class{dmDSdata}} object.
 }
 \examples{
 ### Differential splicing analysis
+ ### Create dmDSdata object
 
  head(dataDS_counts)
  dataDS_metadata
@@ -41,14 +42,12 @@ Constructor function for a \code{\linkS4class{dmDSdata}} object.
  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id,
  sample_id = sample_id, group = group)
 
- length(d)
-
  plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{dataDS_counts}}, \code{\link{dataDS_metadata}}, \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

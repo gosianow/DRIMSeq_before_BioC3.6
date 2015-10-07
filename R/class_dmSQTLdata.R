@@ -7,7 +7,7 @@ NULL
 #' 
 #' dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
 #' 
-#' @details 
+#' @return 
 #' 
 #' \itemize{
 #'   \item \code{names(x)}: Get the gene names.
@@ -16,14 +16,22 @@ NULL
 #' }
 #' 
 #' @param x dmSQTLdata object.
-#' @param i,j Parameters used for subsetting. See Details.
+#' @param i,j Parameters used for subsetting.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
 #' @slot genotypes MatrixList of unique genotypes. Rows correspond to blocks, columns to samples. Each matrix in this list is a collection of unique genotypes that are matched with a given gene.
 #' @slot blocks MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assigns them to blocks.
 #' @slot samples data.frame with information about samples. It contains unique sample names \code{sample_id}.
+#' 
+#'  @examples 
+#' d <- dataSQTL_dmSQTLdata
+#' head(names(d))
+#' length(d)
+#' d[1:10, ]
+#' d[1:10, 1:10]
+#' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} 
+#' @seealso \code{\link{dataSQTL_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
@@ -31,7 +39,25 @@ setClass("dmSQTLdata",
                         samples = "data.frame"))
 
 
-##############################################################
+setValidity("dmSQTLdata", function(object){
+  # has to return TRUE when valid object!
+  
+  if(!ncol(object@counts) == ncol(object@genotypes))
+    return(paste0("Unequal number of samples in 'counts' and 'genotypes' ", ncol(object@counts), " and ", ncol(object@genotypes)))
+  
+  ### Mystery: This does not pass
+#   if(!all(colnames(object@blocks) %in% c("block_id", "snp_id")))
+#     return(paste0("'blocks' must contain 'block_id' and 'snp_id' variables"))
+  
+  if(!all(names(object@counts) == names(object@genotypes)))
+    return(paste0("'genotypes' and 'counts' do not contain the same genes"))
+  
+  if(!all(names(object@blocks) == names(object@genotypes)))
+    return(paste0("'genotypes' and 'blocks' do not contain the same genes or SNPs"))
+  
+  return(TRUE)
+  
+})
 
 
 
@@ -65,19 +91,19 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
   
   if(missing(j)){
     
-    counts <- x@counts[i, ]
-    genotypes <- x@genotypes[i, ]
-    blocks <- x@blocks[i, ]
+    counts <- x@counts[i, , drop = FALSE]
+    genotypes <- x@genotypes[i, , drop = FALSE]
+    blocks <- x@blocks[i, , drop = FALSE]
     samples <- x@samples
     
   }else{
     
-    counts <- x@counts[i, j]
-    genotypes <- x@genotypes[i, j]
-    blocks <- x@blocks[i, ]
+    counts <- x@counts[i, j, drop = FALSE]
+    genotypes <- x@genotypes[i, j, drop = FALSE]
+    blocks <- x@blocks[i, , drop = FALSE]
     samples <- x@samples
     rownames(samples) <- samples$sample_id
-    samples <- samples[j, ]
+    samples <- samples[j, , drop = FALSE]
     samples$sample_id <- factor(samples$sample_id)
     rownames(samples) <- NULL
     
@@ -104,6 +130,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @return Returns a \code{\linkS4class{dmSQTLdata}} object.
 #'  @examples 
 #'  ### sQTL analysis
+#'  ### Create dmSQTLdata object
 #'  
 #'  # counts
 #'  counts <- dataSQTL_counts[, -(1:2)]
@@ -149,17 +176,24 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   
   stopifnot( class( gene_id ) %in% c("character", "factor"))
   stopifnot( class( feature_id ) %in% c("character", "factor"))
-  stopifnot( length(gene_id) == length( feature_id ) )
+  stopifnot( length(gene_id) == length(feature_id) )
+  stopifnot(nrow(counts) == length(feature_id))
+  
   
   stopifnot( class( genotypes ) %in% c("matrix", "data.frame"))
   genotypes <- as.matrix(genotypes)
   stopifnot( mode( genotypes ) %in% c("numeric"))
+  stopifnot(all(genotypes %in% c(-1, 0, 1, 2, NA)))
   
   stopifnot( class( gene_id_genotypes ) %in% c("character", "factor"))
   stopifnot( class( snp_id ) %in% c("character", "factor"))
   stopifnot( length(gene_id_genotypes) == length( snp_id ) )
+  stopifnot(nrow(genotypes) == length( snp_id ))
+  
   
   stopifnot( class( sample_id ) %in% c("character", "factor"))
+  stopifnot(ncol(counts) == ncol(genotypes))
+  stopifnot(ncol(genotypes) == length(sample_id))
   
   ### keep genes that are in counts and in genotypes
   
@@ -172,7 +206,6 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   genotypes <- genotypes[genes2keep, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[genes2keep]
   snp_id <- snp_id[genes2keep]
-  
   
   
   ### order genes in counts and in genotypes
@@ -264,11 +297,43 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 ##############################################################
 
 #' @rdname dmSQTLdata
-#'  @param gene_ranges \code{\linkS4class{GRanges}} object with gene location.
-#'  @param snp_ranges \code{\linkS4class{GRanges}} object with SNP location.
+#'  @param gene_ranges \code{\linkS4class{GRanges}} object with gene location. It must contain gene names when calling names().
+#'  @param snp_ranges \code{\linkS4class{GRanges}} object with SNP location. It must contain SNP names when calling names().
 #'  @param window Size of a down and up stream window, which is defining the surrounding for a gene. Only SNPs that are located within a gene or its surrounding are considered in the sQTL analysis. 
 #'  @export
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+  
+  
+  stopifnot( class( counts ) %in% c("matrix", "data.frame"))
+  counts <- as.matrix(counts)
+  stopifnot( mode( counts ) %in% c("numeric"))
+  
+  stopifnot( class( gene_id ) %in% c("character", "factor"))
+  stopifnot( class( feature_id ) %in% c("character", "factor"))
+  stopifnot( length(gene_id) == length( feature_id ) )
+  stopifnot(nrow(counts) == length(feature_id))
+  
+  stopifnot( class( genotypes ) %in% c("matrix", "data.frame"))
+  genotypes <- as.matrix(genotypes)
+  stopifnot( mode( genotypes ) %in% c("numeric"))
+  stopifnot(all(genotypes %in% c(-1, 0, 1, 2, NA)))
+  
+  stopifnot( class( snp_id ) %in% c("character", "factor"))
+  stopifnot(nrow(genotypes) == length( snp_id ))
+  
+  stopifnot( class( sample_id ) %in% c("character", "factor"))
+  stopifnot(ncol(counts) == ncol(genotypes))
+  stopifnot(ncol(genotypes) == length(sample_id))
+  
+  stopifnot(class(gene_ranges) == "GRanges")
+  stopifnot(class(snp_ranges) == "GRanges")
+  stopifnot(!is.null(names(snp_ranges)))
+  stopifnot(!is.null(names(gene_ranges)))
+  
+  stopifnot(is.numeric(window))
+  stopifnot(window >= 0)
+  
+  
   
   rownames(genotypes) <- snp_id
   gene_ranges <- GenomicRanges::resize(gene_ranges, GenomicRanges::width(gene_ranges) + 2 * window, fix = "center")
@@ -304,6 +369,14 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+  
+  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
+  stopifnot(min_gene_expr >= 0)
+  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= nrow(x@counts))
+  stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
+  stopifnot(max_features >= 2)
+  stopifnot(minor_allele_freq >= 1 && minor_allele_freq <= floor(nrow(x@counts)/2))
+  
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allele_freq = minor_allele_freq, BPPARAM = BPPARAM)
   

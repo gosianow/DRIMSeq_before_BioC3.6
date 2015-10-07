@@ -21,7 +21,7 @@ dm_fitOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, prop_m
     
     fit_gr <- dm_fitOneGeneOneGroup(y = y[, igroups[[gr]], drop = FALSE], gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
     
-    ### Return NA if any group has NA (Check how it works for DS with many groups!!!)
+    
     if(is.na(fit_gr[[2]][1])){
       pi <- matrix(NA, nrow = k, ncol = ngroups, dimnames = list(rownames(y), lgroups))
       stats <- rep(NA, ngroups)

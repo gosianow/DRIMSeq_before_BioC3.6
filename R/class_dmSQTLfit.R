@@ -16,6 +16,29 @@ setClass("dmSQTLfit",
          representation(dispersion = "character",
                         fit_full = "list"))
 
+
+setValidity("dmSQTLfit", function(object){
+  # has to return TRUE when valid object!
+  
+  if(!length(object@dispersion) == 1)
+    return(paste0("'dispersion' must have length 1"))
+  
+  if(!object@dispersion %in% c("common_dispersion", "genewise_dispersion"))
+    return(paste0("'dispersion' can have values 'common_dispersion' or 'genewise_dispersion'"))
+  
+  if(!length(object@counts) == length(object@fit_full))
+    return(paste0("Different number of genes in 'counts' and 'fit_full'"))
+  
+  if(!all(lapply(object@fit_full, class) == "MatrixList"))
+    return(paste0("'fit_full' must be a list of MatrixLists"))
+  
+  return(TRUE)
+  
+})
+
+
+
+
 ################################################################################
 
 setMethod("show", "dmSQTLfit", function(object){
@@ -31,6 +54,13 @@ setMethod("show", "dmSQTLfit", function(object){
 #' @export
 setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
+  stopifnot(length(dispersion) == 1)
+  stopifnot(dispersion %in% c("genewise_dispersion", "common_dispersion"))
+  stopifnot(length(prop_mode) == 1)
+  stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
+  stopifnot(length(prop_tol) == 1)
+  stopifnot(is.numeric(prop_tol) && prop_tol > 0)
+  stopifnot(is.logical(verbose))
   
   fit_full <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
@@ -49,8 +79,20 @@ setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_disper
 #' @export
 setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
+  stopifnot(all(gene_id %in% names(x@blocks)))
+  stopifnot(length(gene_id) == length(snp_id))
   
+  for(i in 1:length(gene_id)){
+    
+    if(!snp_id[i] %in% x@blocks[[gene_id[i], "snp_id"]])
+      stop(paste0("gene ",gene_id[i], " and SNP ", snp_id[i], " do not match!"))
+    
+  }
+  
+  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
+  stopifnot(is.logical(order))
+  stopifnot(is.logical(plot_full))
+  stopifnot(is.logical(plot_main))
   
   dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
   

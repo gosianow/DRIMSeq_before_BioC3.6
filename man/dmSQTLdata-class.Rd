@@ -18,17 +18,17 @@
 \arguments{
 \item{x}{dmSQTLdata object.}
 
-\item{i,j}{Parameters used for subsetting. See Details.}
+\item{i,j}{Parameters used for subsetting.}
 }
-\description{
-dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
-}
-\details{
+\value{
 \itemize{
   \item \code{names(x)}: Get the gene names.
   \item \code{length(x)}: Get the number of genes.
   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts, genotypes and blocks corresponding to genes i and samples j.
 }
+}
+\description{
+dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
 }
 \section{Slots}{
 
@@ -41,10 +41,17 @@ dmSQTLdata contains genomic feature expression, in counts, genotypes and sample 
 
 \item{\code{samples}}{data.frame with information about samples. It contains unique sample names \code{sample_id}.}
 }}
+\examples{
+d <- dataSQTL_dmSQTLdata
+head(names(d))
+length(d)
+d[1:10, ]
+d[1:10, 1:10]
+}
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
+\code{\link{dataSQTL_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 }
 

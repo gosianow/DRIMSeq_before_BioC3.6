@@ -40,20 +40,23 @@ First, estimate the null Dirichlet-multinomial model proportions, i.e., feature 
 }
 \examples{
 ### Differential splicing analysis
+### Fit null model proportions and test for DS
 
-d <- dataDS_dmDSdispersion
+d <- dataDS_dmDSfit
 
 # If possible, increase the number of workers
-d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-
 d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 plotTest(d)
 
+### Plot feature proportions for top DS gene
+
 res <- results(d)
 res <- res[order(res$pvalue, decreasing = FALSE), ]
 
-plotFit(d, gene_id = res$gene_id[1])
+gene_id <- res$gene_id[1]
+
+plotFit(d, gene_id = gene_id)
 }
 \author{
 Malgorzata Nowicka

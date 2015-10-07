@@ -52,12 +52,9 @@
 \arguments{
 \item{x}{MatrixList object.}
 
-\item{value,i,j,name}{Parameters used for subsetting and assigning new attributes to x. See Details.}
+\item{value,i,j,name}{Parameters used for subsetting and assigning new attributes to x.}
 }
-\description{
-A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
-}
-\details{
+\value{
 \itemize{
   \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData matrix.
@@ -68,6 +65,9 @@ A MatrixList object is a container for a list of matrices which have the same nu
   \item \code{x$name}: Shortcut for \code{x[['name']]}.
   \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j.
 }
+}
+\description{
+A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
 }
 \section{Slots}{
 

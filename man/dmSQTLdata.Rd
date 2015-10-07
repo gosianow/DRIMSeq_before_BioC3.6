@@ -30,9 +30,9 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 
-\item{gene_ranges}{\code{\linkS4class{GRanges}} object with gene location.}
+\item{gene_ranges}{\code{\linkS4class{GRanges}} object with gene location. It must contain gene names when calling names().}
 
-\item{snp_ranges}{\code{\linkS4class{GRanges}} object with SNP location.}
+\item{snp_ranges}{\code{\linkS4class{GRanges}} object with SNP location. It must contain SNP names when calling names().}
 
 \item{window}{Size of a down and up stream window, which is defining the surrounding for a gene. Only SNPs that are located within a gene or its surrounding are considered in the sQTL analysis.}
 }
@@ -47,6 +47,7 @@ It is quite common that sample grouping defined by some of the SNPs is identical
 }
 \examples{
 ### sQTL analysis
+ ### Create dmSQTLdata object
 
  # counts
  counts <- dataSQTL_counts[, -(1:2)]

@@ -60,7 +60,7 @@ dmDispersion(x, ...)
 
 \item{disp_adjust}{Logical. Whether to use the Cox-Reid adjusted or non-adjusted profile likelihood.}
 
-\item{disp_mode}{Optimization method used to maximize the profile likelihood. Possible values are \code{"optimize", "optim", "constrOptim", "grid"}. See Details.}
+\item{disp_mode}{Optimization method used to maximize the profile likelihood. Possible values are \code{"optimize"}, \code{"optim"}, \code{"constrOptim"}, \code{"grid"}. See Details.}
 
 \item{disp_interval}{Numeric vector of length 2 defining the interval of possible values for the dispersion.}
 
@@ -143,10 +143,16 @@ Only some of the rest of dispersion parameters in dmDispersion have an influence
 }
 \examples{
 ### Differential splicing analysis
+### Calculate dispersion
 
 d <- dataDS_dmDSdata
-d <- dmFilter(d)
-\dontrun{
+
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+\donttest{
 # If possible, increase the number of workers
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
@@ -159,6 +165,6 @@ plotDispersion(d)
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

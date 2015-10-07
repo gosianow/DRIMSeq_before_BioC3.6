@@ -13,13 +13,13 @@
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 }
-\description{
-dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
-}
-\details{
+\value{
 \itemize{
  \item \code{results(x)}: Get a data.frame with results.
 }
+}
+\description{
+dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
 }
 \section{Slots}{
 
@@ -28,10 +28,14 @@ dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null m
 
 \item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
+\examples{
+d <- dataSQTL_dmSQTLtest
+head(results(d))
+}
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotTest}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
+\code{\link{dataSQTL_dmSQTLtest}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
 }
 

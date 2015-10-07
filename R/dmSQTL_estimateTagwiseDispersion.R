@@ -6,22 +6,18 @@
 dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08,  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
-  
   cat("* Estimating genewise dispersion.. \n")
   
-  time <- system.time(
+  time <- system.time( 
     switch(
       disp_mode, 
       
       optimize={
         
         disp_list <- BiocParallel::bplapply(inds, function(g){
-          # g = 1; y = counts[[g]]; snps = genotypes[[g]]
-          
+          # g = 1
           y = counts[[g]]
           snps = genotypes[[g]]
-          # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
-          
           disp <- rep(NA, nrow(snps))
           names(disp) <- rownames(snps)
           
@@ -39,24 +35,19 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             igroups <- lapply(lgroups, function(gr){which(group == gr)})
             names(igroups) <- lgroups
             
-            ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
             gamma0 <- disp_interval[1] + (1-(sqrt(5) - 1)/2)*(disp_interval[2]-disp_interval[1])
-            
             if(is.na(dm_profileLikTagwise(gamma0 = gamma0, y = yg, ngroups = ngroups, lgroups = lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
-            next
-            
+              next
             
             optimum <- optimize(f = dm_profileLikTagwise, interval = disp_interval,
                                 y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
                                 disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
                                 maximum = TRUE, tol = disp_tol)
             
-            disp[i] <- optimum$maximum			 
+            disp[i] <- optimum$maximum       
             
           }
-          
           return(disp)  
-          
         }, BPPARAM = BPPARAM)
         
         names(disp_list) <- names(counts)
@@ -64,18 +55,12 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         
       },
       
-      
-      
-      
       optim={
         
         disp_list <- BiocParallel::bplapply(inds, function(g){
-          # g = 1; y = counts[[g]]; snps = genotypes[[g]]
-          
+          # g = 1
           y = counts[[g]]
           snps = genotypes[[g]]
-          # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
-          
           disp <- rep(NA, nrow(snps))
           names(disp) <- rownames(snps)
           
@@ -93,31 +78,27 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             igroups <- lapply(lgroups, function(gr){which(group == gr)})
             names(igroups) <- lgroups
             
-            ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
             gamma0 <- disp_init
-            
             if(is.na(dm_profileLikTagwise(gamma0 = gamma0, y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
-            next
+              next
             
-           if(disp_init_weirMoM){
-             disp_init_tmp <- dm_weirMoM(y = counts[[g]], se=FALSE)
-             if(is.na(disp_init_tmp))
-               disp_init_tmp <- disp_init
-           }else{
-             disp_init_tmp <- disp_init
-           }
+            if(disp_init_weirMoM){
+              disp_init_tmp <- dm_weirMoM(y = counts[[g]], se=FALSE)
+              if(is.na(disp_init_tmp))
+                disp_init_tmp <- disp_init
+            }else{
+              disp_init_tmp <- disp_init
+            }
             
             try( optimum <- optim(par = disp_init_tmp, fn = dm_profileLikTagwise, gr = NULL, 
                                   y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
                                   disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
                                   method = "L-BFGS-B", lower = 1e-2, upper = 1e+10, control = list(fnscale = -1, factr = disp_tol)), silent = TRUE )
             
-            disp[i] <- optimum$par			 
+            disp[i] <- optimum$par       
             
           }
-          
           return(disp)  
-          
         }, BPPARAM = BPPARAM)
         
         names(disp_list) <- names(counts)
@@ -125,17 +106,12 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         
       },
       
-      
-      
       constrOptim={
         
         disp_list <- BiocParallel::bplapply(inds, function(g){
-          # g = 1; y = counts[[g]]; snps = genotypes[[g]]
-          
+          # g = 1
           y = counts[[g]]
           snps = genotypes[[g]]
-          # snps <- snps[1:min(nrow(snps), 5), , drop = FALSE]
-          
           disp <- rep(NA, nrow(snps))
           names(disp) <- rownames(snps)
           
@@ -153,11 +129,9 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             igroups <- lapply(lgroups, function(gr){which(group == gr)})
             names(igroups) <- lgroups
             
-            ### return NA if gene has 1 exon or observations in one sample in group (anyway this gene would not be fitted by dmFit)
             gamma0 <- disp_init
-            
             if(is.na(dm_profileLikTagwise(gamma0 = gamma0, y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)))
-            next
+              next
             
             ui <- 1
             ci <- 1e-8
@@ -170,24 +144,18 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
               disp_init_tmp <- disp_init
             }
             
-            
             optimum <- constrOptim(theta = disp_init_tmp, dm_profileLikTagwise, grad = NULL, method = "Nelder-Mead", ui=ui, ci=ci, control = list(fnscale = -1, reltol = disp_tol),  y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose )
-            
-            
+
             disp[i] <- optimum$par
             
           }
-          
           return(disp)
-          
         }, BPPARAM = BPPARAM)
         
         names(disp_list) <- names(counts)
         dispersion <- disp_list
         
-        
       },
-      
       
       grid={
         
@@ -233,19 +201,16 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
               ll[i, j] <- out
               
             } # j
-            
           } # i
           
           return(ll)
           
         }, BPPARAM = BPPARAM)
         
-        
         loglik <- do.call(rbind, loglikL)
         NAs <- complete.cases(loglik)        
         
         loglik <- loglik[NAs, , drop = FALSE]
-              
         
         if(disp_moderation != "none"){
           
@@ -260,14 +225,14 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             disp_moderation, 
             
             common={
-             
-             moderation <- colMeans(loglik)
-             
-             loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
-             
-             },
-             
-             trended={
+              
+              moderation <- colMeans(loglik)
+              
+              loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
+              
+            },
+            
+            trended={
               
               mean_expression <- rep(mean_expression, width(genotypes))[NAs]
               o <- order(mean_expression)
@@ -279,32 +244,25 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
               loglik <- loglik + priorN * moderation ### like in edgeR estimateTagwiseDisp
               # loglik <- (loglik + priorN * moderation)/(1 + priorN) ### like in edgeR dispCoxReidInterpolateTagwise
               
-              
             }
-            )
+          )
           
         }
         
-        
         out <- edgeR::maximizeInterpolant(splinePts, loglik)
-        
         
         #### set NA for genes that tagwise disp could not be calculated            
         dispersion <- rep(NA, length(NAs))
         names(dispersion) <- rownames(genotypes@unlistData)
-        
         dispersion[NAs] <- disp_init * 2^out
-        
         dispersion <- relist(dispersion, genotypes@partitioning)
         
       }))
-
-
+  
   cat("Took ", time["elapsed"], " seconds.\n")
   if(verbose) cat("*** Genewise dispersion: ", head(unlist(dispersion[1:6])), "... \n")
   
   return(dispersion)
-  
 }
 
 

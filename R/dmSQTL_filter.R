@@ -6,8 +6,7 @@ NULL
 dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ########################################################
-  # filtering on counts 
-  # put NA for samples with low gene expression
+  # filtering on counts, put NA for samples with low gene expression
   ########################################################
   
   ### calculate cpm
@@ -21,13 +20,8 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   
   counts_new <- lapply(inds, function(g){
     # g = 1
-    # print(g)
     expr_cpm_gene <- counts_cpm[[g]]
     expr_gene <- counts[[g]]
-    
-    # ### no genes with one transcript
-    # if(dim(expr_gene)[1] == 1)
-    # return(NULL)
     
     ### genes with min expression
     if(! sum(colSums(expr_cpm_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
@@ -48,13 +42,9 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     #### Have to think how to order the transcripts because here I do not have the same grouping 
     # if(!max_features == Inf){
     #   if(sum(trans2keep) > max_features){
-    
     #     tr_order <- order(-rowQuantiles(-prop, min_samps_feature_prop/ncol(prop)), decreasing = TRUE)
-    
     #     trans2keep <- trans2keep[trans2keep]
-    
     #     trans2keep <- names(trans2keep[sort(tr_order[1:max_features])])
-    
     #   }
     # }
     
@@ -126,7 +116,6 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   
   blocks <- blocks[NULLs, ]
   
-  
   ########################################################
   # filtering on blocks
   ########################################################
@@ -135,14 +124,10 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   
   blocks_new <- MatrixList(lapply(inds, function(b){
     # b = 1
-    
     blocks[[b]][blocks[[b]][, "block_id"] %in% rownames(genotypes_new[[b]]), , drop = FALSE]
-    
   }))
-  
   names(blocks_new) <- names(genotypes_new)
-  
-  
+
   data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, blocks = blocks_new, samples = samples)
   
   return(data)

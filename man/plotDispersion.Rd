@@ -20,6 +20,9 @@ plotDispersion(x, ...)
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 }
+\value{
+Scatterplot of Dirichlet-multinomial gene-wise dispersion versus mean gene expression. Both variables are scaled with log10. One dot in the plot corresponds to a gene.
+}
 \description{
 Dispersion versus mean expression plot
 }
@@ -33,6 +36,6 @@ plotDispersion(d)
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+\code{\link{dataDS_dmDSdispersion}}, \code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

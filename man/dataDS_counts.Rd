@@ -5,10 +5,11 @@
 \alias{dataDS_counts}
 \alias{dataDS_dmDSdata}
 \alias{dataDS_dmDSdispersion}
+\alias{dataDS_dmDSfit}
 \alias{dataDS_dmDStest}
 \alias{dataDS_metadata}
 \alias{dataDS_status}
-\title{Data for differential splicing analysis}
+\title{Sample data for differential splicing analysis}
 \format{\code{dataDS_counts} contains exonic bin counts. A data.frame with 7 variables:
 \itemize{
   \item \code{group_id}: Exonic bin IDs.
@@ -27,7 +28,7 @@
   \item \code{status}: 1 for genes with differential splicing and 0 for genes without DS.
 }
 
-\code{dataDS_dmDSdata}, \code{dataDS_dmDSdispersion} and \code{dataDS_dmDStest} are the \code{DM} package objects created through the differential splicing analysis pipeline.}
+\code{dataDS_dmDSdata}, \code{dataDS_dmDSdispersion}, \code{dataDS_dmDSfit} and \code{dataDS_dmDStest} are \code{DM} package objects created through the differential splicing analysis pipeline. See Examples.}
 \source{
 Soneson C, Matthes KL, Nowicka M, Law CW, Robinson MD. Differential transcript usage from RNA-seq data : isoform pre-filtering improves performance of count-based methods. 2015.
 
@@ -44,10 +45,82 @@ dataDS_dmDSdata
 
 dataDS_dmDSdispersion
 
+dataDS_dmDSfit
+
 dataDS_dmDStest
 }
 \description{
 A subset (100 randomly selected genes) of exonic bin counts computed with DEXSeq package in a simulation study based on Drosophila genome. In this study data was generated to mimic an RNA-seq assay for 6 samples separated into 2 conditions (3 versus 3 samples). Differential transcript usage was induced by swapping, between the 2 conditions, the expression of two most abundant transcripts for 1000 genes. Our subset consists of 20 genes with differential splicing (status 1) and 80 without (status 0). For more details about this simulations, see the reference in Source paragraph.
+}
+\examples{
+### Differential splicing analysis
+\donttest{
+
+ ### Create dmDSdata object
+
+ head(dataDS_counts)
+ dataDS_metadata
+
+ counts <- dataDS_counts[,-1]
+ group_id <- dataDS_counts[,1]
+ group_split <- limma::strsplit2(group_id, ":")
+ gene_id <- group_split[, 1]
+ feature_id <- group_split[, 2]
+ sample_id = dataDS_metadata$sample_id
+ group = dataDS_metadata$group
+
+ d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id,
+ sample_id = sample_id, group = group)
+
+ plotData(d)
+
+ ## dataDS_dmDSdata <- d
+
+ ### Filtering
+
+ # Check what is the minimal number of replicates per condition
+ table(samples(d)$group)
+
+ d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+ plotData(d)
+
+ ### Calculate dispersion
+
+ # If possible, increase the number of workers
+ d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotDispersion(d)
+
+ ## dataDS_dmDSdispersion <- d
+
+ ### Fit full model proportions
+
+ # If possible, increase the number of workers
+ d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ ## dataDS_dmDSfit <- d
+
+ ### Fit null model proportions and test for DS
+
+ # If possible, increase the number of workers
+ d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotTest(d)
+
+ ## dataDS_dmDStest <- d
+
+ ### Plot feature proportions for top DS gene
+
+ res <- results(d)
+ res <- res[order(res$pvalue, decreasing = FALSE), ]
+
+ gene_id <- res$gene_id[1]
+
+ plotFit(d, gene_id = gene_id)
+ plotFit(d, gene_id = gene_id, plot_type = "lineplot")
+ plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
+
+}
 }
 \keyword{datasets}
 

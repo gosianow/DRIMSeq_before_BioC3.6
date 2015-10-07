@@ -193,12 +193,15 @@ dev.off()
 ### End examples
 
 
+dataDS_dmDSfit <- d
+
+use_data(dataDS_dmDSfit, overwrite = TRUE)
+
+
+
 
 ### Start examples
-d <- dataDS_dmDSdispersion
-
-# If possible, increase the number of workers
-d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dataDS_dmDSfit
 
 d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 

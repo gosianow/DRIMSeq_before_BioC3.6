@@ -7,7 +7,7 @@ NULL
 #' 
 #' dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the differential splicing analysis. Feature ratios are estimated for each gene and each condition. Result of \code{\link{dmFit}}.
 #' 
-#' @details 
+#' @return
 #' 
 #' \itemize{
 #'  \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for each condition.
@@ -19,13 +19,41 @@ NULL
 #' 
 #' @slot dispersion Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.
 #' @slot fit_full \code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the full model likelihoods are stored in \code{metadata} slot.
+#' 
+#' @examples 
+#' d <- dataDS_dmDSfit
+#' head(proportions(d))
+#' head(statistics(d))
+#' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotFit}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
+#' @seealso \code{\link{dataDS_dmDSfit}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSfit", 
          contains = "dmDSdispersion",
          representation(dispersion = "character",
                         fit_full = "MatrixList"))
 
+
+setValidity("dmDSfit", function(object){
+  # has to return TRUE when valid object!
+  
+  if(!length(object@dispersion) == 1)
+    return(paste0("'dispersion' must have length 1"))
+  
+  if(!object@dispersion %in% c("common_dispersion", "genewise_dispersion"))
+    return(paste0("'dispersion' can have values 'common_dispersion' or 'genewise_dispersion'"))
+  
+  if(!length(object@counts) == length(object@fit_full))
+    return(paste0("Different length of 'counts' and 'fit_full'"))
+  
+  if(!ncol(object@fit_full) == nlevels(object@samples$group))
+    return(paste0("Wrong number of groups in 'fit_full'"))
+  
+  if(!ncol(object@fit_full@metadata) == nlevels(object@samples$group))
+    return(paste0("Wrong number of groups in 'fit_full@metadata'"))
+
+  return(TRUE)
+  
+})
 
 ################################################################################
 
@@ -90,19 +118,28 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 #' @return Returns a \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 #' @examples 
 #' ### Differential splicing analysis 
+#' ### Fit full model proportions
 #' 
 #' d <- dataDS_dmDSdispersion
 #' 
 #' # If possible, increase the number of workers
 #' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' 
-#' plotFit(d, gene_id = names(d)[1])
 #' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
+#' @seealso \code{\link{dataDS_dmDSdispersion}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 #' @rdname dmFit
 #' @export
 setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+  
+  stopifnot(length(dispersion) == 1)
+  stopifnot(dispersion %in% c("genewise_dispersion", "common_dispersion"))
+  stopifnot(length(prop_mode) == 1)
+  stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
+  stopifnot(length(prop_tol) == 1)
+  stopifnot(is.numeric(prop_tol) && prop_tol > 0)
+  stopifnot(is.logical(verbose))
+  
   
   
   fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
@@ -118,7 +155,8 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
 
 #' Plot feature proportions
 #' 
-#' Plot the observed and estimated feature ratios.
+#' @return 
+#' Plot, per gene, the observed and estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
 #' 
 #' @param x \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} object.
 #' @param ... Other parameters that can be defined by methods using this generic.
@@ -138,8 +176,7 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' 
 #' @examples 
 #' ### Differential splicing analysis
-#' 
-#' # Plot proportions of top gene
+#' ### Plot feature proportions for top DS gene
 #' 
 #' d <- dataDS_dmDStest
 #' 
@@ -148,7 +185,7 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' 
 #' gene_id <- res$gene_id[1]
 #' 
-#' plotFit(d, gene_id = gene_id, plot_type = "barplot")
+#' plotFit(d, gene_id = gene_id)
 #' plotFit(d, gene_id = gene_id, plot_type = "lineplot")
 #' plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 #' 
@@ -158,7 +195,12 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @export
 setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
+  stopifnot(all(gene_id %in% names(x@counts)))
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
+  stopifnot(is.logical(order))
+  stopifnot(is.logical(plot_full))
+  stopifnot(is.logical(plot_main))
+  
   
   dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
   

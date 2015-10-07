@@ -29,12 +29,9 @@ samples(x, ...)
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 
-\item{i,j}{Parameters used for subsetting. See Details.}
+\item{i,j}{Parameters used for subsetting.}
 }
-\description{
-dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
-}
-\details{
+\value{
 \itemize{
  \item \code{counts(object)}: Get a data.frame with counts.
  \item \code{samples(x)}: Get a data.frame with the sample information.
@@ -43,6 +40,9 @@ dmDSdata contains expression, in counts, of genomic features such as exons or tr
   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j.
 }
 }
+\description{
+dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+}
 \section{Slots}{
 
 \describe{
@@ -50,10 +50,19 @@ dmDSdata contains expression, in counts, of genomic features such as exons or tr
 
 \item{\code{samples}}{data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
 }}
+\examples{
+d <- dataDS_dmDSdata
+head(counts(d))
+samples(d)
+head(names(d))
+length(d)
+d[1:50, ]
+d[1:50, 1:3]
+}
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
+\code{\link{dataDS_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 }
 

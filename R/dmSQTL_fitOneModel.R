@@ -40,7 +40,6 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              
              for(i in 1:n_snps){          
               # i = 29
-              print(i)
 
               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
               yg <- y[, !NAs]             

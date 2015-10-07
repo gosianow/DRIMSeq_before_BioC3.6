@@ -44,17 +44,19 @@ plotFit(x, ...)
 
 \item{plot_null}{Logical. Whether to plot the proportions estimated by the null model.}
 
-\item{compared_groups}{Numeric or character indicating comparison that should be plotted.}
+\item{compared_groups}{Numeric or character indicating comparison, defined in \code{\link{dmTest}}, that should be plotted.}
 
 \item{snp_id}{Vector of SNP IDs to be plotted. \code{snp_id} must match \code{gene_id}.}
 }
+\value{
+Plot, per gene, the observed and estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
+}
 \description{
-Plot the observed and estimated feature ratios.
+Plot feature proportions
 }
 \examples{
 ### Differential splicing analysis
-
-# Plot proportions of top gene
+### Plot feature proportions for top DS gene
 
 d <- dataDS_dmDStest
 
@@ -63,7 +65,7 @@ res <- res[order(res$pvalue, decreasing = FALSE), ]
 
 gene_id <- res$gene_id[1]
 
-plotFit(d, gene_id = gene_id, plot_type = "barplot")
+plotFit(d, gene_id = gene_id)
 plotFit(d, gene_id = gene_id, plot_type = "lineplot")
 plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 }

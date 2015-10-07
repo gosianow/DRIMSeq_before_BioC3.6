@@ -7,7 +7,7 @@ NULL
 #' 
 #' dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
 #' 
-#' @details 
+#' @return
 #' 
 #' \itemize{
 #'  \item \code{counts(object)}: Get a data.frame with counts.
@@ -18,13 +18,23 @@ NULL
 #' }
 #' 
 #' @param object,x dmDSdata object.
-#' @param i,j Parameters used for subsetting. See Details.
+#' @param i,j Parameters used for subsetting.
 #' @param ... Other parameters that can be defined by methods using this generic.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
 #' @slot samples data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
+#' 
+#' @examples 
+#' d <- dataDS_dmDSdata
+#' head(counts(d))
+#' samples(d)
+#' head(names(d))
+#' length(d)
+#' d[1:50, ]
+#' d[1:50, 1:3]
+#' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
+#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
                         samples = "data.frame"))
@@ -42,7 +52,7 @@ setValidity("dmDSdata", function(object){
   if(all(c("sample_id", "group") %in% colnames(object@samples)))
     out <- TRUE
   else
-    return(paste0("'samples' must contain 'sample_id' amd 'group' variables"))
+    return(paste0("'samples' must contain 'sample_id' and 'group' variables"))
   
   if(length(unique(object@samples$sample_id)) == nrow(object@samples))
     out <- TRUE
@@ -107,15 +117,15 @@ setMethod("[", "dmDSdata", function(x, i, j){
   
   if(missing(j)){
     
-    counts <- x@counts[i, ]
+    counts <- x@counts[i, , drop = FALSE]
     samples <- x@samples
     
   }else{
     
-    counts <- x@counts[i, j]
+    counts <- x@counts[i, j, drop = FALSE]
     samples <- x@samples
     rownames(samples) <- samples$sample_id
-    samples <- samples[j, ]
+    samples <- samples[j, , drop = FALSE]
     samples$sample_id <- factor(samples$sample_id)
     samples$group <- factor(samples$group)
     rownames(samples) <- NULL
@@ -143,6 +153,7 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  @return Returns a \linkS4class{dmDSdata} object.
 #'  @examples
 #'  ### Differential splicing analysis
+#'  ### Create dmDSdata object
 #'  
 #'  head(dataDS_counts)
 #'  dataDS_metadata
@@ -158,11 +169,9 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, 
 #'  sample_id = sample_id, group = group)
 #'  
-#'  length(d)
-#'  
 #'  plotData(d)
 #'  
-#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#'  @seealso \code{\link{dataDS_counts}}, \code{\link{dataDS_metadata}}, \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
 dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
@@ -259,21 +268,29 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @examples 
 #' ### Differential splicing analysis
-#'
-#' dd <- dataDS_dmDSdata
-#' plotData(dd)
+#' ### Filtering
 #' 
-#' d <- dmFilter(dd)
+#' d <- dataDS_dmDSdata
 #' plotData(d)
 #' 
-#' d <- dmFilter(dd, max_features = 10)
+#' # Check what is the minimal number of replicates per condition 
+#' table(samples(d)$group)
+#' 
+#' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 #' plotData(d)
 #' 
-#' @seealso \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' 
+#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
+  
+  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
+  stopifnot(min_gene_expr >= 0)
+  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= nrow(x@counts))
+  stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
+  stopifnot(max_features >= 2)
   
   data_filtered <- dmDS_filter(counts = x@counts, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features)
   
@@ -286,6 +303,7 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_
 
 #' Plot data summary
 #' 
+#' @return 
 #' Plot a histogram of the number of features per gene. Additionally, for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
 #' 
 #' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
@@ -304,7 +322,7 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' plotData(d)
 #'
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){

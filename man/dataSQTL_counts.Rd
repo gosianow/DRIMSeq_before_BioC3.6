@@ -4,9 +4,10 @@
 \name{dataSQTL_counts}
 \alias{dataSQTL_counts}
 \alias{dataSQTL_dmSQTLdata}
+\alias{dataSQTL_dmSQTLtest}
 \alias{dataSQTL_gene_ranges}
 \alias{dataSQTL_genotypes}
-\title{Data for sQTL analysis}
+\title{Sample data for sQTL analysis}
 \format{\code{dataSQTL_counts} contains transcript expected counts. A data.frame with 93 variables:
 \itemize{
   \item \code{gene_id}: Gene IDs.
@@ -28,7 +29,7 @@
 }
 
 
-\code{dataSQTL_dmSQTLdata} is a \code{DM} package object created through the sQTL analysis pipeline.}
+\code{dataSQTL_dmSQTLdata} and \code{dataSQTL_dmSQTLtest} are \code{DM} package objects created through the sQTL analysis pipeline. See Examples.}
 \source{
 Lappalainen T, Sammeth M, Friedländer MR, et al. Transcriptome and genome sequencing uncovers functional variation in humans. Nature. 2013;501(7468):506–11.
 
@@ -44,9 +45,91 @@ dataSQTL_genotypes
 dataSQTL_gene_ranges
 
 dataSQTL_dmSQTLdata
+
+dataSQTL_dmSQTLtest
 }
 \description{
 A subset of data from GEUVADIS project where 465 RNA-seq samples from lymphoblastoid cell lines were obtained. 422 of this samples were sequenced within the 1000 Genome Project Phase 1. Here, we make available a subset of bi-allelic SNPs and transcript expected counts for CEPH (CEU) population that corresponds to 50 randomly selected genes from chromosome 19.
+}
+\examples{
+### sQTL analysis
+\donttest{
+
+ ### Create dmSQTLdata object
+
+ # counts
+ counts <- dataSQTL_counts[, -(1:2)]
+ gene_id <- dataSQTL_counts[, 1]
+ feature_id <- dataSQTL_counts[, 2]
+
+ # gene_ranges
+ dataSQTL_gene_ranges
+ gene_ranges <- dataSQTL_gene_ranges
+ names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
+
+ # genotypes
+ head(dataSQTL_genotypes)
+ genotypes <- dataSQTL_genotypes[, -(1:4)]
+
+ snp_id <- dataSQTL_genotypes$snp_id
+
+ # snp_ranges with names!
+ snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr),
+   IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+ names(snp_ranges) <- dataSQTL_genotypes$snp_id
+
+ sample_id <- colnames(counts)
+
+
+ d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges,
+   genotypes, snp_id, snp_ranges, sample_id, window = 5e3,
+   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotData(d)
+
+ ## dataSQTL_dmSQTLdata <- d
+
+ ### Filtering
+
+ # If possible, increase the number of workers
+ d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5,
+   minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+ plotData(d)
+
+ ### Calculate dispersion
+
+ # If possible, increase the number of workers
+ d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotDispersion(d)
+
+ ### Fit full model proportions
+
+ # If possible, increase the number of workers
+ d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ ### Fit null model proportions and test for sQTLs
+
+ # If possible, increase the number of workers
+ d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+ plotTest(d)
+
+ ## dataSQTL_dmSQTLtest <- d
+
+ ### Plot feature proportions for top sQTL
+
+ res <- results(d)
+ res <- res[order(res$pvalue, decreasing = FALSE), ]
+
+ gene_id <- res$gene_id[1]
+ snp_id <- res$snp_id[1]
+
+ plotFit(d, gene_id, snp_id)
+ plotFit(d, gene_id, snp_id, plot_type = "boxplot2", order = FALSE)
+ plotFit(d, gene_id, snp_id, plot_type = "ribbonplot")
+
+}
 }
 \keyword{datasets}
 
