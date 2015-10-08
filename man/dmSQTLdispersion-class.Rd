@@ -5,7 +5,7 @@
 \alias{dmSQTLdispersion-class}
 \title{dmSQTLdispersion object}
 \description{
-dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) ratios for each gene-SNP pair in the sQTL analysis. Result of \code{\link{dmDispersion}}.
+dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) counts for each gene-SNP pair in the sQTL analysis. Result of \code{\link{dmDispersion}}.
 }
 \section{Slots}{
 

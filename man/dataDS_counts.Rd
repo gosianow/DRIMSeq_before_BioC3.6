@@ -10,19 +10,19 @@
 \alias{dataDS_metadata}
 \alias{dataDS_status}
 \title{Sample data for differential splicing analysis}
-\format{\code{dataDS_counts} contains exonic bin counts. A data.frame with 7 variables:
+\format{\code{dataDS_counts} contains exonic bin counts. A data frame with 7 variables:
 \itemize{
-  \item \code{group_id}: Exonic bin IDs.
+  \item \code{group_id}: Exonic bin IDs, which contain gene IDs and bin numbers separated with ':'.
   \item \code{sample_1, sample_2, ...}: Quantification of the exonic bins in 6 samples.
   }
 
-\code{dataDS_metadata} describes the samples. A data.frame with 2 variables:
+\code{dataDS_metadata} describes the samples. A data frame with 2 variables:
 \itemize{
   \item \code{sample_id}: Sample IDs.
   \item \code{group}: Grouping into two conditions.
 }
 
-\code{dataDS_status} contains the information about the differential splicing status of genes. A data.frame with 2 variables:
+\code{dataDS_status} contains the information about the differential splicing status of genes. A data frame with 2 variables:
 \itemize{
   \item \code{gene_id}: Gene IDs.
   \item \code{status}: 1 for genes with differential splicing and 0 for genes without DS.
@@ -50,7 +50,7 @@ dataDS_dmDSfit
 dataDS_dmDStest
 }
 \description{
-A subset (100 randomly selected genes) of exonic bin counts computed with DEXSeq package in a simulation study based on Drosophila genome. In this study data was generated to mimic an RNA-seq assay for 6 samples separated into 2 conditions (3 versus 3 samples). Differential transcript usage was induced by swapping, between the 2 conditions, the expression of two most abundant transcripts for 1000 genes. Our subset consists of 20 genes with differential splicing (status 1) and 80 without (status 0). For more details about this simulations, see the reference in Source paragraph.
+A subset (100 randomly selected genes) of exonic bin counts computed with DEXSeq package in a simulation study based on Drosophila genome. In this study, data was generated to mimic an RNA-seq assay for 6 samples separated into 2 conditions (3 versus 3 samples). Differential transcript usage was induced for 1000 genes by swapping, between the 2 conditions, the expression of two most abundant transcripts. Our subset consists of 20 genes with differential splicing (status 1) and 80 without (status 0). For more details about this simulations, see the reference in Source paragraph.
 }
 \examples{
 ### Differential splicing analysis
@@ -58,19 +58,16 @@ A subset (100 randomly selected genes) of exonic bin counts computed with DEXSeq
 
  ### Create dmDSdata object
 
+ # counts
  head(dataDS_counts)
- dataDS_metadata
+ # metadata
+ head(dataDS_metadata)
 
- counts <- dataDS_counts[,-1]
- group_id <- dataDS_counts[,1]
- group_split <- limma::strsplit2(group_id, ":")
- gene_id <- group_split[, 1]
- feature_id <- group_split[, 2]
- sample_id = dataDS_metadata$sample_id
- group = dataDS_metadata$group
+ group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
 
- d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id,
- sample_id = sample_id, group = group)
+ d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1],
+   feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id,
+   group = dataDS_metadata$group)
 
  plotData(d)
 

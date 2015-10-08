@@ -105,7 +105,7 @@ dataSQTL_counts <- data.frame(gene_id = gene_id, transcript_id = feature_id, cou
 tools::showNonASCII(colnames(dataSQTL_counts))
 
 for(i in 1:ncol(dataSQTL_counts))
-print(tools::showNonASCII(dataSQTL_counts[, i]))
+  print(tools::showNonASCII(dataSQTL_counts[, i]))
 
 
 use_data(dataSQTL_counts, overwrite = TRUE)
@@ -132,35 +132,36 @@ use_data(dataSQTL_genotypes, overwrite = TRUE)
 ### Use the basic components to create dmSQTLdata object
 ########################################################
 
+
+
 ### Create dmSQTLdata object
 
 # counts
 head(dataSQTL_counts)
-
-counts <- dataSQTL_counts[, -(1:2)]
-gene_id <- dataSQTL_counts[, 1]
-feature_id <- dataSQTL_counts[, 2]
-
 # gene_ranges
 dataSQTL_gene_ranges
+# genotypes 
+head(dataSQTL_genotypes)
+
+# gene_ranges with names!
 gene_ranges <- dataSQTL_gene_ranges
 names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
 
-# genotypes
-head(dataSQTL_genotypes)
-genotypes <- dataSQTL_genotypes[, -(1:4)]
-
-snp_id <- dataSQTL_genotypes$snp_id
-
 # snp_ranges with names!
-snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
-names(snp_ranges) <- dataSQTL_genotypes$snp_id
+snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
+                                     IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+names(snp_ranges) <- dataSQTL_genotypes$snp_id 
 
-sample_id <- colnames(counts)
+## Check if samples in count and genotypes are in the same order
+all(colnames(dataSQTL_counts[, -(1:2)]) == colnames(dataSQTL_genotypes[, -(1:4)]))
+sample_id <- colnames(dataSQTL_counts[, -(1:2)])
 
-
-
-d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dmSQTLdataFromRanges(counts = dataSQTL_counts[, -(1:2)], 
+                          gene_id = dataSQTL_counts$gene_id, feature_id = dataSQTL_counts$transcript_id, 
+                          gene_ranges = gene_ranges, genotypes = dataSQTL_genotypes[, -(1:4)], 
+                          snp_id = dataSQTL_genotypes$snp_id, snp_ranges = snp_ranges, 
+                          sample_id = sample_id, window = 5e3, 
+                          BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 plotData(d)
 

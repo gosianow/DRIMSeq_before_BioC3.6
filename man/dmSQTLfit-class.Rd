@@ -5,7 +5,7 @@
 \alias{dmSQTLfit-class}
 \title{dmSQTLfit object}
 \description{
-dmSQTLfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the sQTL analysis. Feature ratios are estimated for each gene and each group that is defined by different SNPs/blocks. Result of dmFit.
+dmSQTLfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full model Dirichlet-multinomial feature proportion estimates needed for the sQTL analysis. Feature ratios are estimated for each gene and each group that is defined by different SNPs/blocks. Result of \code{\link{dmFit}}.
 }
 \section{Slots}{
 

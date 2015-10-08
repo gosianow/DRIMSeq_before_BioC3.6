@@ -33,8 +33,8 @@ samples(x, ...)
 }
 \value{
 \itemize{
- \item \code{counts(object)}: Get a data.frame with counts.
- \item \code{samples(x)}: Get a data.frame with the sample information.
+ \item \code{counts(object)}: Get a data frame with counts.
+ \item \code{samples(x)}: Get a data frame with the sample information.
   \item \code{names(x)}: Get the gene names.
   \item \code{length(x)}: Get the number of genes.
   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j.
@@ -48,7 +48,7 @@ dmDSdata contains expression, in counts, of genomic features such as exons or tr
 \describe{
 \item{\code{counts}}{\code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.}
 
-\item{\code{samples}}{data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
+\item{\code{samples}}{Data frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
 }}
 \examples{
 d <- dataDS_dmDSdata

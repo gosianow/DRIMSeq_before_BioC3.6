@@ -15,18 +15,18 @@
 }
 \value{
 \itemize{
- \item \code{results(x)}: Get a data.frame with results.
+ \item \code{results(x)}: Get a data frame with results. See Slots.
 }
 }
 \description{
-dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
+dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Proportions are calculated for each gene-block pair from pooled (no grouping into conditions) counts. Result of \code{\link{dmTest}}.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.}
 
-\item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
+\item{\code{results}}{Data frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
 }}
 \examples{
 d <- dataSQTL_dmSQTLtest

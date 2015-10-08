@@ -22,7 +22,7 @@ dmTest(x, ...)
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 
-\item{compared_groups}{Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vectors should be levels or numbers of the levels of \code{samples(x)$group}.}
+\item{compared_groups}{Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in these vectors should indicate levels or numbers of the levels in \code{samples(x)$group}.}
 
 \item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.}
 
@@ -36,7 +36,7 @@ dmTest(x, ...)
 Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 }
 \description{
-First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled data. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
+First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled (no grouping into conditions) counts. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 }
 \examples{
 ### Differential splicing analysis

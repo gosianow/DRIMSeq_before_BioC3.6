@@ -4,24 +4,13 @@
 \name{dmDispersion}
 \alias{dmDispersion}
 \alias{dmDispersion,dmDSdata-method}
-\alias{dmDispersion,dmDSdispersion-method}
 \alias{dmDispersion,dmSQTLdata-method}
-\alias{dmDispersion,dmSQTLdispersion-method}
 \title{Estimate dispersions in Dirichlet-multinomial model}
 \usage{
 dmDispersion(x, ...)
 
 \S4method{dmDispersion}{dmDSdata}(x, mean_expression = TRUE,
   common_dispersion = TRUE, genewise_dispersion = TRUE,
-  disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
-  disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
-  disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-
-\S4method{dmDispersion}{dmDSdispersion}(x, mean_expression = FALSE,
-  common_dispersion = FALSE, genewise_dispersion = TRUE,
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
@@ -37,18 +26,9 @@ dmDispersion(x, ...)
   disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
-
-\S4method{dmDispersion}{dmSQTLdispersion}(x, mean_expression = FALSE,
-  common_dispersion = FALSE, genewise_dispersion = TRUE,
-  disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 10000),
-  disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
-  disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1), speed = TRUE)
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmDSdispersion}} object of counts.}
+\item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.}
 
 \item{...}{Other parameters that can be defined by methods using this generic.}
 
@@ -97,9 +77,9 @@ Returns a \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdisper
 Maximum likelihood estimates of dispersion parameters in Dirichlet-multinomial model used in differential splicing or sQTL analysis.
 }
 \details{
-Parameters that are directly used in the dispersion estimation start with prefix \code{disp_}, and the one that are used directly for the proportion estimation start with \code{prop_}.
+Parameters that are used in the dispersion estimation start with prefix \code{disp_}, and those that are used for the proportion estimation start with \code{prop_}.
 
-There are 4 optimization methods implemented within dmDispersion, i.e., \code{"optimize"}, \code{"optim"}, \code{"constrOptim"} and \code{"grid"}, that can be used to estimate the gene-wise dispersion. Common dispersion is estimated with \code{"optimize"}.
+There are 4 optimization methods implemented within dmDispersion (\code{"optimize"}, \code{"optim"}, \code{"constrOptim"} and \code{"grid"}) that can be used to estimate the gene-wise dispersion. Common dispersion is estimated with \code{"optimize"}.
 
 Arguments that are used by all the methods are:
 
@@ -109,7 +89,7 @@ Arguments that are used by all the methods are:
   \item \code{prop_tol}: The accuracy for proportions estimation defined as \code{reltol} in \code{\link{constrOptim}}.
 }
 
-Only some of the rest of dispersion parameters in dmDispersion have an influence on the output for a given \code{disp_mode}:
+Only some of the rest of dispersion parameters in dmDispersion have an influence on the output for a given \code{disp_mode}. Here is a list of such active parameters for different modes:
 
 \code{"optimize"}, which uses \code{\link{optimize}} to maximize the profile likelihood.
 

@@ -1,8 +1,10 @@
 #' @include class_MatrixList.R
 NULL
 
+################################################################################
+### dmDSdata class
+################################################################################
 
-##############################################################
 #' dmDSdata object
 #' 
 #' dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
@@ -10,8 +12,8 @@ NULL
 #' @return
 #' 
 #' \itemize{
-#'  \item \code{counts(object)}: Get a data.frame with counts.
-#'  \item \code{samples(x)}: Get a data.frame with the sample information.
+#'  \item \code{counts(object)}: Get a data frame with counts.
+#'  \item \code{samples(x)}: Get a data frame with the sample information.
 #'   \item \code{names(x)}: Get the gene names.
 #'   \item \code{length(x)}: Get the number of genes.
 #'   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j. 
@@ -22,7 +24,7 @@ NULL
 #' @param ... Other parameters that can be defined by methods using this generic.
 #' 
 #' @slot counts \code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.
-#' @slot samples data.frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
+#' @slot samples Data frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
 #' 
 #' @examples 
 #' d <- dataDS_dmDSdata
@@ -40,31 +42,29 @@ setClass("dmDSdata",
                         samples = "data.frame"))
 
 
+###############################
+
 
 setValidity("dmDSdata", function(object){
   # has to return TRUE when valid object!
   
-  if(ncol(object@counts) == nrow(object@samples))
-    out <- TRUE
-  else 
+  if(!ncol(object@counts) == nrow(object@samples))
     return(paste0("Unequal number of samples in 'counts' and 'samples' ", ncol(object@counts), " and ", nrow(object@samples)))
   
-  if(all(c("sample_id", "group") %in% colnames(object@samples)))
-    out <- TRUE
-  else
+  if(!all(c("sample_id", "group") %in% colnames(object@samples)))
     return(paste0("'samples' must contain 'sample_id' and 'group' variables"))
   
-  if(length(unique(object@samples$sample_id)) == nrow(object@samples))
-    out <- TRUE
-  else
+  if(!length(unique(object@samples$sample_id)) == nrow(object@samples))
     return("There must be a unique 'sample_id' for each sample")
   
-  return(out)
+  return(TRUE)
   
 })
 
 
-##############################################################
+################################################################################
+### show, accessing and subsetting methods
+################################################################################
 
 
 #' @rdname dmDSdata-class
@@ -87,7 +87,7 @@ setMethod("samples", "dmDSdata", function(x) x@samples )
 
 
 
-##############################################################
+################################
 
 setMethod("show", "dmDSdata", function(object){
   
@@ -99,7 +99,7 @@ setMethod("show", "dmDSdata", function(object){
   
 })
 
-##############################################################
+################################
 
 #' @rdname dmDSdata-class
 #' @export
@@ -137,14 +137,15 @@ setMethod("[", "dmDSdata", function(x, i, j){
 })
 
 
-
-##############################################################
+################################################################################
+### dmDSdata
+################################################################################
 
 #'  Create dmDSdata object
 #'  
 #'  Constructor function for a \code{\linkS4class{dmDSdata}} object. 
 #'  
-#'  @param counts Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+#'  @param counts Numeric matrix or data frame of counts. Rows represent features, for example, exons,
 #'    exonic bins or transcripts. Columns represent samples.
 #'  @param gene_id Vector of gene IDs corresponding to \code{counts}.
 #'  @param feature_id Vector of feature IDs corresponding to \code{counts}.
@@ -154,20 +155,17 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  @examples
 #'  ### Differential splicing analysis
 #'  ### Create dmDSdata object
-#'  
+#' 
+#'  # counts
 #'  head(dataDS_counts)
-#'  dataDS_metadata
+#'  # metadata
+#'  head(dataDS_metadata)
 #'  
-#'  counts <- dataDS_counts[,-1]
-#'  group_id <- dataDS_counts[,1]
-#'  group_split <- limma::strsplit2(group_id, ":")
-#'  gene_id <- group_split[, 1]
-#'  feature_id <- group_split[, 2]
-#'  sample_id = dataDS_metadata$sample_id
-#'  group = dataDS_metadata$group
+#'  group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
 #'  
-#'  d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, 
-#'  sample_id = sample_id, group = group)
+#'  d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1], 
+#'    feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id, 
+#'    group = dataDS_metadata$group)
 #'  
 #'  plotData(d)
 #'  
@@ -237,11 +235,15 @@ dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
 }
 
 
-##############################################################
+################################################################################
+### dmFilter
+################################################################################
+
+
 
 #' Filtering
 #' 
-#' Filtering of genes and features with too low expression. Additionally, for the dmSQTLdata object, filtering of genotypes with too low frequency.
+#' Filtering of genes and features with low expression. Additionally, for the dmSQTLdata object, filtering of genotypes with low frequency.
 #' 
 #' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @param ... Other parameters that can be defined by methods using this generic.
@@ -250,12 +252,12 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
 
 
-##############################################################
+################################
 
 #' @details 
 #' Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
 #' 
-#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the mininal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
+#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
 #' 
 #' @param min_samps_gene_expr Minimal number of samples where genes should 
 #'   be expressed. See Details.
@@ -299,7 +301,11 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_
   
 })
 
-##############################################################
+
+################################################################################
+### plotData
+################################################################################
+
 
 #' Plot data summary
 #' 
@@ -312,7 +318,7 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_
 setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 
-##############################################################
+#################################
 
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
 #' @examples 

@@ -24,8 +24,8 @@ statistics(x, ...)
 }
 \value{
 \itemize{
- \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for each condition.
- \item \code{statistics(x)}: Get a data.frame with maximum log-likelihoods for each condition.
+ \item \code{proportions(x)}: Get a data frame with estimated feature ratios for each condition.
+ \item \code{statistics(x)}: Get a data frame with maximum log-likelihoods for each condition.
 }
 }
 \description{

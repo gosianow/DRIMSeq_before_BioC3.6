@@ -2,22 +2,24 @@
 NULL
 
 ################################################################################
+### dmSQTLtest class
+################################################################################
 
 #' dmSQTLtest object
 #' 
-#' dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Result of \code{\link{dmTest}}.
+#' dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for sQTLs. Proportions are calculated for each gene-block pair from pooled (no grouping into conditions) counts. Result of \code{\link{dmTest}}.
 #' 
 #' @return
 #' 
 #' \itemize{
-#'  \item \code{results(x)}: Get a data.frame with results.
+#'  \item \code{results(x)}: Get a data frame with results. See Slots.
 #' }
 #' 
 #' @param x dmSQTLtest object.
 #' @param ... Other parameters that can be defined by methods using this generic.
 #' 
 #' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.
-#' @slot results data.frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @slot results Data frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' 
 #' @examples 
 #' d <- dataSQTL_dmSQTLtest
@@ -28,7 +30,10 @@ NULL
 setClass("dmSQTLtest", 
          contains = "dmSQTLfit",
          representation(fit_null = "list",
-          results = "data.frame"))
+                        results = "data.frame"))
+
+
+#####################################
 
 
 setValidity("dmSQTLtest", function(object){
@@ -48,7 +53,10 @@ setValidity("dmSQTLtest", function(object){
 })
 
 
-##############################################################
+################################################################################
+### show and accessing methods
+################################################################################
+
 
 #' @rdname dmSQTLtest-class
 #' @export
@@ -56,7 +64,7 @@ setMethod("results", "dmSQTLtest", function(x) x@results )
 
 
 
-################################################################################
+#################################
 
 setMethod("show", "dmSQTLtest", function(object){
   
@@ -68,7 +76,9 @@ setMethod("show", "dmSQTLtest", function(object){
 
 
 ################################################################################
-# prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
+### dmTest
+################################################################################
+
 
 #' @rdname dmTest
 #' @export
@@ -80,14 +90,10 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(is.logical(verbose))
   
-  
   fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
   results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, BPPARAM = BPPARAM)
-  
   colnames(results)[colnames(results) == "snp_id"] <- "block_id" 
-  
-  
   results_spl <- split(results, factor(results$gene_id, levels = names(x@blocks)))
   
   inds <- 1:length(results_spl)
@@ -97,18 +103,15 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
     
     res <- results_spl[[i]]
     blo <- x@blocks[[i]]
-    
     matching <- match(blo[, "block_id"], res[, "block_id"])
     snp_id <- blo[, "snp_id"]
-    
     res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue")])
     
     return(res_new)
-
-    })
+    
+  })
   
   results_new <- do.call(rbind, results_new)
-  
   
   return(new("dmSQTLtest", fit_null = fit_null, results = results_new, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
   
@@ -116,6 +119,8 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
 })
 
 
+################################################################################
+### plotTest
 ################################################################################
 
 #' @rdname plotTest
@@ -127,7 +132,8 @@ setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
 })
 
 
-
+################################################################################
+### plotFit
 ################################################################################
 
 #' @rdname plotFit
@@ -155,46 +161,6 @@ setMethod("plotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "box
   
   
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

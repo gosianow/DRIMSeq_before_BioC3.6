@@ -2,17 +2,19 @@
 NULL
 
 ################################################################################
+### dmDStest class
+################################################################################
 
 #' dmDStest object
 #' 
-#' dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Result of \code{\link{dmTest}}.
+#' dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Proportions are calculated for each gene from pooled (no grouping into conditions) counts. Result of \code{\link{dmTest}}.
 #' 
 #' @return 
 #' 
 #' \itemize{
-#'  \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
-#'  \item \code{statistics(x)}: Get a data.frame with full and null log-likelihoods and degrees of freedom.
-#'  \item \code{results(x)}: Get a data.frame with results.
+#'  \item \code{proportions(x)}: Get a data frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
+#'  \item \code{statistics(x)}: Get a data frame with full and null log-likelihoods and degrees of freedom.
+#'  \item \code{results(x)}: Get a data frame with results. See Slots.
 #' }
 #' 
 #' @param x dmDStest object.
@@ -20,7 +22,7 @@ NULL
 #' 
 #' @slot compared_groups List of vectors specifying which group comparisons are performed.
 #' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.
-#' @slot results data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for each comparison specified in \code{compared_groups}.
+#' @slot results Data frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for each comparison specified in \code{compared_groups}.
 #' 
 #' @examples 
 #' d <- dataDS_dmDStest
@@ -36,6 +38,9 @@ setClass("dmDStest",
          representation(compared_groups = "list",
                         fit_null = "list",
                         results = "data.frame"))
+
+
+##################################
 
 
 setValidity("dmDStest", function(object){
@@ -57,7 +62,9 @@ setValidity("dmDStest", function(object){
   
 })
 
-##############################################################
+################################################################################
+### accessing methods
+################################################################################
 
 #' @rdname dmDStest-class
 #' @export
@@ -86,6 +93,7 @@ setMethod("proportions", "dmDStest", function(x){
   
 })
 
+###################################
 
 #' @rdname dmDStest-class
 #' @export
@@ -119,7 +127,7 @@ setMethod("statistics", "dmDStest", function(x){
   
 })
 
-
+###################################
 
 #' @rdname dmDStest-class
 #' @export
@@ -131,7 +139,7 @@ setMethod("results", "dmDStest", function(x) x@results )
 
 
 
-################################################################################
+###################################
 
 setMethod("show", "dmDStest", function(object){
   
@@ -142,10 +150,12 @@ setMethod("show", "dmDStest", function(object){
 })
 
 ################################################################################
+### dmTest
+################################################################################
 
 #' Likelihood ratio test
 #' 
-#' First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled data. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
+#' First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled (no grouping into conditions) counts. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 #' 
 #' @param x \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 #' @param ... Other parameters that can be defined by methods using this generic.
@@ -153,11 +163,11 @@ setMethod("show", "dmDStest", function(object){
 setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
 
-################################################################################
+##################################
 
 
 #' @inheritParams dmFit
-#' @param compared_groups Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vectors should be levels or numbers of the levels of \code{samples(x)$group}.
+#' @param compared_groups Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in these vectors should indicate levels or numbers of the levels in \code{samples(x)$group}.
 #' 
 #' @return Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @examples 
@@ -209,9 +219,7 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x
         stop(paste0("Levels in comparison ", i, " do not match groups defined in samples"))
       
     }
-    
     }
-  
   
   nc <- length(compared_groups)
   
@@ -267,6 +275,8 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x
 
 
 ################################################################################
+### plotTest
+################################################################################
 
 #' Plot p-values distribution
 #' 
@@ -279,7 +289,7 @@ setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 
 
 
-################################################################################
+####################################
 
 #' @inheritParams plotData
 #' @examples
@@ -302,7 +312,8 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
 })
 
 
-
+################################################################################
+### plotFit
 ################################################################################
 
 #' @param compared_groups Numeric or character indicating comparison, defined in \code{\link{dmTest}}, that should be plotted.

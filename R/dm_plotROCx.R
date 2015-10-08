@@ -1,14 +1,16 @@
-
-
 #' ROC plot
 #' 
-#' @param results List of data.frames with results for different methods. Each data.frame should contain \code{gene_id}, \code{pvalue} and \code{adj_pvalue} columns. Otherwise NAs are returned.
-#' @param status Data.frame with truth. It must have \code{gene_id} and \code{status} columns, where \code{status} can take values of 0 and 1 (or FALSE, TRUE).
-#' @return 
-#' calculateROCx returns a list where each element contains a data.frame ROC with TPR and FPR and a data.frame X with TPR and FPR calculated when the FDR is lower than 0.05. 
+#' Creates ROC curves for a list of result data frames.
 #' 
-#'  @seealso \code{\link{plotTPRFDR}}, \code{\link{plotVenn}}
+#' @param results List of data frames with results from different methods. Each data frame should contain \code{gene_id}, \code{pvalue} and \code{adj_pvalue} columns. Otherwise NAs are returned.
+#' @param status Data frame with truth. It must have \code{gene_id} and \code{status} columns, where \code{status} can take values of 0 and 1 (or FALSE, TRUE).
+#' @return 
+#' \code{calculateROCx} returns a list where each element contains a data frame ROC with TPR and FPR and a data frame X with TPR and FPR calculated when the estimated FDR is lower than 0.05. 
+#' 
+#' \code{plotROCx} returns a plot with ROC curves. Additionally, on each curve, the TPR for the estimated FDR lower than 0.05 is marked with X.
+#' 
 #'  @author Malgorzata Nowicka
+#'  @name plotROCx
 #'  @export
 calculateROCx <- function(results, status){
   
@@ -69,7 +71,7 @@ calculateROCx <- function(results, status){
 ################################################################################
 
 #' @param data_ROCx List structured like the output of \code{calculateROCx}.
-#' @param metadata Data.frame where each row corresponds to one element of \code{data_ROCx} list. Columns describe the origin of this results, for example, which method was used to obtain them.
+#' @param metadata Data frame where each row corresponds to one element of \code{data_ROCx} list. Columns describe the origin of this results, for example, which method was used to obtain them.
 #' @param plot_var Name of one of the variables in \code{metadata} that indicates which results should be displayed in a single panel. 
 #' @param facet_var Vector of one or two variables in \code{metadata} which indicates how the results should be splitted into different panels. If \code{NULL}, no splitting is done.
 #' @param plot_colors Vector of colors corresponding to the levels of variables indicated by \code{plot_var}. If \code{NULL}, default colors are used. 
@@ -78,19 +80,19 @@ calculateROCx <- function(results, status){
 #' @examples 
 #' 
 #' status <- dataDS_status
-#' 
 #' d <- dataDS_dmDStest
+#' 
 #' results <- list()
 #' results[[1]] <- results(d)
-#' 
 #' metadata <- data.frame(method = "DM")
 #' 
 #' data_ROCx <- calculateROCx(results, status)
 #' 
 #' plotROCx(data_ROCx, metadata, plot_var = "method", facet_var = NULL, 
-#' plot_colors = NULL, xylim_one = TRUE)
+#'    plot_colors = NULL, xylim_one = TRUE)
 #' 
-#' @rdname calculateROCx
+#' @seealso \code{\link{dataDS_status}}, \code{\link{dataDS_dmDStest}}, \code{\link{plotTPRFDR}}, \code{\link{plotVenn}}
+#' @rdname plotROCx
 #' @export
 plotROCx <- function(data_ROCx, metadata, plot_var, facet_var = NULL, plot_colors = NULL, xylim_one = FALSE){
   
@@ -129,8 +131,7 @@ plotROCx <- function(data_ROCx, metadata, plot_var, facet_var = NULL, plot_color
   
   X <- do.call(rbind, Xlist)
   ROC <- do.call(rbind, ROClist)
-  
-  
+
   ggp <- ggplot(data = ROC, aes_string(x = "FPR", y = "TPR", group = plot_var, colour = plot_var)) +
     theme_bw() +
     geom_line(size = 1.5, na.rm=TRUE) +
@@ -149,13 +150,7 @@ plotROCx <- function(data_ROCx, metadata, plot_var, facet_var = NULL, plot_color
   if(length(facet_var) == 2)
     ggp <- ggp + facet_grid(reformulate(facet_var[1], facet_var[2]))
   
-  
-  # pdf("./ROC.pdf")
-  
   print(ggp)
-  
-  # dev.off()
-  
   
 }
 

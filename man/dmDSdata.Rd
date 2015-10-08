@@ -7,7 +7,7 @@
 dmDSdata(counts, gene_id, feature_id, sample_id, group)
 }
 \arguments{
-\item{counts}{Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+\item{counts}{Numeric matrix or data frame of counts. Rows represent features, for example, exons,
   exonic bins or transcripts. Columns represent samples.}
 
 \item{gene_id}{Vector of gene IDs corresponding to \code{counts}.}
@@ -28,19 +28,16 @@ Constructor function for a \code{\linkS4class{dmDSdata}} object.
 ### Differential splicing analysis
  ### Create dmDSdata object
 
+ # counts
  head(dataDS_counts)
- dataDS_metadata
+ # metadata
+ head(dataDS_metadata)
 
- counts <- dataDS_counts[,-1]
- group_id <- dataDS_counts[,1]
- group_split <- limma::strsplit2(group_id, ":")
- gene_id <- group_split[, 1]
- feature_id <- group_split[, 2]
- sample_id = dataDS_metadata$sample_id
- group = dataDS_metadata$group
+ group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
 
- d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id,
- sample_id = sample_id, group = group)
+ d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1],
+   feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id,
+   group = dataDS_metadata$group)
 
  plotData(d)
 }

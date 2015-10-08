@@ -102,18 +102,13 @@ use_data(dataDS_counts, dataDS_metadata, dataDS_status, overwrite = TRUE)
 
 
 
-
 ### Start examples
-counts <- as.matrix(dataDS_counts[,-1])
-group_id <- dataDS_counts[,1]
-group_split <- limma::strsplit2(group_id, ":")
-gene_id <- group_split[, 1]
-feature_id <- group_split[, 2]
-sample_id = dataDS_metadata$sample_id
-group = dataDS_metadata$group
+head(dataDS_counts)
+head(dataDS_metadata)
 
+group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
 
-d <- dmDSdata(counts = counts, gene_id = gene_id, feature_id = feature_id, sample_id = sample_id, group = group)
+d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1], feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id, group = dataDS_metadata$group)
 
 plotData(d)
 dev.off()
@@ -124,8 +119,6 @@ dev.off()
 dataDS_dmDSdata <- d
 
 use_data(dataDS_dmDSdata, overwrite = TRUE)
-
-
 
 
 ### Start examples

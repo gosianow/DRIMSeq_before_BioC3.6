@@ -1,22 +1,24 @@
 #' @include class_show_utils.R
 NULL
 
-##############################################################
+################################################################################
+### MatrixList class
+################################################################################
 
 #' MatrixList object
 #' 
-#' A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in 'metadata' matrix.
+#' A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in \code{metadata} matrix.
 #' 
 #' @return  
 #' 
 #' \itemize{
 #'   \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
-#'   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData matrix.
+#'   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData slot.
 #'   \item \code{length(x)}: Get the number of matrices in a list.
 #'   \item \code{width(x)}: Get the number of rows of each of the matrices.
-#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the dimensions, number of rows or number of columns of unlistData matrix.
+#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the dimensions, number of rows or number of columns of unlistData slot.
 #'   \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
-#'   \item \code{x$name}: Shortcut for \code{x[['name']]}.
+#'   \item \code{x$name}: Shortcut for \code{x[["name"]]}.
 #'   \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j. 
 #' }
 #' 
@@ -35,6 +37,7 @@ setClass("MatrixList",
                         metadata = "matrix"))
 
 
+###################################
 
 setValidity("MatrixList", function(object){
   # has to return TRUE when valid object!
@@ -60,7 +63,9 @@ setValidity("MatrixList", function(object){
 })
 
 
-##############################################################
+################################################################################
+### MatrixList
+################################################################################
 
 MatrixList <- function(..., metadata){
   
@@ -101,7 +106,9 @@ MatrixList <- function(..., metadata){
 }
 
 
-##############################################################
+################################################################################
+### show method
+################################################################################
 
 
 setMethod("show", "MatrixList", function(object){
@@ -149,7 +156,9 @@ setMethod("show", "MatrixList", function(object){
 })
 
 
-##############################################################
+################################################################################
+### accessing methods
+################################################################################
 
 
 #' @rdname MatrixList-class
@@ -249,6 +258,11 @@ setMethod("ncol", "MatrixList", function(x){
 })
 
 
+################################################################################
+### subsetting methods
+################################################################################
+
+
 #' @aliases [[,MatrixList-method
 #' @rdname MatrixList-class
 #' @export
@@ -271,7 +285,7 @@ setMethod("$", "MatrixList", function(x, name){
 })
 
 
-##############################################################
+################################
 
 #' @aliases [,MatrixList-method
 #' @rdname MatrixList-class

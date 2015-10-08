@@ -1,13 +1,16 @@
-
 #' Venn diagram
+#' 
+#' Venn diagram overlaps for a list of result data frames.
 #'  
-#' @inheritParams calculateROCx
+#' @inheritParams plotROCx
 #' @param threshold Threshold for the FDR.
 #' @return 
-#' calculateVenn returns a list of vectors with names of the genes that are significant \code{adj_pvalue < threshold}. If status is not \code{NULL}, the last element of the output is a list of genes with status equal 1.
+#' \code{calculateVenn} returns a list of vectors with names of the genes that are significant \code{adj_pvalue < threshold} for different methods. If status is not \code{NULL}, the last element of the output is a list of genes with status equal 1.
 #' 
-#' @seealso \code{\link{plotROCx}}, \code{\link{plotTPRFDR}}
+#' \code{plotVenn} returns a venn diagram overlaps of significant genes for different methods. \code{plotVenn} is a wrapper function that uses \code{\link[VennDiagram]{venn.diagram}} for plotting.
+#' 
 #'  @author Malgorzata Nowicka
+#'  @name plotVenn
 #' @export
 calculateVenn <- function(results, status = NULL, threshold = 0.05){
   
@@ -48,19 +51,19 @@ calculateVenn <- function(results, status = NULL, threshold = 0.05){
 #' @examples 
 #' 
 #' status <- dataDS_status
-#' 
 #' d <- dataDS_dmDStest
+#' 
 #' results <- list()
 #' results[[1]] <- results(d)
-#' 
 #' metadata <- data.frame(method = "DM")
 #' 
 #' data_venn <- calculateVenn(results, status = status, threshold = 0.05)
 #' 
 #' plotVenn(data_venn, plot_results = 1, metadata, plot_var = "method", 
-#' plot_colors = NULL, plot_status = TRUE)
+#'    plot_colors = NULL, plot_status = TRUE)
 #' 
-#' @rdname calculateVenn
+#' @seealso \code{\link{dataDS_status}}, \code{\link{dataDS_dmDStest}}, \code{\link{plotROCx}}, \code{\link{plotTPRFDR}}
+#' @rdname plotVenn
 #' @export
 plotVenn <- function(data_venn, plot_results, metadata, plot_var, plot_colors = NULL, plot_status = TRUE){
   

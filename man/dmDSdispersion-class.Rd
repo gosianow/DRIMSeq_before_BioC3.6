@@ -44,13 +44,13 @@ genewise_dispersion(x) <- value
 }
 \value{
 \itemize{
- \item \code{mean_expression(x)}: Get a data.frame with mean gene expression.
+ \item \code{mean_expression(x)}: Get a data frame with mean gene expression.
  \item \code{common_dispersion(x), common_dispersion(x) <- value}: Get or set common dispersion. \code{value} must be numeric.
-  \item \code{genewise_dispersion(x), genewise_dispersion(x) <- value}: Get a data.frame with gene-wise dispersion or set new gene-wise dispersion. \code{value} must be a vector.
+  \item \code{genewise_dispersion(x), genewise_dispersion(x) <- value}: Get a data frame with gene-wise dispersion or set new gene-wise dispersion. \code{value} must be a vector.
 }
 }
 \description{
-dmDSdispersion extends the \code{\linkS4class{dmDSdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) ratios for each gene in the differential splicing analysis. Result of \code{\link{dmDispersion}}.
+dmDSdispersion extends the \code{\linkS4class{dmDSdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) coiunts for each gene in the differential splicing analysis. Result of \code{\link{dmDispersion}}.
 }
 \section{Slots}{
 

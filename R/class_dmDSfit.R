@@ -2,6 +2,8 @@
 NULL
 
 ################################################################################
+### dmDSfit class
+################################################################################
 
 #' dmDSfit object
 #' 
@@ -10,8 +12,8 @@ NULL
 #' @return
 #' 
 #' \itemize{
-#'  \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for each condition.
-#'  \item \code{statistics(x)}: Get a data.frame with maximum log-likelihoods for each condition.
+#'  \item \code{proportions(x)}: Get a data frame with estimated feature ratios for each condition.
+#'  \item \code{statistics(x)}: Get a data frame with maximum log-likelihoods for each condition.
 #' }
 #' 
 #' @param x dmDSdispersion object.
@@ -32,6 +34,8 @@ setClass("dmDSfit",
          representation(dispersion = "character",
                         fit_full = "MatrixList"))
 
+
+#####################################
 
 setValidity("dmDSfit", function(object){
   # has to return TRUE when valid object!
@@ -55,6 +59,10 @@ setValidity("dmDSfit", function(object){
   
 })
 
+
+
+################################################################################
+### accessing methods
 ################################################################################
 
 
@@ -87,7 +95,7 @@ setMethod("statistics", "dmDSfit", function(x){
 
 
 
-################################################################################
+#################################
 
 setMethod("show", "dmDSfit", function(object){
   
@@ -98,6 +106,8 @@ setMethod("show", "dmDSfit", function(object){
   
 })
 
+################################################################################
+### dmFit
 ################################################################################
 
 #' Estimate proportions in Dirichlet-multinomial model
@@ -110,7 +120,7 @@ setMethod("show", "dmDSfit", function(object){
 setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 
 
-################################################################################
+####################################
 
 
 #' @inheritParams dmDispersion
@@ -152,6 +162,8 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
 
 
 ################################################################################
+### plotFit
+################################################################################
 
 #' Plot feature proportions
 #' 
@@ -164,7 +176,7 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
 setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 
 
-################################################################################
+#####################################
 
 
 #' @inheritParams plotData
@@ -206,49 +218,6 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
   
   
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

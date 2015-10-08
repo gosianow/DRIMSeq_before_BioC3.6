@@ -24,13 +24,13 @@ results(x, ...)
 }
 \value{
 \itemize{
- \item \code{proportions(x)}: Get a data.frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
- \item \code{statistics(x)}: Get a data.frame with full and null log-likelihoods and degrees of freedom.
- \item \code{results(x)}: Get a data.frame with results.
+ \item \code{proportions(x)}: Get a data frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
+ \item \code{statistics(x)}: Get a data frame with full and null log-likelihoods and degrees of freedom.
+ \item \code{results(x)}: Get a data frame with results. See Slots.
 }
 }
 \description{
-dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Result of \code{\link{dmTest}}.
+dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Proportions are calculated for each gene from pooled (no grouping into conditions) counts. Result of \code{\link{dmTest}}.
 }
 \section{Slots}{
 
@@ -39,7 +39,7 @@ dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model
 
 \item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.}
 
-\item{\code{results}}{data.frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for each comparison specified in \code{compared_groups}.}
+\item{\code{results}}{Data frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for each comparison specified in \code{compared_groups}.}
 }}
 \examples{
 d <- dataDS_dmDStest

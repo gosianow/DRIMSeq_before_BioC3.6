@@ -41,5 +41,7 @@ Malgorzata Nowicka
 }
 \seealso{
 \code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+
+\code{\link{dataSQTL_dmSQTLdata}}
 }
 

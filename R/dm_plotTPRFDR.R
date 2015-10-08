@@ -1,14 +1,16 @@
-
-
 #' TPR versus achieved FDR plot
-#'  
-#' @inheritParams calculateROCx
+#' 
+#' TPR versus achieved FDR plot for a list of result data frames.
+#' 
+#' @inheritParams plotROCx
 #' @param thresholds Thresholds for the FDR.
 #' @return 
-#' calculateTPRFDR returns a list of data.frames with FDR thresholds and the corresponding TPRs and achieved FDRs.
+#' \code{calculateTPRFDR} returns a list of data frames with FDR thresholds and the corresponding TPRs and achieved FDRs.
 #' 
-#' @seealso \code{\link{plotROCx}}, \code{\link{plotVenn}}
+#' \code{plotTPRFDR} returns a plot with TPR versus achieved FDR curves. TPR and achieved FDR are marked for each threshold with a circle. If the achieved FDR is lower than the corresponding threshold, the circle is filled with colour, otherwise, it is white inside.
+#' 
 #'  @author Malgorzata Nowicka
+#'  @name plotTPRFDR
 #' @export
 calculateTPRFDR <- function(results, status, thresholds = c(0.01, 0.05, 0.1)){
   
@@ -76,20 +78,20 @@ calculateTPRFDR <- function(results, status, thresholds = c(0.01, 0.05, 0.1)){
 #' @examples 
 #' 
 #' status <- dataDS_status
-#' 
 #' d <- dataDS_dmDStest
+#' 
 #' results <- list()
 #' results[[1]] <- results(d)
-#' 
 #' metadata <- data.frame(method = "DM")
 #' 
 #' data_TPRFDR <- calculateTPRFDR(results, status, 
-#' thresholds = c(0.01, 0.05, 0.1))
+#'    thresholds = c(0.01, 0.05, 0.1))
 #' 
 #' plotTPRFDR(data_TPRFDR, metadata, plot_var = "method", facet_var = NULL, 
-#' plot_colors = NULL, xylim_one = TRUE)
+#'    plot_colors = NULL, xylim_one = TRUE)
 #' 
-#' @rdname calculateTPRFDR
+#' @seealso \code{\link{dataDS_status}}, \code{\link{dataDS_dmDStest}}, \code{\link{plotROCx}}, \code{\link{plotVenn}}
+#' @rdname plotTPRFDR
 #' @export
 plotTPRFDR <- function(data_TPRFDR, metadata, plot_var, facet_var = NULL, plot_colors = NULL, xylim_one = FALSE){
   
@@ -107,7 +109,6 @@ plotTPRFDR <- function(data_TPRFDR, metadata, plot_var, facet_var = NULL, plot_c
     plot_colors <- colorb(nlevels(metadata[, plot_var]))
   }
   
-  
   TPRFDRlist <- lapply(1:nrow(metadata), function(r){
     # r = 1
     
@@ -116,8 +117,7 @@ plotTPRFDR <- function(data_TPRFDR, metadata, plot_var, facet_var = NULL, plot_c
     TPRFDR <- cbind(TPRFDR, metadata[rep(r, nrow(TPRFDR)), , drop = FALSE])
     
   })
-  
-  
+
   TPRFDR <- do.call(rbind, TPRFDRlist)
   
   TPRFDR$white <- ifelse(TPRFDR$FDR <= TPRFDR$threshold, NA, TPRFDR$TPR)
@@ -145,13 +145,7 @@ plotTPRFDR <- function(data_TPRFDR, metadata, plot_var, facet_var = NULL, plot_c
   if(length(facet_var) == 2)
     ggp <- ggp + facet_grid(reformulate(facet_var[1], facet_var[2]))
   
-  
-  # pdf("./TPRFDR.pdf")
-  
   print(ggp)
-  
-  # dev.off()
-  
   
 }
 

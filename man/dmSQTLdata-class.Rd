@@ -28,7 +28,7 @@
 }
 }
 \description{
-dmSQTLdata contains genomic feature expression, in counts, genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
+dmSQTLdata contains genomic feature expression (counts), genotypes and sample information needed for the sQTL analysis. It can be created with function \code{\link{dmSQTLdataFromRanges}} or \code{\link{dmSQTLdata}}.
 }
 \section{Slots}{
 
@@ -39,7 +39,7 @@ dmSQTLdata contains genomic feature expression, in counts, genotypes and sample 
 
 \item{\code{blocks}}{MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assigns them to blocks.}
 
-\item{\code{samples}}{data.frame with information about samples. It contains unique sample names \code{sample_id}.}
+\item{\code{samples}}{Data frame with information about samples. It contains unique sample names \code{sample_id}.}
 }}
 \examples{
 d <- dataSQTL_dmSQTLdata

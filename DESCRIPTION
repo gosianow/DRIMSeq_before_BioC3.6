@@ -2,13 +2,13 @@ Package: DM
 Type: Package
 Title: Differential splicing and sQTL analysis with Dirichlet-multinomial model
     in RNA-seq
-Version: 0.2.5
-Date: 2015-09-23
+Version: 0.2.6
+Date: 2015-10-07
 Author: Malgorzata Nowicka and Mark Robinson, both at University Zurich.
 Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
 Description: The package provides two frameworks. One for the differential
     splicing analysis between different conditions and one for the sQTL analysis.
-    Both are based on modeling the ratios of genomic features (i.e., transcripts,
+    Both are based on modeling the counts of genomic features (i.e., transcripts,
     exons or exonic bins) with Dirichlet-multinomial distribution. The package also
     makes available functions for visualization and exploration of the data and
     results.

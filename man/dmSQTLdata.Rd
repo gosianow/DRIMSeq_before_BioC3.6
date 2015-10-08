@@ -13,7 +13,7 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
-\item{counts}{Numeric matrix or data.frame of counts. Rows represent features, for example, exons,
+\item{counts}{Numeric matrix or data frame of counts. Rows represent features, for example, exons,
   exonic bins or transcripts. Columns represent samples.}
 
 \item{gene_id}{Vector of gene IDs corresponding to \code{counts}.}
@@ -40,7 +40,7 @@ dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges, genotypes,
 Returns a \code{\linkS4class{dmSQTLdata}} object.
 }
 \description{
-Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata requires that SNPs are already matched with the genes. dmSQTLdataFromRanges does the matching by assigning to a gene all the SNPs that are located in a given surrounding (\code{window}) of this gene.
+Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata requires that SNPs are already matched to corresponding genes. dmSQTLdataFromRanges does the matching by assigning to a gene all the SNPs that are located in a given surrounding (\code{window}) of this gene.
 }
 \details{
 It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
@@ -50,34 +50,31 @@ It is quite common that sample grouping defined by some of the SNPs is identical
  ### Create dmSQTLdata object
 
  # counts
- counts <- dataSQTL_counts[, -(1:2)]
- gene_id <- dataSQTL_counts[, 1]
- feature_id <- dataSQTL_counts[, 2]
-
+ head(dataSQTL_counts)
  # gene_ranges
  dataSQTL_gene_ranges
+ # genotypes
+ head(dataSQTL_genotypes)
+
+ ## gene_ranges with names!
  gene_ranges <- dataSQTL_gene_ranges
  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
 
- # genotypes
- head(dataSQTL_genotypes)
- genotypes <- dataSQTL_genotypes[, -(1:4)]
-
- snp_id <- dataSQTL_genotypes$snp_id
-
-# snp_ranges with names!
+ ## snp_ranges with names!
  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr),
- IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
- names(snp_ranges) <- dataSQTL_genotypes$snp_id ### DO NOT FORGET about names
+   IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
+ names(snp_ranges) <- dataSQTL_genotypes$snp_id
 
- all(colnames(counts) == colnames(genotypes))
+ ## Check if samples in count and genotypes are in the same order
+ all(colnames(dataSQTL_counts[, -(1:2)]) == colnames(dataSQTL_genotypes[, -(1:4)]))
+ sample_id <- colnames(dataSQTL_counts[, -(1:2)])
 
- sample_id <- colnames(counts)
-
- # create dmSQTLdata object
- d <- dmSQTLdataFromRanges(counts, gene_id, feature_id, gene_ranges,
- genotypes, snp_id, snp_ranges, sample_id, window = 5e3,
- BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+ d <- dmSQTLdataFromRanges(counts = dataSQTL_counts[, -(1:2)],
+   gene_id = dataSQTL_counts$gene_id, feature_id = dataSQTL_counts$transcript_id,
+   gene_ranges = gene_ranges, genotypes = dataSQTL_genotypes[, -(1:4)],
+   snp_id = dataSQTL_genotypes$snp_id, snp_ranges = snp_ranges,
+   sample_id = sample_id, window = 5e3,
+   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
  plotData(d)
 }
@@ -85,6 +82,6 @@ It is quite common that sample grouping defined by some of the SNPs is identical
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{dataSQTL_counts}}, \code{\link{dataSQTL_gene_ranges}}, \code{\link{dataSQTL_genotypes}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 
