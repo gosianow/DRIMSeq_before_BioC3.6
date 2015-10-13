@@ -22,11 +22,33 @@ NULL
 #' @slot results Data frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
 #' 
 #' @examples 
-#' d <- dataSQTL_dmSQTLtest
+#' 
+#' #############################
+#' ### sQTL analysis
+#' #############################
+#' # If possible, increase the number of workers in BPPARAM
+#' 
+#' d <- data_dmSQTLdata
+#' \donttest{
+#' ### Filtering
+#' d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5, 
+#'    minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Calculate dispersion
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Fit full model proportions
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Fit null model proportions and test for sQTLs
+#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' plotTest(d)
+#' 
 #' head(results(d))
 #' 
+#' }
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataSQTL_dmSQTLtest}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
+#' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
 setClass("dmSQTLtest", 
          contains = "dmSQTLfit",
          representation(fit_null = "list",
@@ -78,7 +100,6 @@ setMethod("show", "dmSQTLtest", function(object){
 ################################################################################
 ### dmTest
 ################################################################################
-
 
 #' @rdname dmTest
 #' @export

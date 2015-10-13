@@ -39,29 +39,38 @@ Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} objec
 First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled (no grouping into conditions) counts. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
+
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit full model proportions
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
 ### Fit null model proportions and test for DS
-
-d <- dataDS_dmDSfit
-
-# If possible, increase the number of workers
 d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-
 plotTest(d)
 
-### Plot feature proportions for top DS gene
+head(proportions(d))
+head(statistics(d))
+head(results(d))
 
-res <- results(d)
-res <- res[order(res$pvalue, decreasing = FALSE), ]
-
-gene_id <- res$gene_id[1]
-
-plotFit(d, gene_id = gene_id)
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 }
 

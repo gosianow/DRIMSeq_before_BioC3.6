@@ -46,42 +46,48 @@ Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata r
 It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
 }
 \examples{
-### sQTL analysis
- ### Create dmSQTLdata object
+#############################
+### Create dmSQTLdata object
+#############################
 
- # counts
- head(dataSQTL_counts)
- # gene_ranges
- dataSQTL_gene_ranges
- # genotypes
- head(dataSQTL_genotypes)
+library(GenomicRanges)
+library(rtracklayer)
 
- ## gene_ranges with names!
- gene_ranges <- dataSQTL_gene_ranges
- names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
+data_dir  <- system.file("extdata", package = "DRIMSeq")
 
- ## snp_ranges with names!
- snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr),
-   IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
- names(snp_ranges) <- dataSQTL_genotypes$snp_id
 
- ## Check if samples in count and genotypes are in the same order
- all(colnames(dataSQTL_counts[, -(1:2)]) == colnames(dataSQTL_genotypes[, -(1:4)]))
- sample_id <- colnames(dataSQTL_counts[, -(1:2)])
+# gene_ranges with names!
+gene_ranges <- import(paste0(data_dir, "/genes_subset.bed"))
+names(gene_ranges) <- mcols(gene_ranges)$name
 
- d <- dmSQTLdataFromRanges(counts = dataSQTL_counts[, -(1:2)],
-   gene_id = dataSQTL_counts$gene_id, feature_id = dataSQTL_counts$transcript_id,
-   gene_ranges = gene_ranges, genotypes = dataSQTL_genotypes[, -(1:4)],
-   snp_id = dataSQTL_genotypes$snp_id, snp_ranges = snp_ranges,
-   sample_id = sample_id, window = 5e3,
+counts <- read.table(paste0(data_dir, "/TrQuantCount_CEU_subset.tsv"),
+   header = TRUE, sep = "\\t", as.is = TRUE)
+
+genotypes <- read.table(paste0(data_dir, "/genotypes_CEU_subset.tsv"),
+   header = TRUE, sep = "\\t", as.is = TRUE)
+
+# snp_ranges with names!
+snp_ranges <- GRanges(Rle(genotypes$chr), IRanges(genotypes$start,
+   genotypes$end))
+names(snp_ranges) <- genotypes$snpId
+
+## Check if samples in count and genotypes are in the same order
+all(colnames(counts[, -(1:2)]) == colnames(genotypes[, -(1:4)]))
+sample_id <- colnames(counts[, -(1:2)])
+
+
+d <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId,
+   feature_id = counts$trId, gene_ranges = gene_ranges,
+   genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId,
+   snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3,
    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
- plotData(d)
+plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataSQTL_counts}}, \code{\link{dataSQTL_gene_ranges}}, \code{\link{dataSQTL_genotypes}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{data_dmSQTLdata}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

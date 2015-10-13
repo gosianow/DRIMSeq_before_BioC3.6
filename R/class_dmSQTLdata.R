@@ -26,14 +26,19 @@ NULL
 #' @slot samples Data frame with information about samples. It contains unique sample names \code{sample_id}.
 #' 
 #'  @examples 
-#' d <- dataSQTL_dmSQTLdata
+#' #############################
+#' ### sQTL analysis
+#' #############################
+#' 
+#' d <- data_dmSQTLdata
+#' 
 #' head(names(d))
 #' length(d)
 #' d[1:10, ]
 #' d[1:10, 1:10]
 #' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataSQTL_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} 
+#' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} 
 setClass("dmSQTLdata", 
          representation(counts = "MatrixList", 
                         genotypes = "MatrixList", 
@@ -138,39 +143,46 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #'  @return Returns a \code{\linkS4class{dmSQTLdata}} object.
 #'  @examples 
-#'  ### sQTL analysis
-#'  ### Create dmSQTLdata object
 #'  
-#'  # counts
-#'  head(dataSQTL_counts)
-#'  # gene_ranges
-#'  dataSQTL_gene_ranges
-#'  # genotypes 
-#'  head(dataSQTL_genotypes)
-#'  
-#'  ## gene_ranges with names!
-#'  gene_ranges <- dataSQTL_gene_ranges
-#'  names(gene_ranges) <- S4Vectors::mcols(gene_ranges)$name
-#'  
-#'  ## snp_ranges with names!
-#'  snp_ranges <- GenomicRanges::GRanges(S4Vectors::Rle(dataSQTL_genotypes$chr), 
-#'    IRanges::IRanges(dataSQTL_genotypes$start, dataSQTL_genotypes$end))
-#'  names(snp_ranges) <- dataSQTL_genotypes$snp_id 
-#'  
-#'  ## Check if samples in count and genotypes are in the same order
-#'  all(colnames(dataSQTL_counts[, -(1:2)]) == colnames(dataSQTL_genotypes[, -(1:4)]))
-#'  sample_id <- colnames(dataSQTL_counts[, -(1:2)])
-#'  
-#'  d <- dmSQTLdataFromRanges(counts = dataSQTL_counts[, -(1:2)], 
-#'    gene_id = dataSQTL_counts$gene_id, feature_id = dataSQTL_counts$transcript_id, 
-#'    gene_ranges = gene_ranges, genotypes = dataSQTL_genotypes[, -(1:4)], 
-#'    snp_id = dataSQTL_genotypes$snp_id, snp_ranges = snp_ranges, 
-#'    sample_id = sample_id, window = 5e3, 
+#' #############################
+#' ### Create dmSQTLdata object
+#' #############################
+#' 
+#' library(GenomicRanges)
+#' library(rtracklayer)
+#' 
+#' data_dir  <- system.file("extdata", package = "DRIMSeq")
+#' 
+#' 
+#' # gene_ranges with names!
+#' gene_ranges <- import(paste0(data_dir, "/genes_subset.bed"))
+#' names(gene_ranges) <- mcols(gene_ranges)$name
+#' 
+#' counts <- read.table(paste0(data_dir, "/TrQuantCount_CEU_subset.tsv"), 
+#'    header = TRUE, sep = "\t", as.is = TRUE)
+#' 
+#' genotypes <- read.table(paste0(data_dir, "/genotypes_CEU_subset.tsv"), 
+#'    header = TRUE, sep = "\t", as.is = TRUE)
+#' 
+#' # snp_ranges with names!
+#' snp_ranges <- GRanges(Rle(genotypes$chr), IRanges(genotypes$start, 
+#'    genotypes$end))
+#' names(snp_ranges) <- genotypes$snpId 
+#' 
+#' ## Check if samples in count and genotypes are in the same order
+#' all(colnames(counts[, -(1:2)]) == colnames(genotypes[, -(1:4)]))
+#' sample_id <- colnames(counts[, -(1:2)])
+#' 
+#' 
+#' d <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId, 
+#'    feature_id = counts$trId, gene_ranges = gene_ranges, 
+#'    genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId, 
+#'    snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3, 
 #'    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' plotData(d)
 #'  
-#'  plotData(d)
-#'  
-#'  @seealso \code{\link{dataSQTL_counts}}, \code{\link{dataSQTL_gene_ranges}}, \code{\link{dataSQTL_genotypes}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#'  @seealso \code{\link{data_dmSQTLdata}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
 dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes, snp_id, sample_id, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -350,6 +362,19 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' 
 #' In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. For some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to include in the downstream analysis. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allele_freq} should indicate the minimal number of samples for the minor allele frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allele_freq}.
 #' 
+#' @examples 
+#' #############################
+#' ### sQTL analysis
+#' #############################
+#' # If possible, increase the number of workers in BPPARAM
+#' 
+#' d <- data_dmSQTLdata
+#' \donttest{
+#' ### Filtering
+#' d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5, 
+#'    minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' plotData(d)
+#' }
 #' @rdname dmFilter
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -376,12 +401,14 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_ge
 
 
 #' @examples 
+#' 
+#' #############################
 #' ### sQTL analysis
-#'
-#' d <- dataSQTL_dmSQTLdata
+#' #############################
+#' 
+#' d <- data_dmSQTLdata
 #' plotData(d)
 #'
-#' @seealso \code{\link{dataSQTL_dmSQTLdata}}
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){

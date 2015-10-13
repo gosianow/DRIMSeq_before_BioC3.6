@@ -53,22 +53,35 @@ In differential splicing analysis, we suggest using \code{min_samps_gene_expr} a
 In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. For some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to include in the downstream analysis. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allele_freq} should indicate the minimal number of samples for the minor allele frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allele_freq}.
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+
+d <- data_dmDSdata
+\donttest{
 ### Filtering
-
-d <- dataDS_dmDSdata
-plotData(d)
-
 # Check what is the minimal number of replicates per condition
 table(samples(d)$group)
-
 d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 plotData(d)
+}
+#############################
+### sQTL analysis
+#############################
+# If possible, increase the number of workers in BPPARAM
+
+d <- data_dmSQTLdata
+\donttest{
+### Filtering
+d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5,
+   minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+plotData(d)
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

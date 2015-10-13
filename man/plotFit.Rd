@@ -55,11 +55,28 @@ Plot, per gene, the observed and estimated with Dirichlet-multinomial model feat
 Plot feature proportions
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
+
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit full model proportions
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit null model proportions and test for DS
+d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
 ### Plot feature proportions for top DS gene
-
-d <- dataDS_dmDStest
-
 res <- results(d)
 res <- res[order(res$pvalue, decreasing = FALSE), ]
 
@@ -68,11 +85,13 @@ gene_id <- res$gene_id[1]
 plotFit(d, gene_id = gene_id)
 plotFit(d, gene_id = gene_id, plot_type = "lineplot")
 plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
 }
 

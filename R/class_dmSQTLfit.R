@@ -12,7 +12,7 @@ NULL
 #' @slot dispersion Character specifying which type of dispersion was used for fitting: \code{"common_dispersion"} or \code{"genewise_dispersion"}.
 #' @slot fit_full List of \code{\linkS4class{MatrixList}} objects. Each element of this list contains the full model proportion estimates for all the blocks associated with a given gene. Columns of MatrixLists correspond to 3 genotypes (0,1,2). The full model likelihoods are stored in \code{metadata} slot.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotFit}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
+#' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLfit", 
          contains = "dmSQTLdispersion",
          representation(dispersion = "character",

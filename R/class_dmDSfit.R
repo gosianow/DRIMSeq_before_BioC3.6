@@ -23,12 +23,31 @@ NULL
 #' @slot fit_full \code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the full model likelihoods are stored in \code{metadata} slot.
 #' 
 #' @examples 
-#' d <- dataDS_dmDSfit
+#' ###################################
+#' ### Differential splicing analysis
+#' ###################################
+#' # If possible, increase the number of workers in BPPARAM
+#' 
+#' d <- data_dmDSdata
+#' \donttest{
+#' ### Filtering
+#' # Check what is the minimal number of replicates per condition 
+#' table(samples(d)$group)
+#' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+#' 
+#' ### Calculate dispersion
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Fit full model proportions
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
 #' head(proportions(d))
 #' head(statistics(d))
 #' 
+#' }
+#' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataDS_dmDSfit}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
+#' @seealso \code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSfit", 
          contains = "dmDSdispersion",
          representation(dispersion = "character",
@@ -127,17 +146,31 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 #' @param dispersion Character defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"} or \code{"common_dispersion"}.
 #' @return Returns a \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 #' @examples 
-#' ### Differential splicing analysis 
+#' ###################################
+#' ### Differential splicing analysis
+#' ###################################
+#' # If possible, increase the number of workers in BPPARAM
+#' 
+#' d <- data_dmDSdata
+#' \donttest{
+#' ### Filtering
+#' # Check what is the minimal number of replicates per condition 
+#' table(samples(d)$group)
+#' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+#' 
+#' ### Calculate dispersion
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
 #' ### Fit full model proportions
-#' 
-#' d <- dataDS_dmDSdispersion
-#' 
-#' # If possible, increase the number of workers
 #' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 #' 
+#' head(proportions(d))
+#' head(statistics(d))
+#' 
+#' }
 #' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataDS_dmDSdispersion}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
+#' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 #' @rdname dmFit
 #' @export
 setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -149,14 +182,10 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
   stopifnot(length(prop_tol) == 1)
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(is.logical(verbose))
-  
-  
-  
+
   fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = TRUE, BPPARAM = BPPARAM)
   
-  
   return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
-  
   
 })
 
@@ -187,11 +216,29 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @param plot_main Logical. Whether to plot a title with the information about the Dirichlet-multinomial estimates.
 #' 
 #' @examples 
+#' 
+#' ###################################
 #' ### Differential splicing analysis
+#' ###################################
+#' # If possible, increase the number of workers in BPPARAM
+#' 
+#' d <- data_dmDSdata
+#' \donttest{
+#' ### Filtering
+#' # Check what is the minimal number of replicates per condition 
+#' table(samples(d)$group)
+#' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+#' 
+#' ### Calculate dispersion
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Fit full model proportions
+#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
+#' ### Fit null model proportions and test for DS
+#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' 
 #' ### Plot feature proportions for top DS gene
-#' 
-#' d <- dataDS_dmDStest
-#' 
 #' res <- results(d)
 #' res <- res[order(res$pvalue, decreasing = FALSE), ]
 #' 
@@ -201,8 +248,10 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' plotFit(d, gene_id = gene_id, plot_type = "lineplot")
 #' plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 #' 
+#' }
+#' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
+#' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
 #' @rdname plotFit
 #' @export
 setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){

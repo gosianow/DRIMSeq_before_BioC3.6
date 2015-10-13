@@ -39,18 +39,33 @@ Returns a \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
 Maximum likelihood estimates of genomic feature (for instance, transcript, exon, exonic bin) proportions in full Dirichlet-multinomial model used in differential splicing or sQTL analysis. Full model estimation means that proportions are estimated for every group/condition separately.
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
+
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
 ### Fit full model proportions
-
-d <- dataDS_dmDSdispersion
-
-# If possible, increase the number of workers
 d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+head(proportions(d))
+head(statistics(d))
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdispersion}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 }
 

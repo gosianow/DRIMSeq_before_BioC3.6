@@ -27,15 +27,36 @@ Plot a histogram of p-values.
 Plot p-values distribution
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
 
-d <- dataDS_dmDStest
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit full model proportions
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit null model proportions and test for DS
+d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
 plotTest(d)
+
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}
 }
 

@@ -51,18 +51,23 @@ dmDSdata contains expression, in counts, of genomic features such as exons or tr
 \item{\code{samples}}{Data frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
 }}
 \examples{
-d <- dataDS_dmDSdata
+###################################
+### Differential splicing analysis
+###################################
+
+d <- data_dmDSdata
+
 head(counts(d))
 samples(d)
 head(names(d))
 length(d)
-d[1:50, ]
-d[1:50, 1:3]
+d[1:20, ]
+d[1:20, 1:3]
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
+\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 }
 

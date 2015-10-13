@@ -1,4 +1,4 @@
 library(testthat)
-library(DM)
+library(DRIMSeq)
 
-test_check("DM")
+test_check("DRIMSeq")

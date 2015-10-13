@@ -27,15 +27,32 @@ Scatterplot of Dirichlet-multinomial gene-wise dispersion versus mean gene expre
 Dispersion versus mean expression plot
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
 
-d <- dataDS_dmDSdispersion
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 plotDispersion(d)
+
+head(mean_expression(d))
+common_dispersion(d)
+head(genewise_dispersion(d))
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdispersion}}, \code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

@@ -27,16 +27,21 @@ NULL
 #' @slot samples Data frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.
 #' 
 #' @examples 
-#' d <- dataDS_dmDSdata
+#' ###################################
+#' ### Differential splicing analysis
+#' ###################################
+#' 
+#' d <- data_dmDSdata
+#' 
 #' head(counts(d))
 #' samples(d)
 #' head(names(d))
 #' length(d)
-#' d[1:50, ]
-#' d[1:50, 1:3]
+#' d[1:20, ]
+#' d[1:20, 1:3]
 #' 
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
+#' @seealso \code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 setClass("dmDSdata", 
          representation(counts = "MatrixList", 
                         samples = "data.frame"))
@@ -153,23 +158,47 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  @param group Vector that defines the goupping of samples.
 #'  @return Returns a \linkS4class{dmDSdata} object.
 #'  @examples
-#'  ### Differential splicing analysis
-#'  ### Create dmDSdata object
+#'  
+#' #############################
+#' ### Create dmDSdata object
+#' #############################
+#' ### Get HTSeq exonic bin counts from 'pasilla' package
 #' 
-#'  # counts
-#'  head(dataDS_counts)
-#'  # metadata
-#'  head(dataDS_metadata)
-#'  
-#'  group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
-#'  
-#'  d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1], 
-#'    feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id, 
-#'    group = dataDS_metadata$group)
-#'  
-#'  plotData(d)
-#'  
-#'  @seealso \code{\link{dataDS_counts}}, \code{\link{dataDS_metadata}}, \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' library(pasilla)
+#' 
+#' data_dir  <- system.file("extdata", package="pasilla")
+#' count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
+#' count_files
+#' 
+#' # Create a data frame with htseq counts
+#' htseq_list <- lapply(1:length(count_files), function(i){
+#'   # i = 1
+#'   htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
+#'   colnames(htseq) <- c("group_id", gsub("fb.txt", "", 
+#'      strsplit(count_files[i], "extdata/")[[1]][2]))
+#'   return(htseq)
+#' })
+#' 
+#' htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE, 
+#'    sort = FALSE), htseq_list)
+#' tail(htseq_counts)
+#' htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+#' 
+#' group_split <- limma::strsplit2(htseq_counts[, 1], ":")
+#' 
+#' d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1], 
+#'    feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1], 
+#'    group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+#' 
+#' plotData(d)
+#' 
+#' # Use a subset of genes, which is defined in the following file
+#' genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
+#' d <- d[names(d) %in% genes_subset, ]
+#' 
+#' plotData(d)
+#' 
+#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
 dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
@@ -269,20 +298,19 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @param max_features Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept. 
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
 #' @examples 
+#' ###################################
 #' ### Differential splicing analysis
+#' ###################################
+#' 
+#' d <- data_dmDSdata
+#' \donttest{
 #' ### Filtering
-#' 
-#' d <- dataDS_dmDSdata
-#' plotData(d)
-#' 
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' 
 #' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 #' plotData(d)
-#' 
-#' 
-#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' }
+#' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
@@ -322,13 +350,16 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 #' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
 #' @examples 
+#' ###################################
 #' ### Differential splicing analysis
-#'
-#' d <- dataDS_dmDSdata
+#' ###################################
+#' 
+#' d <- data_dmDSdata
 #' plotData(d)
 #'
+#'
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
+#' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 #' @rdname plotData
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){

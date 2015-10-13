@@ -20,6 +20,6 @@ dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispe
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotDispersion}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
+\code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 }
 

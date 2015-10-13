@@ -122,29 +122,32 @@ Only some of the rest of dispersion parameters in dmDispersion have an influence
 }
 }
 \examples{
+###################################
 ### Differential splicing analysis
-### Calculate dispersion
+###################################
+# If possible, increase the number of workers in BPPARAM
 
-d <- dataDS_dmDSdata
-
+d <- data_dmDSdata
+\donttest{
+### Filtering
 # Check what is the minimal number of replicates per condition
 table(samples(d)$group)
-
 d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 
-\donttest{
-# If possible, increase the number of workers
+### Calculate dispersion
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-}
-\dontshow{
-d <- dataDS_dmDSdispersion
-}
 plotDispersion(d)
+
+head(mean_expression(d))
+common_dispersion(d)
+head(genewise_dispersion(d))
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

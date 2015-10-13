@@ -25,26 +25,49 @@ Returns a \linkS4class{dmDSdata} object.
 Constructor function for a \code{\linkS4class{dmDSdata}} object.
 }
 \examples{
-### Differential splicing analysis
- ### Create dmDSdata object
+#############################
+### Create dmDSdata object
+#############################
+### Get HTSeq exonic bin counts from 'pasilla' package
 
- # counts
- head(dataDS_counts)
- # metadata
- head(dataDS_metadata)
+library(pasilla)
 
- group_split <- limma::strsplit2(dataDS_counts[, 1], ":")
+data_dir  <- system.file("extdata", package="pasilla")
+count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
+count_files
 
- d <- dmDSdata(counts = dataDS_counts[, -1], gene_id = group_split[, 1],
-   feature_id = group_split[, 2], sample_id = dataDS_metadata$sample_id,
-   group = dataDS_metadata$group)
+# Create a data frame with htseq counts
+htseq_list <- lapply(1:length(count_files), function(i){
+  # i = 1
+  htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
+  colnames(htseq) <- c("group_id", gsub("fb.txt", "",
+     strsplit(count_files[i], "extdata/")[[1]][2]))
+  return(htseq)
+})
 
- plotData(d)
+htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE,
+   sort = FALSE), htseq_list)
+tail(htseq_counts)
+htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+
+group_split <- limma::strsplit2(htseq_counts[, 1], ":")
+
+d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1],
+   feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1],
+   group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+
+plotData(d)
+
+# Use a subset of genes, which is defined in the following file
+genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
+d <- d[names(d) \%in\% genes_subset, ]
+
+plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_counts}}, \code{\link{dataDS_metadata}}, \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

@@ -27,21 +27,23 @@ Plot a histogram of the number of features per gene. Additionally, for \code{\li
 Plot data summary
 }
 \examples{
+###################################
 ### Differential splicing analysis
+###################################
 
-d <- dataDS_dmDSdata
+d <- data_dmDSdata
 plotData(d)
+#############################
 ### sQTL analysis
+#############################
 
-d <- dataSQTL_dmSQTLdata
+d <- data_dmSQTLdata
 plotData(d)
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
-
-\code{\link{dataSQTL_dmSQTLdata}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 }
 

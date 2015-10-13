@@ -42,7 +42,12 @@ dmSQTLdata contains genomic feature expression (counts), genotypes and sample in
 \item{\code{samples}}{Data frame with information about samples. It contains unique sample names \code{sample_id}.}
 }}
 \examples{
-d <- dataSQTL_dmSQTLdata
+#############################
+### sQTL analysis
+#############################
+
+d <- data_dmSQTLdata
+
 head(names(d))
 length(d)
 d[1:10, ]
@@ -52,6 +57,6 @@ d[1:10, 1:10]
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataSQTL_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
+\code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 }
 

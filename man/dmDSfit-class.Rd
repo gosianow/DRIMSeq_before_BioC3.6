@@ -39,14 +39,33 @@ dmDSfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the full
 \item{\code{fit_full}}{\code{\linkS4class{MatrixList}} containing the per gene feature ratios. Columns correspond to different conditions. Additionally, the full model likelihoods are stored in \code{metadata} slot.}
 }}
 \examples{
-d <- dataDS_dmDSfit
+###################################
+### Differential splicing analysis
+###################################
+# If possible, increase the number of workers in BPPARAM
+
+d <- data_dmDSdata
+\donttest{
+### Filtering
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+
+### Calculate dispersion
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+### Fit full model proportions
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
 head(proportions(d))
 head(statistics(d))
+
+}
 }
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{dataDS_dmDSfit}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
+\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDStest}}
 }
 

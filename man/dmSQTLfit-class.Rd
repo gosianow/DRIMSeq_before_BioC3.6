@@ -18,6 +18,6 @@ dmSQTLfit extends the \code{\linkS4class{dmDSdispersion}} class by adding the fu
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotFit}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
+\code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
 }
 
