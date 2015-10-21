@@ -210,7 +210,7 @@ dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null 
       scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
       guides(fill = guide_legend(nrow = 25)) +
       xlab("Groups") +
-      ylab("Proportions") +
+      ylab("Estimated proportions") +
       geom_bar(data = prop_est_full_order, aes_string(x = "group", y = "proportion", fill = "feature_id"), stat = "identity", width = width, position="stack") + gr
     
     return(ggp)

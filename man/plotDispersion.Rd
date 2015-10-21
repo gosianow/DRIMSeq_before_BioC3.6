@@ -41,11 +41,10 @@ d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
 
 ### Calculate dispersion
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+
+
 plotDispersion(d)
 
-head(mean_expression(d))
-common_dispersion(d)
-head(genewise_dispersion(d))
 
 }
 }

@@ -9,13 +9,12 @@
 \usage{
 dmFilter(x, ...)
 
-\S4method{dmFilter}{dmDSdata}(x, min_samps_gene_expr = 3, min_gene_expr = 1,
-  min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf)
+\S4method{dmFilter}{dmDSdata}(x, min_samps_gene_expr, min_samps_feature_prop,
+  min_gene_expr = 1, min_feature_prop = 0.01, max_features = Inf)
 
-\S4method{dmFilter}{dmSQTLdata}(x, min_samps_gene_expr = 70,
-  min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1,
-  max_features = Inf, minor_allele_freq = 5,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+\S4method{dmFilter}{dmSQTLdata}(x, min_samps_gene_expr, min_samps_feature_prop,
+  minor_allele_freq, min_gene_expr = 1, min_feature_prop = 0.1,
+  max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.}
@@ -25,10 +24,10 @@ dmFilter(x, ...)
 \item{min_samps_gene_expr}{Minimal number of samples where genes should
 be expressed. See Details.}
 
-\item{min_gene_expr}{Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.}
-
 \item{min_samps_feature_prop}{Minimal number of samples where features
 should be expressed. See details.}
+
+\item{min_gene_expr}{Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.}
 
 \item{min_feature_prop}{Minimal proportion for feature expression. This value
 should be between 0 and 1.}

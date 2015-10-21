@@ -314,7 +314,7 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
+setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_prop, min_gene_expr = 1, min_feature_prop = 0.01, max_features = Inf){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
   stopifnot(min_gene_expr >= 0)

@@ -377,7 +377,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' }
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 1, min_feature_prop = 0.1, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
   stopifnot(min_gene_expr >= 0)

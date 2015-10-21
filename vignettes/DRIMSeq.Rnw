@@ -1,0 +1,327 @@
+%\VignetteIndexEntry{Differential splicing and sQTL analyses in RNA-seq with 'DRIMSeq' package}
+%\VignettePackage{DRIMSeq}
+%\VignetteEngine{knitr::knitr}
+
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex(use.unsrturl=FALSE)
+@
+
+
+\bioctitle[Differential splicing and sQTL analyses in RNA-seq with \Rpackage{DRIMSeq} package]{DRIMSeq: Dirichlet-multinomial framework for differential splicing and sQTL analyses in RNA-seq.}
+%% also: \bioctitle{Title used for both header and title page}
+%% or... \title{Title used for both header and title page}
+\author{Malgorzata Nowicka\footnote{gosia.nowicka@uzh.ch}, Mark Robinson}
+
+% \Rpackage{}
+% \Biocpkg{IRanges} 
+% \Biocexptpkg{parathyroidSE} 
+% \CRANpkg{data.table}
+
+% \Rfunction{findOverlaps} for functions findOverlaps.
+% \Robject{olaps} for variables olaps.
+% \Rclass{GRanges} when referring to a formal class GRanges.
+% \Rcode{log(x)} for R code, log(x).
+
+% \emph{}
+
+\begin{document}
+\maketitle 
+\noindent This vignette describes version \Sexpr{packageDescription("DRIMSeq")$Version} of the \Rpackage{DRIMSeq} package.
+\tableofcontents
+
+
+<<setup_knitr, include=FALSE, cache=FALSE>>=
+library(knitr)
+opts_chunk$set(cache = TRUE, tidy = FALSE, tidy.opts = list(blank = FALSE), highlight=FALSE, out.width = "8cm", out.height = "8cm", fig.align = "center")
+@
+
+
+
+%------------------------------------------------------------------------------
+%	Introduction
+%------------------------------------------------------------------------------
+
+\section{Overview of Dirichlet-multinomial model}
+
+In the \Rpackage{DRIMSeq} package we implemented a Dirichlet-multinomial framework that can be used for modeling various multivariate count data with the interest in finding the instances where the ratios of observed features are different between the experimental conditions. Such model can be applied, for example, in differential splicing or sQTL analysis where the multivariate features are transcripts or exons of a gene. Depending on the type of counts that are used in the analysis, you can test for differential splicing at the level of transcirpt or exon ratio changes. \fixme{Another applications}. The implementation of Dirichlet-multinomial model in \Rpackage{DRIMSeq} package is customised for differential splicing and sQTL analyses, but the data object \Rclass{dmDSdata} can contain different types of counts, and thus, other types of multivariate differential analysis between groups can be performed.
+
+The statistical details of \Rpackage{DRIMSeq} are presented in our paper \fixme{citation to DRIMSeq paper}. In short, the method consists of three statistical steps. First, we use the profile likelihood to estimate the dispersion, i.e., the variability of feature ratios between samples (replicates) within conditions. Dispersion is needed in order to find the significant changes in features ratios between conditions which should be sufficiently stronger than the changes/variability withing conditions. Second, we use the maximum likelihood to estimate the full model (estimated in every group/condition separetely) and null model (estimated from all data) proportions and its corresponding likelihoods. Finally, we use the likelihood ratio statistic to to test for the differences between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
+
+
+\section{Hints for DRIMSeq pipelines}
+
+In this vignette, we present how one could perform differential splicing analysis and sQTL analysis with \Rpackage{DRIMSeq} package. We use small subsets of data so that you can run the whole pipelines within few minutes in \R{} on a single core computer. 
+
+Both pipelines consist of the initial steps where objects containing the data needed for the analysis are created and then filtered. Functions used for this purpose, such as \Rfunction{dmDSdata} or \Rfunction{dmSQTLdata} and \Rfunction{dmFilter}, have some parameters (like \Robject{counts}, \Robject{gene\_id}, \Robject{min\_samps\_gene\_expr}, etc.) for which no defalut values are predefined. These parameters must be specified by user in order to proceed with the pipeline.
+
+Functions \Rfunction{dmDispersion}, \Rfunction{dmFit} and \Rfunction{dmTest}, which perform the actual statistical analysis described above, require that only one parameter \Robject{x} containinig the data is specified by user. These functions have many other parameters available for twicking, but they do have default values, which were chosen based on many real data analysis, assigned.
+
+Some of the steps are quite time consumming, especially the dispersion estimation, where proportions of each gene are refitted for different dispersion parameters. Thus, we reccomend to, if possible, always increase the number of workers in \Robject{BPPARAM}. 
+
+
+
+
+
+
+%------------------------------------------------------------------------------
+%	Differential splicing analysis work-flow
+%------------------------------------------------------------------------------
+
+\section{Differential splicing analysis work-flow}
+
+
+\subsection{Preparing table of counts}
+
+Different methods (reference to Charlotte's paper) require different steps like alignement 
+
+Exonic bin counts: HTSeq, featureCounts, 
+Transcript expected counts: kallisto, RSEM, BitSeq
+
+
+\subsection{Example data}
+
+To demonstrate the usage of \Rpackage{DRIMSeq} in differentiall splicing analysis, we will use a \emph{pasilla} data set produced by Brooks et al. \cite{Brooks2011}. The aim of their study was to identify exons that are regulated by \emph{pasilla} protein, the Drosophila melanogaster ortholog of mammalian NOVA1 and NOVA2 which are one of the well studied splicing factors. In their RNA-seq experiment the libraries were prepared from 7 biologically independent samples: 4 control samples and 3 samples in which \emph{pasilla} was knocked-down. The libraries were sequenced on Illumina Genome Analyzer II using single-end and paired-end sequencing and different read lengths. The RNA-seq data can be downloaded from the NCBI’s Gene Expression Omnibus (GEO) under the accession number GSE18508. In the examples bolow, we use a subset of the \software{HTSeq} counts available in \Biocexptpkg{pasilla} package, where you can find all the steps needed, for processing the GEO data, to get a table with exonic bin counts. 
+
+
+\subsection{Differential splicing analysis with DRIMSeq package}
+
+In oder to do the analysis, we have to create a \Rclass{dmDSdata} object, which contains the feature counts and information about grouping samples into conditions. With each step of the pipeline, additional elements are added to this object. So that, at the end of the analysis, the object contains results from all the steps, such as dispersion estimates, proportions estimates, likelihood ratio statistics, p-values, adjusted p-values. As new elements are added, the object also changes its name \Rclass{dmDSdata} $->$ \Rclass{dmDSdispersion} $->$ \Rclass{dmDSfit} $->$ \Rclass{dmDStest}, but every following one inherits the slots and the methods available for the previous one. 
+
+
+
+\subsubsection{Loading pasilla data into R}
+
+The counts obtained from \software{HTSeq} are saved in separate text files for each sample. We want to put them together into one data frame. 
+
+
+<<DSpasilla1>>=
+library(pasilla)
+
+data_dir  <- system.file("extdata", package="pasilla")
+count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
+count_files
+
+## Read the HTSeq files into R
+htseq_list <- lapply(1:length(count_files), function(i){
+  htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
+  colnames(htseq) <- c("group_id", gsub("fb.txt", "", strsplit(count_files[i], 
+    "extdata/")[[1]][2]))
+  return(htseq)
+})
+
+## Merge them into one data frame
+htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE, 
+  sort = FALSE), htseq_list)
+
+## Remove the summary elements
+tail(htseq_counts)
+htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+
+@
+
+
+The exon bin IDs produced by \software{HTSeq} consist of the gene IDs and the bin number separated by colon. To create the \Rclass{dmDSdata} object, we need a vector of gene IDs and a vector of feature IDs, here bin IDs.
+
+
+<<DSpasilla2>>=
+group_split <- limma::strsplit2(htseq_counts[, 1], ":")
+@
+
+
+
+Finally, load the \Rpackage{DRIMSeq} package.
+
+<<DSlibrary>>=
+suppressPackageStartupMessages(library(DRIMSeq))
+@
+
+
+Create a \Rcode{dmDSdata} object (saved as variable \Robject{d}), which contains counts and information about samples such as sample IDs and a variable \Robject{group} defining the experimental groups/conditions. When printing variable \Robject{d}, you can see its class, size and which accessor methods can be applied. For \Rcode{dmDSdata} object, there are two methods which return data frames with counts and samples.  
+
+
+<<DSdmDSdata_create>>=
+d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1], 
+  feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1], 
+  group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+d
+head(counts(d), 4)
+head(samples(d), 4)
+@
+
+You can also make a data summary plot, which is a histogram of the number of features per gene. There are genes, that have nearly 100 of exonic bins. 
+
+<<DSdmDSdata_plot>>=
+plotData(d)
+@
+
+
+To make the analysis runnable within this vignette, we want to keep only a small subset of genes, which is defined in the following file.
+
+<<DSdmDSdata_subset>>=
+genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
+d <- d[names(d) %in% genes_subset, ]
+d
+plotData(d)
+@
+
+After subsetting, \Robject{d} contains counts for $46$ genes.
+
+
+\subsubsection{Filtering}
+
+Filtering of genes and features with low expression improves the performance of Dirichlet-multinomial model. Genes may have many features that are expressed very lowly (so that even if there was any differential expression, it would not be biologically significant) or not expressed at all. Removing such features from the analysis has two effects. First, it reduces the number of parameters (proportions) to estimate. Second, improves the estimation of dispersion \fixme{Do simulation}. However, too stringent filtering may remove genes and features where the differential changes happen, and, in consequence, lead to loss of power. 
+
+Thus, finding an optimal filter is a challenge. In differential splicing analysis, we reccomend to adjust the filtering parameters according to the number of replicates per condition. At the feature level, we suggest using \Robject{min\_samps\_feature\_prop} equal to the minimal number of replicates in any of the conditions. For example, in \emph{pasilla} assay with 3 knock-down and 4 control samples, we would set this parameters to 3. Like this, we allow a situation where a feature (here, an exonic bin) is expressed in one condition but may not be expressed at all in another one. The level of feature expression is controlled by \Robject{min\_feature\_prop}. Our default value is set up to 0.01, which means that only the features with ratio of at least 1\% in 3 samples are kept. 
+
+Filtering at the gene level ensures that the observed feature ratios have some minimal reliability. Although, Dirichlet-multinomial model works on feature counts, and not on feature ratios, which means that it gives more confidence to the ratios based on 100 versus 500 reads than 1 versus 5, a minimal filtering for the gene expression removes the genes with mostly zero counts and reduces the number of tests in multiple test correction. The default value that we propose is \Rcode{min\_samps\_gene\_expr = 3} and \Rcode{min\_gene\_expr = 1}, which means that only genes that are expressed at the level of 1 cpm in at least 3 samples are kept for the downstream analysis.
+
+
+<<DSdmFilter>>=
+# Check what is the minimal number of replicates per condition
+table(samples(d)$group)
+d <- dmFilter(d, min_samps_gene_expr = 3, min_gene_expr = 1,
+  min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf)
+plotData(d)
+@
+
+\subsubsection{Dispersion estimation}
+
+Ideally, we would like to get accurate dispersion estimates for every gene, which is problematic when analysing small sample size data sets because dispersion estimates become inaccurate when the sample size decreases especially for lowly expressed genes. As an alternative, we could assume that all the genes have the same dispersion and based on all the data we could calculate a common dispersion, which is less inaccurate. However, such assumption is quite unrealistic. Moderated dispersion is a trade-off between gene-wise and common dispersion. The moderated estimates are a weighted combination of common and individual dispersion and we reccomend such approach when analysing small sample size data sets.
+
+At this step three values may be calculated: mean expression of genes, common dispersion and gene-wise dispersions. 
+In the default setting all of them are computed and common dispersion is used as an initial value in the grid appraoch to estimate moderated gene-wise dispersions, which are shrunk toward the common dispersion.
+
+This step of our pipeline is the most time consuming, thus consider increasing the number of workers in \Robject{BPPARAM}. 
+
+<<DSdmDispersion>>=
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d
+head(mean_expression(d))
+common_dispersion(d)
+head(genewise_dispersion(d))
+@
+
+To inspect the behaviour of dispersion estimates, you can plot them against the mean gene expression. Here, the effect of shrinking is not so well visible because our data set is very small. To see how it works on real data sets, go to our paper \fixme{citation to DRIMSeq paper}.
+
+<<DSdmDispersion_plot>>=
+plotDispersion(d)
+@
+
+
+\subsubsection{Proportions estimation}
+
+In this step, we estimate the full model proportions, meaning, that transcript or exon proportions are estimated for each condition separetely. You can access this estimates and the corresponding statisctics, such as log-likelihoods, with \Rfunction{proportions} and \Rfunction{statistics} functions, respectively.
+
+
+
+<<DSdmFit, out.width = "16cm", fig.width = 16>>=
+d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d
+
+head(proportions(d), 3)
+head(statistics(d), 3)
+@
+
+
+\subsubsection{Testing for differential splicing}
+
+Calling the \Rfunction{dmTest} function results in two things. First, null model proportions, i.e., feature ratios based on pooled (no grouping into conditions) counts, are estimated. Second, likelihood ratio statistic is used to test for the difference between feature proportions in different groups to identify the differentially spliced genes. 
+
+By default, a parameter \Rcode{compared\_groups} in \Rfunction{dmTest} equals to \Rcode{1:nlevels(samples(x)\$group)}, which means that we test for differences in splicing between any of the groups specified in \Rcode{samples(d)\$group}. In \emph{pasilla} example, there are only two conditions, and there is only one comparison that can be done. In the case where the gouping variable has more that two levels, you could be intereseted in the pair-wise comparisons, which you can specify with \Robject{compared\_groups} parameter. 
+
+Now, if you call \Rfunction{proportions} or \Rfunction{statistics} function, results of null estimation are added to the previous data frames.
+
+<<DSdmTest>>=
+d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d
+
+head(proportions(d), 3)
+head(statistics(d), 3)
+
+@
+
+To obtain the results of likelihood ratio test, you have to call the function \Rfunction{results}, which returns a data frame with likelihood ratio statistics, degrees of freedom, p-values and Benjamini and Hochberg adjusted p-values for each gene. 
+
+
+<<DSdmTest_results>>=
+head(results(d), 3)
+@
+
+You can plot the histogram of p-values.
+
+<<DSdmTest_plot>>=
+plotTest(d)
+@
+
+For genes of interest, you can make plots (bar plots, line plots, box plots, ribbon plots) of observed and estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes. Here, we plot the results for the top significant gene.
+
+<<DSdmLRT_plotFit, out.width = "16cm", fig.width = 16>>=
+res <- results(d)
+res <- res[order(res$pvalue, decreasing = FALSE), ]
+gene_id <- res$gene_id[1]
+
+plotFit(d, gene_id = gene_id)
+plotFit(d, gene_id = gene_id, plot_type = "lineplot")
+plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
+
+@
+
+
+
+
+%------------------------------------------------------------------------------
+%	sQTL analysis work-flow
+%------------------------------------------------------------------------------
+
+
+\section{sQTL analysis work-flow}
+
+\subsection{Example data}
+
+Data downloaded from
+
+\subsection{Genotypes preprocessing}
+
+Preprocessing steps on CSV files with genotypes
+
+
+\subsection{sQTL analysis with DRIMSeq package}
+
+Assuming you have counts and bi-allelic genotypes...
+
+
+
+
+\appendix
+\clearpage
+\begin{center}
+{\Large\sffamily\bfseries\color{BiocBlue} APPENDIX} \addcontentsline{toc}{section}{APPENDIX}
+\end{center}
+
+
+%--------------------------------------------------
+% Session information
+%--------------------------------------------------
+
+\section{Session information}
+
+
+<<sessionInfo>>=
+sessionInfo()
+@
+
+%--------------------------------------------------
+% References
+%--------------------------------------------------
+
+\section{References}
+
+\bibliographystyle{ieeetr}
+\bibliography{DRIMSeq}
+
+
+\end{document}
