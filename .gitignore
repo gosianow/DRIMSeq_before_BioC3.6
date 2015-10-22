@@ -10,3 +10,4 @@ vignettes/*
 !vignettes/*.Rmd
 !vignettes/*.pdf
 !vignettes/figure
+!vignettes/*.bib
