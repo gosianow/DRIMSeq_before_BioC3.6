@@ -68,7 +68,7 @@ dmDispersion(x, ...)
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 
-\item{speed}{Logical. If \code{TRUE}, there will be only one dipsersion calculated per gene and it will be assigned to all the blocks matched with this gene. If \code{FALSE}, dispersion is calculated per each gene-block. Such calculation may take a long time, since there can be hundreds of SNPs/blocks per gene.}
+\item{speed}{Logical. If \code{FALSE}, dispersion is calculated per each gene-block. Such calculation may take a long time, since there can be hundreds of SNPs/blocks per gene. If \code{TRUE}, there will be only one dipsersion calculated per gene and it will be assigned to all the blocks matched with this gene.}
 }
 \value{
 Returns a \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.

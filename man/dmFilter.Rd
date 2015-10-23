@@ -34,7 +34,7 @@ should be between 0 and 1.}
 
 \item{max_features}{Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept.}
 
-\item{minor_allele_freq}{Minimal number of samples for the minor allele presence.}
+\item{minor_allele_freq}{Minimal number of samples where each of the genotypes has to be present.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }
@@ -47,9 +47,11 @@ Filtering of genes and features with low expression. Additionally, for the dmSQT
 \details{
 Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition.
 
-In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
+\code{min_samps_gene_expr} defines the minimal number of samples where gene is required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. On the other hand, such strict requirement would lead to elimination of genes where, for example, expression is low in only few samples. A value that leads to a balanced solution is needed.
 
-In sQTL analysis, \code{min_samps_gene_expr} could be equal to the total sample size. For some genes, missing values are present in the data. Thus, this number should indicate the minimal number of samples that you allow to include in the downstream analysis. For each gene, samples with gene expression lower than \code{min_gene_expr} have \code{NA}s assigned. This means that such samples are not considered in the sQTL analysis. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm are skipped in the analysis. \code{minor_allele_freq} should indicate the minimal number of samples for the minor allele frequency. Usually, it is equal to 5\% of total samples. \code{min_samps_feature_prop} should be equal to \code{minor_allele_freq}.
+In differential splicing analysis, we suggest using \code{min_samps_gene_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+
+In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples.
 }
 \examples{
 ###################################

@@ -16,7 +16,7 @@ dmDSdata(counts, gene_id, feature_id, sample_id, group)
 
 \item{sample_id}{Vector of unique sample IDs corresponding to the columns in \code{counts}.}
 
-\item{group}{Vector that defines the goupping of samples.}
+\item{group}{Vector that defines the grouping of samples.}
 }
 \value{
 Returns a \linkS4class{dmDSdata} object.

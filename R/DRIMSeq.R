@@ -6,6 +6,7 @@
 #' @import S4Vectors
 #' @import ggplot2
 #' @importFrom reshape2 melt
+#' @import grid
 NULL
 
 
@@ -138,7 +139,7 @@ NULL
 
 #' Sample data for sQTL analysis
 #'
-#' A subset of data from GEUVADIS project where 465 RNA-Seq samples from lymphoblastoid cell lines were obtained. 422 of this samples were sequenced within the 1000 Genome Project Phase 1. Here, we make available a subset of bi-allelic SNPs and transcript expected counts for CEPH (CEU) population that corresponds to 50 randomly selected genes from chromosome 19. For the details of how this data was generated, see the User Guide.
+#' A subset of data from GEUVADIS project where 462 RNA-Seq samples from lymphoblastoid cell lines were obtained. The genome sequencing data of the same individuals is provided by the 1000 Genomes Project. The samples in this project come from five populations: CEPH (CEU), Finns (FIN), British (GBR), Toscani (TSI) and Yoruba (YRI). Here, we make available subsets of bi-allelic SNPs and transcript expected counts for CEPH population (91 individuals) that correspond to 50 randomly selected genes from chromosome 19. For the details on how this data was preprocessed, see the vignette.
 #' 
 #' @format 
 #' \code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object. See Examples.

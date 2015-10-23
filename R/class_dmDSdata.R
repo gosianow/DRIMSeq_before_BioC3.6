@@ -155,7 +155,7 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #'  @param gene_id Vector of gene IDs corresponding to \code{counts}.
 #'  @param feature_id Vector of feature IDs corresponding to \code{counts}.
 #'  @param sample_id Vector of unique sample IDs corresponding to the columns in \code{counts}.
-#'  @param group Vector that defines the goupping of samples.
+#'  @param group Vector that defines the grouping of samples.
 #'  @return Returns a \linkS4class{dmDSdata} object.
 #'  @examples
 #'  
@@ -285,8 +285,10 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
 #' @details 
 #' Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
+#'
+#' \code{min_samps_gene_expr} defines the minimal number of samples where gene is required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. On the other hand, such strict requirement would lead to elimination of genes where, for example, expression is low in only few samples. A value that leads to a balanced solution is needed.
 #' 
-#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} and \code{min_samps_feature_prop} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameters to 3.
+#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
 #' 
 #' @param min_samps_gene_expr Minimal number of samples where genes should 
 #'   be expressed. See Details.

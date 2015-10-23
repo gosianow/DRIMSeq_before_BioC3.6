@@ -1,6 +1,6 @@
 # Prepare data for examples and vignette 
 
-# setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/geuvadis/")
+setwd("/home/gosia/R/multinomial_project/package_devel/DRIMSeq/")
 
 library(DRIMSeq)
 
@@ -38,19 +38,26 @@ write.table(genes_bed, paste0(data_dir, "annotation/genes.bed"), quote = FALSE, 
 
 samples <- read.table(paste0(data_dir, "geuvadis_analysis_results/E-GEUV-1.sdrf.txt"), header = T, sep="\t", as.is=TRUE)
 
+table(samples$Assay.Name)
+
 samples <- samples[c("Assay.Name", "Characteristics.population.")]
 samples <- unique(samples)
 
+dim(samples)
 table(samples$Characteristics.population.)
 
 colnames(samples) <- c("sample_id", "population")
-samples$sample_id_short <- limma::strsplit2(samples$sample_id, "\\.")[,1]
+samples$sample_id_short <- strsplit2(samples$sample_id, "\\.")[,1]
 
 
 
 ### expression in counts
 
 expr_all <- read.table(paste0(data_dir, "geuvadis_analysis_results/GD660.TrQuantCount.txt"), header = T, sep="\t", as.is = TRUE)
+
+
+table(colnames(expr_all) %in% samples$sample_id)
+
 
 expr_all <- expr_all[, c("TargetID", "Gene_Symbol", samples$sample_id)]
 colnames(expr_all) <- c("trId", "geneId", samples$sample_id_short)
@@ -66,20 +73,12 @@ for(i in unique(samples$population)){
 
 
 ### genotypes
-
+library(Rsamtools)
 library(VariantAnnotation)
 library(tools)
 
 
 files <- list.files(path = paste0(data_dir, "geuvadis_genotypes"), pattern = "genotypes.vcf.gz", full.names = TRUE, include.dirs = FALSE)
-
-chr <- gsub("chr", "", strsplit2(files, split = "\\.")[, 2])
-
-## extended gene ranges
-window <- 5000
-gene_ranges <- resize(gtf, GenomicRanges::width(gtf) + 2 * window, fix = "center")
-
-population <- unique(samples$population)
 
 ## bigzip and index the vcf files
 for(i in 1:length(files)){
@@ -89,6 +88,13 @@ for(i in 1:length(files)){
   idx <- indexTabix(zipped, format = "vcf")
   
 }
+
+## extended gene ranges
+window <- 5000
+gene_ranges <- resize(gtf, GenomicRanges::width(gtf) + 2 * window, fix = "center")
+
+population <- unique(samples$population)
+chr <- gsub("chr", "", strsplit2(files, split = "\\.")[, 2])
 
 
 for(j in 1:length(population)){
@@ -142,7 +148,7 @@ for(j in 1:length(population)){
     ### sorting
     genotypes <- genotypes[order(genotypes[,2]), ]
     
-    write.table(genotypes, file=paste0(out.dir, "genotypes_", j, "_chr", chr[i], ".tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+    write.table(genotypes, file = paste0(data_dir, "genotypes/genotypes_", j, "_chr", chr[i], ".tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
     
     
   }
@@ -176,59 +182,75 @@ all(colnames(counts[, -(1:2)]) == colnames(genotypes[, -(1:4)]))
 sample_id <- colnames(counts[, -(1:2)])
 
 
-d <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId, feature_id = counts$trId, gene_ranges = gene_ranges, genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- d_org <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId, feature_id = counts$trId, gene_ranges = gene_ranges, genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 
-plotData(d)
+plotData(d, out_dir = "./")
+
+
 
 ### Filtering
-d <- dmFilter(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 
-plotData(d)
+plotData(d, out_dir = "./")
+
 
 # set.seed(123)
 # genes_subset <- names(d)[sample(length(d), size = 50, replace = FALSE)]
 
-
 oo <- order(width(d@genotypes), decreasing = FALSE)
 genes_subset <- names(d)[oo][1:50]
 
-d <- d[genes_subset, ]
 
-snps_subset <- d@blocks@unlistData[, "snp_id"]
+
+d_sub1 <- d_org[genes_subset, ]
+snps_subset1 <- unique(d_sub1@blocks@unlistData[, "snp_id"])
+
+
+d_sub2 <- d[genes_subset, ]
+snps_subset2 <- unique(d_sub2@blocks@unlistData[, "snp_id"])
+
+
+snps_extra <- setdiff(snps_subset1, snps_subset2)
+snps_extra <- snps_extra[sample(length(snps_extra), size = 500, replace = FALSE)]
+
 
 write.table(genes_subset, paste0("inst/extdata/gene_id_subset.txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
-write.table(snps_subset, paste0("inst/extdata/snp_id_subset.txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(c(snps_subset2, snps_extra), paste0("inst/extdata/snp_id_subset.txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
 
 
 ########################################################
 # Keep data only for 50 genes from chr19 
 ########################################################
 
-data_ex_dir <- system.file("extdata", package = "DRIMSeq")
+# data_ex_dir <- system.file("extdata", package = "DRIMSeq")
 
-genes_subset = readLines(file.path(data_ex_dir, "/gene_id_subset.txt"))
-snps_subset = readLines(file.path(data_ex_dir, "/snp_id_subset.txt"))
+# genes_subset = readLines(file.path(data_ex_dir, "/gene_id_subset.txt"))
+# snps_subset = readLines(file.path(data_ex_dir, "/snp_id_subset.txt"))
+
+
+genes_subset = readLines(file.path("inst/extdata/gene_id_subset.txt"))
+snps_subset = readLines(file.path("inst/extdata/snp_id_subset.txt"))
 
 
 ### Subset gene ranges
 gene_bed <- read.table(paste0(data_dir, "annotation/genes.bed"), header = FALSE, as.is = TRUE)
 gene_bed <- gene_bed[gene_bed[, 4] %in% genes_subset, ]
 
-write.table(gene_bed, paste0(data_ex_dir, "/genes_subset.bed"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(gene_bed, paste0("inst/extdata/genes_subset.bed"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
 
 
 ### Subset counts
 counts <- read.table(paste0(data_dir, "expression/TrQuantCount_CEU.tsv"), header = TRUE, as.is = TRUE)
 counts <- counts[counts$geneId %in% genes_subset, ]
 
-write.table(counts, paste0(data_ex_dir, "/TrQuantCount_CEU_subset.tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+write.table(counts, paste0("inst/extdata/TrQuantCount_CEU_subset.tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 
 ### Subset genotypes
 genotypes <- read.table(paste0(data_dir, "genotypes/genotypes_CEU_chr19.tsv"), header = TRUE, sep = "\t", as.is = TRUE)
 genotypes <- genotypes[genotypes$snpId %in% snps_subset, ]
 
-write.table(genotypes, paste0(data_ex_dir, "/genotypes_CEU_subset.tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+write.table(genotypes, paste0("inst/extdata/genotypes_CEU_subset.tsv"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 
 ########################################################

@@ -25,7 +25,8 @@ Imports:
     GenomicRanges,
     S4Vectors,
     ggplot2,
-    reshape2
+    reshape2,
+    grid
 LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr
@@ -85,3 +86,4 @@ Collate:
     'dm_rdirichlet.R'
     'dm_score.R'
     'dm_weirMoM.R'
+    'multiplot.R'
