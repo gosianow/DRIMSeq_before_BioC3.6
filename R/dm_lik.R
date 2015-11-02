@@ -7,8 +7,9 @@
 dm_likG <- function(pi, gamma0, y){
   ## pi has length of k-1
   ## gamma0 has length 1
-  ## y has k rows and any number of columns
-  
+  ## y has k rows and any number of columns n
+  ## This function returns likelihhod without normalizing component, but it is OK for LR test.
+   
   N <- ncol(y)
   S <- colSums(y)
   
@@ -18,11 +19,42 @@ dm_likG <- function(pi, gamma0, y){
   
   l <- N * lgamma(gamma0) - sum(lgamma(S + gamma0)) + l
   
+  # normalizing_part <- sum(lgamma(S + 1) - colSums(lgamma(y + 1)))
+  
   return(l)
   
 }
 
 
+dm_lik_regG <- function(b, x, gamma0, y){
+  ## b has length of p * (q-1)
+  ## gamma0 has length 1
+  ## y has q rows and n columns
+  ## This function returns likelihhod without normalizing component, but it is OK for LR test.
+  
+  y <- t(y)
+  
+  n <- nrow(x)
+  q <- ncol(y)
+  p <- ncol(x)
+  
+  b <- matrix(b, p, q-1)
+  
+  z <- exp(x %*% b)
+  pi <- z/(1 + rowSums(z))
+  pi <- cbind(pi, 1 - rowSums(pi))
+  
+  s <- rowSums(y)
+  
+  l <- sum(rowSums(lgamma(y + gamma0 * pi) - lgamma(pi * gamma0)))
+
+  l <- n * lgamma(gamma0) - sum(lgamma(s + gamma0)) + l
+  
+  # normalizing_part <- sum(lgamma(s + 1) - rowSums(lgamma(y + 1)))
+  
+  return(l)
+  
+}
 
 ##############################################################################
 # log-likelihood for k-1 parameters (pi)

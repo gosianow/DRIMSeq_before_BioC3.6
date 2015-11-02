@@ -18,7 +18,7 @@ dm_adjustmentOneGeneOneGroup <- function(y, gamma0, pi){
   N <- ncol(y) 
   pi <- pi[keep_row]
   
-  adj <- log(det(N * dm_FIMobsG(pi = pi[-length(pi)], gamma0, y, inv = FALSE) ))/2 
+  adj <- log(det(N * (- dm_HessianG(pi = pi[-length(pi)], gamma0, y)) ))/2 
 ## with Gamma functions ## if pi is NULL then:
 # Error in is.data.frame(x) :
 #   dims [product 6] do not match the length of object [0]

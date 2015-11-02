@@ -1,4 +1,4 @@
-dm_FisherScoring <- function(y, k, gamma0, verbose = FALSE){
+dm_NewtonRaphson <- function(y, k, gamma0, verbose = FALSE){
   ### This mode is completely unprepared!!! And slow.
   
   plot = FALSE
@@ -33,17 +33,19 @@ dm_FisherScoring <- function(y, k, gamma0, verbose = FALSE){
     
     if(abs(lik2 - lik1) < epsilon) conv <- FALSE
     
-    scoreFun <- dm_scoreG(pi, gamma0, y)
-    if(verbose) cat("scoreFun:", scoreFun, fill = TRUE)
+    score <- dm_scoreG(pi, gamma0, y)
+    if(verbose) cat("score:", score, fill = TRUE)
     
     # if(mode=="exp") invFIM <- dmInvExpFIMkm1(pi, gamma0, y)
     # else if(mode=="obs") invFIM <- dmInvObsFIMkm1(pi, gamma0, y)
-    invFIM <- dm_FIMobs(pi, gamma0, y)
+    hessian <- dm_HessianG(pi, gamma0, y)
     
-    if(verbose) cat("invFIM:", invFIM, fill = TRUE)
+    if(verbose) cat("hessian:", hessian, fill = TRUE)
     
-    # Updates parameter estimates
-    pi <- pi + invFIM %*% scoreFun
+    # Update parameter estimates
+    update <- solve(hessian, score)
+    pi <- pi - update
+    
     
     ## check if pi is negative, then restart with new init params
     if(any(c(pi, 1-sum(pi)) <= 0 )){
