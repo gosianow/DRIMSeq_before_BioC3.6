@@ -3,7 +3,7 @@
 # returns common likelihood = sum of likelihoods from all genes
 ##############################################################################
 
-# gamma0 = 38196.6; counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
+# gamma0 = 3819.66; counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 
 dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRUE, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -32,6 +32,4 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes, disp_adjust = TRU
   return(adjLik)
   
 }
-
-
 

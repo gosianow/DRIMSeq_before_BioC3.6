@@ -7,7 +7,7 @@
 # it returns a list of MatrixLists; unlistData = pi, metadata = stats
 
 
-dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", "null")[1], prop_mode=c("constrOptim", "constrOptimG")[2], prop_tol = 1e-12, verbose=FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
   
@@ -27,7 +27,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
            if(verbose) cat("* Fitting full model.. \n")
            
            time <- system.time(fff <- BiocParallel::bplapply(inds, function(g){
-             # g = 662
+             # g = 9
              
              y = counts[[g]]
              n_y <- nrow(y)
@@ -39,11 +39,11 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              stats <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, lgroups_g))
              
              for(i in 1:n_snps){          
-              # i = 29
+              # i = 1
 
               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-              yg <- y[, !NAs]             
-              group <- snps[i, !NAs]
+              yg <- y[, !NAs, drop = FALSE]             
+              group <- snps[i, !NAs, drop = FALSE]
               group <- factor(group)
               ngroups <- nlevels(group)
               lgroups <- levels(group)
@@ -100,7 +100,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               # print(i)
               
               NAs <- is.na(snps[i, ]) | is.na(y[1, ])            
-              yg <- y[, !NAs]
+              yg <- y[, !NAs, drop = FALSE]
                            
               f <- dm_fitOneGeneOneGroup(y = yg, gamma0 = gamma0[[g]][i], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
               

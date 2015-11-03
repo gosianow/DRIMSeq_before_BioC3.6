@@ -63,7 +63,7 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
     
     
     if(!is.null(out_dir))
-      pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , gene), ".pdf"), width = 12, height = 7)
+      pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , paste0(i, "_", gene)), ".pdf"), width = 12, height = 7)
     
     print(ggp)
     

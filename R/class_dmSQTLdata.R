@@ -294,12 +294,11 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 ######################################
 
 
-
-#' @rdname dmSQTLdata
 #'  @param gene_ranges \code{\linkS4class{GRanges}} object with gene location. It must contain gene names when calling names().
 #'  @param snp_ranges \code{\linkS4class{GRanges}} object with SNP location. It must contain SNP names when calling names().
 #'  @param window Size of a down and up stream window, which is defining the surrounding for a gene. Only SNPs that are located within a gene or its surrounding are considered in the sQTL analysis. 
-#'  @export
+#' @rdname dmSQTLdata
+#' @export
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
 
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))

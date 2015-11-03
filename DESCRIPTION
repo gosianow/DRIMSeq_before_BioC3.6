@@ -71,8 +71,8 @@ Collate:
     'dmSQTL_plotFit.R'
     'dmSQTL_profileLikCommon.R'
     'dmSQTL_test.R'
-    'dm_FIM.R'
-    'dm_FisherScoring.R'
+    'dm_Hessian.R'
+    'dm_NewtonRaphson.R'
     'dm_adjustmentOneGeneManyGroups.R'
     'dm_adjustmentOneGeneOneGroup.R'
     'dm_colorb.R'
@@ -87,3 +87,4 @@ Collate:
     'dm_score.R'
     'dm_weirMoM.R'
     'multiplot.R'
+RoxygenNote: 5.0.0
