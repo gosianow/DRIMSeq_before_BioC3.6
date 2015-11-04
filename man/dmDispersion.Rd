@@ -14,7 +14,7 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "trended", disp_prior_df = 1, disp_span = 0.3,
+  disp_moderation = "common", disp_prior_df = 1, disp_span = 0.3,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
