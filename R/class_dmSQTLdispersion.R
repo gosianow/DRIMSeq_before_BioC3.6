@@ -103,7 +103,7 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
   stopifnot(length(disp_moderation) == 1)
   stopifnot(disp_moderation %in% c("none", "common", "trended"))
   stopifnot(length(disp_prior_df) == 1)
-  stopifnot(is.numeric(disp_prior_df) && disp_prior_df > 0)
+  stopifnot(is.numeric(disp_prior_df) && disp_prior_df >= 0)
   stopifnot(length(disp_span) == 1)
   stopifnot(is.numeric(disp_span) && disp_span > 0 && disp_span < 1)
   stopifnot(length(prop_mode) == 1)
