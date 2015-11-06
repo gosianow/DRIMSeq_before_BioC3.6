@@ -127,7 +127,12 @@ setMethod("[", "dmDSdata", function(x, i, j){
     
   }else{
     
-    counts <- x@counts[i, j, drop = FALSE]
+    if(missing(i)){
+      counts <- x@counts[, j, drop = FALSE]
+    }else{
+      counts <- x@counts[i, j, drop = FALSE]
+    }
+
     samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, , drop = FALSE]

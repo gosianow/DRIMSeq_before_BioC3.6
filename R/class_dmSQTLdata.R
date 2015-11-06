@@ -110,9 +110,15 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
     
   }else{
     
-    counts <- x@counts[i, j, drop = FALSE]
-    genotypes <- x@genotypes[i, j, drop = FALSE]
-    blocks <- x@blocks[i, , drop = FALSE]
+    if(missing(i)){
+      counts <- x@counts[, j, drop = FALSE]
+      genotypes <- x@genotypes[, j, drop = FALSE]
+    }else{
+      counts <- x@counts[i, j, drop = FALSE]
+      genotypes <- x@genotypes[i, j, drop = FALSE]
+      blocks <- x@blocks[i, , drop = FALSE]
+    }
+
     samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, , drop = FALSE]
