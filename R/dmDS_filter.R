@@ -1,7 +1,7 @@
 #' @include dm_cpm.R
 NULL
 
-# counts = x@counts; samples = x@samples; min_samps_gene_expr = 3; min_gene_expr = 1; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
+# counts = x@counts; samples = x@samples; min_samps_gene_expr = 1; min_gene_expr = 1; min_samps_feature_prop = 1; min_feature_prop = 0.01; max_features = Inf
 
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
@@ -10,7 +10,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
   
   inds <- which(width(counts) > 1)
   
-  min_samps_feature_prop2 <- max(2, min_samps_feature_prop)
+  min_samps_feature_prop2 <- max(1, min_samps_feature_prop) # max(2, min_samps_feature_prop)
   
   counts_new <- lapply(inds, function(g){
     # g = 117
@@ -31,7 +31,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     if(sum(samps2keep) < min_samps_feature_prop2)
       return(NULL)
     
-    prop <- prop.table(expr_gene[, samps2keep], 2) 
+    prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
     trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
     ### no genes with one transcript
@@ -42,7 +42,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     if(!max_features == Inf){
       if(sum(trans2keep) > max_features){
         
-        tr_order <- order(apply(aggregate(t(prop[trans2keep, ]), by = list(group = samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
+        tr_order <- order(apply(aggregate(t(prop[trans2keep, , drop = FALSE]), by = list(group = samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
         
         trans2keep <- trans2keep[trans2keep]
         
@@ -51,7 +51,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
       }
     }
     
-    expr <- expr_gene[trans2keep, ] 
+    expr <- expr_gene[trans2keep, , drop = FALSE] 
     
     return(expr)
     
