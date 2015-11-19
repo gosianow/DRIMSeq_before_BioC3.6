@@ -10,8 +10,6 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
   
   inds <- which(width(counts) > 1)
   
-  min_samps_feature_prop2 <- max(1, min_samps_feature_prop) # it was max(2, min_samps_feature_prop)
-  
   counts_new <- lapply(inds, function(g){
     # g = 117
     # print(g)
@@ -26,12 +24,15 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     if(! sum(colSums(expr_cpm_gene) >= min_gene_expr) >= min_samps_gene_expr )
       return(NULL)
     
-    samps2keep <- colSums(expr_cpm_gene) != 0 & !is.na(expr_cpm_gene[1, ])
+    samps2keep <- colSums(expr_cpm_gene) > 0 & !is.na(expr_cpm_gene[1, ])
     
-    if(sum(samps2keep) < min_samps_feature_prop2)
+    if(sum(samps2keep) == 0)
       return(NULL)
     
     prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
+    # prop.table(matrix(c(1,0), 2, 1), 2)
+    # prop.table(matrix(c(0,0), 2, 1), 2)
+    # prop.table(matrix(c(0,0, 1, 0), 2, 2), 2)
     
     ### transcripts with min proportion
     trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop

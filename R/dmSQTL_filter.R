@@ -16,8 +16,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
   
   inds <- which(width(counts) > 1)
-  min_samps_feature_prop2 <- max(2, min_samps_feature_prop)
-  
+
   counts_new <- lapply(inds, function(g){
     # g = 1
     expr_cpm_gene <- counts_cpm[[g]]
@@ -26,10 +25,15 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     ### genes with min expression
     if(! sum(colSums(expr_cpm_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
       return(NULL)
+      
+      samps2keep <- colSums(expr_cpm_gene) > 0 & !is.na(expr_cpm_gene[1, ])
+      
+      if(sum(samps2keep) == 0)
+        return(NULL)
     
     samps2keep <- colSums(expr_cpm_gene) >= min_gene_expr & !is.na(expr_cpm_gene[1, ])
     
-    if(sum(samps2keep) < min_samps_feature_prop2)
+    if(sum(samps2keep) < max(1, min_samps_feature_prop))
       return(NULL)
     
     prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
