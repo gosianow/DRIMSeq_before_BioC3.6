@@ -29,7 +29,8 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            time <- system.time(ff <- BiocParallel::bplapply(inds, function(g){  
              # g = 1
-             # cat("Gene:", g, fill = TRUE)
+             if(verbose >= 2)
+              cat(paste0(" Gene:", g))
 
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
              
@@ -45,6 +46,7 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pis and liks
            
+           if(verbose >= 2) cat("\n")
            if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
            
            return(fff)

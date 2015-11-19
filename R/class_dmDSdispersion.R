@@ -252,7 +252,7 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' @param disp_span Value from 0 to 1 defining the percentage of genes used in smoothing sliding window when calculating the dispersion versus mean expression trend.
 #' @param prop_mode Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.
 #' @param prop_tol The desired accuracy when estimating proportions.
-#' @param verbose Logical. Whether to display more progress messages.
+#' @param verbose Numeric. Definie the level of progress messages displayed. 0 - no messages, 1 - main messages, 2 - message for every gene fitting.
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' 
 #' @return Returns a \code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.
@@ -283,7 +283,7 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' @author Malgorzata Nowicka
 #' @rdname dmDispersion
 #' @export
-setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "common", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "common", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ### Parameter checks:
   stopifnot(is.logical(mean_expression))
@@ -312,7 +312,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
   stopifnot(length(prop_tol) == 1)
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
-  stopifnot(is.logical(verbose))
+  stopifnot(verbose %in% 0:2)
 
   
   if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){

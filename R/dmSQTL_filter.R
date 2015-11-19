@@ -32,7 +32,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     if(sum(samps2keep) < min_samps_feature_prop2)
       return(NULL)
     
-    prop <- prop.table(expr_gene[, samps2keep], 2) 
+    prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
     trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
     ### no genes with one transcript
@@ -48,7 +48,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     #   }
     # }
     
-    expr <- expr_gene[trans2keep, ] 
+    expr <- expr_gene[trans2keep, , drop = FALSE] 
     expr[, !samps2keep] <- NA
     
     return(expr)
