@@ -1,37 +1,29 @@
-#' @include dm_cpm.R
-NULL
 
-# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 1; min_samps_feature_prop = 5; min_feature_prop = 0.1; max_features = Inf; minor_allele_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
+# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 20; min_samps_feature_prop = 5; min_feature_prop = 0.05; max_features = Inf; minor_allele_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
 
-dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 1, min_samps_feature_prop = 5, min_feature_prop = 0.1, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 20, min_samps_feature_prop = 5, min_feature_prop = 0.05, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ########################################################
   # filtering on counts, put NA for samples with low gene expression
   ########################################################
   
-  ### calculate cpm
-  counts_for_cpm <- counts@unlistData
-  counts_for_cpm[is.na(counts_for_cpm)] <- 0
-  
-  counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts_for_cpm), partitioning = counts@partitioning) ### cpm can not handle NAs, so repalce NAs with 0s
-  
   inds <- which(width(counts) > 1)
 
   counts_new <- lapply(inds, function(g){
     # g = 1
-    expr_cpm_gene <- counts_cpm[[g]]
+
     expr_gene <- counts[[g]]
     
     ### genes with min expression
-    if(! sum(colSums(expr_cpm_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
       return(NULL)
       
-      samps2keep <- colSums(expr_cpm_gene) > 0 & !is.na(expr_cpm_gene[1, ])
+      samps2keep <- colSums(expr_gene) > 0 & !is.na(expr_gene[1, ])
       
       if(sum(samps2keep) == 0)
         return(NULL)
     
-    samps2keep <- colSums(expr_cpm_gene) >= min_gene_expr & !is.na(expr_cpm_gene[1, ])
+    samps2keep <- colSums(expr_gene) >= min_gene_expr & !is.na(expr_gene[1, ])
     
     if(sum(samps2keep) < max(1, min_samps_feature_prop))
       return(NULL)

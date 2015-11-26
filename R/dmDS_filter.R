@@ -1,30 +1,21 @@
-#' @include dm_cpm.R
-NULL
 
 # counts = x@counts; samples = x@samples; min_samps_gene_expr = 1; min_gene_expr = 1; min_samps_feature_prop = 1; min_feature_prop = 0.01; max_features = Inf
 
 dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
-  
-  ### calculate cpm
-  counts_cpm <- new("MatrixList", unlistData = dm_cpm(counts@unlistData), partitioning = counts@partitioning)
   
   inds <- which(width(counts) > 1)
   
   counts_new <- lapply(inds, function(g){
     # g = 117
     # print(g)
-    expr_cpm_gene <- counts_cpm[[g]]
+    
     expr_gene <- counts[[g]]
     
-    # ### no genes with one transcript
-    # if(dim(expr_gene)[1] == 1)
-    #   return(NULL)
-    
     ### genes with min expression
-    if(! sum(colSums(expr_cpm_gene) >= min_gene_expr) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_gene) >= min_gene_expr) >= min_samps_gene_expr )
       return(NULL)
     
-    samps2keep <- colSums(expr_cpm_gene) > 0 & !is.na(expr_cpm_gene[1, ])
+    samps2keep <- colSums(expr_gene) > 0 & !is.na(expr_gene[1, ])
     
     if(sum(samps2keep) == 0)
       return(NULL)

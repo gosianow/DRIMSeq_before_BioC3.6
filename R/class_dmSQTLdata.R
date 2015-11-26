@@ -365,7 +365,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' @details 
 #' 
-#' In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples. 
+#' In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 20}, only genes with expression of at least 20 in at least 70 samples are kept, and samples with expression lower than 20 have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples. 
 #' 
 #' @examples 
 #' #############################
@@ -382,7 +382,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' }
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 1, min_feature_prop = 0.1, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 20, min_feature_prop = 0.05, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
   stopifnot(min_gene_expr >= 0)

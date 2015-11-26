@@ -297,7 +297,7 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' 
 #' @param min_samps_gene_expr Minimal number of samples where genes should 
 #'   be expressed. See Details.
-#' @param min_gene_expr Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.
+#' @param min_gene_expr Minimal gene expression.
 #' @param min_samps_feature_prop Minimal number of samples where features
 #'   should be expressed. See details.
 #' @param min_feature_prop Minimal proportion for feature expression. This value
@@ -321,7 +321,7 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_prop, min_gene_expr = 1, min_feature_prop = 0.01, max_features = Inf){
+setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_prop = 0.01, max_features = Inf){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
   stopifnot(min_gene_expr >= 0)
