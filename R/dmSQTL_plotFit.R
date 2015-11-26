@@ -60,7 +60,7 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples, 
     pi_full <- fit_full[[gene]][[block]][, levels(group), drop = FALSE]
     pi_null <- fit_null[[gene]][[block]]
     
-    ggp <- dm_plotProportion(counts = counts_gene, group = group, sample_id = sample_id, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
+    ggp <- dm_plotProportions(counts = counts_gene, group = group, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
     
     
     if(!is.null(out_dir))

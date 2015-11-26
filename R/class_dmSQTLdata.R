@@ -418,7 +418,45 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_f
 #' @export
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
-  dmSQTL_plotData(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, out_dir = out_dir)
+  tt <- width(x@counts)
+  
+  ggp <- dm_plotDataFeatures(tt)
+  
+  
+  if(!is.null(out_dir))
+    pdf(paste0(out_dir, "hist_features.pdf"))
+  
+  print(ggp)
+  
+  if(!is.null(out_dir))
+    dev.off()
+  
+  
+  tt <- width(x@blocks)
+  
+  ggp <- dm_plotDataSnps(tt)
+  
+  if(!is.null(out_dir))
+    pdf(paste0(out_dir, "hist_snps.pdf"))
+  
+  print(ggp)
+  
+  if(!is.null(out_dir))
+    dev.off()
+  
+  
+  tt <- width(x@genotypes)
+  
+  ggp <- dm_plotDataBlocks(tt)
+  
+  
+  if(!is.null(out_dir))
+    pdf(paste0(out_dir, "hist_blocks.pdf"))
+  
+  print(ggp)
+  
+  if(!is.null(out_dir))
+    dev.off()
   
 })
 

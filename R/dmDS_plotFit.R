@@ -58,7 +58,7 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
       pi_null <- proportions_null[[gene]]
     
     
-    ggp <- dm_plotProportion(counts = counts_gene, group = group, sample_id = sample_id, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
+    ggp <- dm_plotProportions(counts = counts_gene, group = group, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
     
     
     

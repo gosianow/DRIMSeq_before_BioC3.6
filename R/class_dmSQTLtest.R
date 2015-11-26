@@ -148,7 +148,17 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
 #' @export
 setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
   
-  dm_plotTable(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"], out_dir = out_dir)
+  ggp <- dm_plotPvalues(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"])
+  
+  if(!is.null(out_dir))
+    pdf(paste0(out_dir, "hist_", "pvalues", ".pdf"))
+  
+  print(ggp)
+  
+  
+  if(!is.null(out_dir))
+    dev.off()
+  
   
 })
 

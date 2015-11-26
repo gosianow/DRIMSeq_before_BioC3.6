@@ -1,6 +1,6 @@
 
 
-dm_plotTable <- function(pvalues, name = "pvalue", out_dir = NULL){
+dm_plotPvalues <- function(pvalues){
   
   df <- data.frame(pvalues = pvalues[!is.na(pvalues)])
   
@@ -13,17 +13,8 @@ dm_plotTable <- function(pvalues, name = "pvalue", out_dir = NULL){
     coord_cartesian(xlim = c(-0.02, 1.02)) +
     geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(nrow(df), " tests       ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 3, size = 6)
   
-  
-  if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_", name, ".pdf"))
-  
-  print(ggp)
-  
-  
-  if(!is.null(out_dir))
-    dev.off()
-  
-  
+return(ggp)
+
 }
 
 
