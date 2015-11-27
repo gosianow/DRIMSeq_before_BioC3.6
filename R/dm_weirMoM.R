@@ -8,6 +8,8 @@ dm_weirMoM <- function(y, se = FALSE){
 
 #   y <- t(y)
   
+  y <- y[rowSums(y) > 0, colSums(y) > 0, drop = FALSE]
+  
   K <- ncol(y)
   J <- nrow(y)
   MoM <- colSums(y)/sum(y)
