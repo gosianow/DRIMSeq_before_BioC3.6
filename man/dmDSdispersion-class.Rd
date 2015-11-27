@@ -73,7 +73,8 @@ d <- data_dmDSdata
 ### Filtering
 # Check what is the minimal number of replicates per condition 
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
+ min_samps_feature_prop = 3)
 
 ### Calculate dispersion
 d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))

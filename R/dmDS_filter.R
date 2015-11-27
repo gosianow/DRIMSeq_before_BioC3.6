@@ -1,7 +1,7 @@
 
-# counts = x@counts; samples = x@samples; min_samps_gene_expr = 1; min_gene_expr = 1; min_samps_feature_prop = 1; min_feature_prop = 0.01; max_features = Inf
+# counts = x@counts; samples = x@samples; min_samps_gene_expr = 6; min_gene_expr = 10; min_samps_feature_expr = 3; min_feature_expr = 10; min_samps_feature_prop = 3; min_feature_prop = 0.01; max_features = Inf
 
-dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr = 1, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
+dmDS_filter <- function(counts, samples, min_samps_gene_expr = 6, min_gene_expr = 10, min_samps_feature_expr = 3, min_feature_expr = 10, min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf){
   
   inds <- which(width(counts) > 1)
   
@@ -9,43 +9,55 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
     # g = 117
     # print(g)
     
-    expr_gene <- counts[[g]]
+    expr_features <- counts[[g]]
     
     ### genes with min expression
-    if(! sum(colSums(expr_gene) >= min_gene_expr) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_features) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
       return(NULL)
     
-    samps2keep <- colSums(expr_gene) > 0 & !is.na(expr_gene[1, ])
+    ### features with min expression
+    features2keep <- rowSums(expr_features >= min_feature_expr, na.rm = TRUE) >= min_samps_feature_expr
     
-    if(sum(samps2keep) == 0)
+    ### no genes with one feature
+    if(sum(features2keep) <= 1)
       return(NULL)
     
-    prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
+    expr_features <- expr_features[features2keep, , drop = FALSE]
+    
+    
+    ### genes with zero expression
+    samps2keep <- colSums(expr_features) > 0 & !is.na(expr_features[1, ])
+    
+    if(sum(samps2keep) < max(1, min_samps_feature_prop))
+      return(NULL)
+    
+    
+    prop <- prop.table(expr_features[, samps2keep, drop = FALSE], 2) 
     # prop.table(matrix(c(1,0), 2, 1), 2)
     # prop.table(matrix(c(0,0), 2, 1), 2)
     # prop.table(matrix(c(0,0, 1, 0), 2, 2), 2)
     
-    ### transcripts with min proportion
-    trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
+    ### features with min proportion
+    features2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
-    ### no genes with one transcript
-    if(sum(trans2keep) <= 1)
+    ### no genes with one feature
+    if(sum(features2keep) <= 1)
       return(NULL)
     
     
     if(!max_features == Inf){
-      if(sum(trans2keep) > max_features){
+      if(sum(features2keep) > max_features){
         
-        tr_order <- order(apply(aggregate(t(prop[trans2keep, , drop = FALSE]), by = list(group = samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
+        tr_order <- order(apply(aggregate(t(prop[features2keep, , drop = FALSE]), by = list(group = samples$group[samps2keep]), median)[, -1], 2, max), decreasing = TRUE)
         
-        trans2keep <- trans2keep[trans2keep]
+        features2keep <- features2keep[features2keep]
         
-        trans2keep <- names(trans2keep[sort(tr_order[1:max_features])])
+        features2keep <- names(features2keep[sort(tr_order[1:max_features])])
         
       }
     }
     
-    expr <- expr_gene[trans2keep, , drop = FALSE] 
+    expr <- expr_features[features2keep, , drop = FALSE] 
     
     return(expr)
     
@@ -56,7 +68,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 3, min_gene_expr 
   counts_new <- MatrixList(counts_new)
   
   data <- new("dmDSdata", counts = counts_new, samples = samples)
-
+  
   return(data)
   
 }

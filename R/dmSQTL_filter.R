@@ -1,50 +1,61 @@
 
-# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 20; min_samps_feature_prop = 5; min_feature_prop = 0.05; max_features = Inf; minor_allele_freq = 10; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
+# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 20; min_samps_feature_expr = 5; min_feature_expr = 20; min_samps_feature_prop = 5; min_feature_prop = 0.05; max_features = Inf; minor_allele_freq = 5; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
 
-dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 20, min_samps_feature_prop = 5, min_feature_prop = 0.05, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 20, min_samps_feature_expr = 5, min_feature_expr = 20, min_samps_feature_prop = 5, min_feature_prop = 0.05, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ########################################################
   # filtering on counts, put NA for samples with low gene expression
   ########################################################
   
   inds <- which(width(counts) > 1)
-
+  
   counts_new <- lapply(inds, function(g){
     # g = 1
-
-    expr_gene <- counts[[g]]
+    
+    expr_features <- counts[[g]]
     
     ### genes with min expression
-    if(! sum(colSums(expr_gene) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
+    if(! sum(colSums(expr_features) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
       return(NULL)
-      
-      samps2keep <- colSums(expr_gene) > 0 & !is.na(expr_gene[1, ])
-      
-      if(sum(samps2keep) == 0)
-        return(NULL)
     
-    samps2keep <- colSums(expr_gene) >= min_gene_expr & !is.na(expr_gene[1, ])
+    ### features with min expression
+    features2keep <- rowSums(expr_features >= min_feature_expr, na.rm = TRUE) >= min_samps_feature_expr
+    
+    ### no genes with one feature
+    if(sum(features2keep) <= 1)
+      return(NULL)
+    
+    expr_features <- expr_features[features2keep, , drop = FALSE]
+    
+    
+    ### genes with zero expression
+    samps2keep <- colSums(expr_features) > 0 & !is.na(expr_features[1, ])
+    
+    if(sum(samps2keep) == 0)
+      return(NULL)
+    
+    samps2keep <- colSums(expr_features) >= min_gene_expr & !is.na(expr_features[1, ])
     
     if(sum(samps2keep) < max(1, min_samps_feature_prop))
       return(NULL)
     
-    prop <- prop.table(expr_gene[, samps2keep, drop = FALSE], 2) 
-    trans2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
+    prop <- prop.table(expr_features[, samps2keep, drop = FALSE], 2) 
+    features2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
     
-    ### no genes with one transcript
-    if(sum(trans2keep) <= 1)
+    ### no genes with one feature
+    if(sum(features2keep) <= 1)
       return(NULL)
     
     #### Have to think how to order the transcripts because here I do not have the same grouping 
     # if(!max_features == Inf){
-    #   if(sum(trans2keep) > max_features){
+    #   if(sum(features2keep) > max_features){
     #     tr_order <- order(-rowQuantiles(-prop, min_samps_feature_prop/ncol(prop)), decreasing = TRUE)
-    #     trans2keep <- trans2keep[trans2keep]
-    #     trans2keep <- names(trans2keep[sort(tr_order[1:max_features])])
+    #     features2keep <- features2keep[features2keep]
+    #     features2keep <- names(features2keep[sort(tr_order[1:max_features])])
     #   }
     # }
     
-    expr <- expr_gene[trans2keep, , drop = FALSE] 
+    expr <- expr_features[features2keep, , drop = FALSE] 
     expr[, !samps2keep] <- NA
     
     return(expr)
@@ -123,7 +134,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     blocks[[b]][blocks[[b]][, "block_id"] %in% rownames(genotypes_new[[b]]), , drop = FALSE]
   }))
   names(blocks_new) <- names(genotypes_new)
-
+  
   data <- new("dmSQTLdata", counts = counts_new, genotypes = genotypes_new, blocks = blocks_new, samples = samples)
   
   return(data)

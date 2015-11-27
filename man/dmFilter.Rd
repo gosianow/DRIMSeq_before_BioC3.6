@@ -9,12 +9,14 @@
 \usage{
 dmFilter(x, ...)
 
-\S4method{dmFilter}{dmDSdata}(x, min_samps_gene_expr, min_samps_feature_prop,
-  min_gene_expr = 1, min_feature_prop = 0.01, max_features = Inf)
+\S4method{dmFilter}{dmDSdata}(x, min_samps_gene_expr, min_samps_feature_expr,
+  min_samps_feature_prop, min_gene_expr = 10, min_feature_expr = 10,
+  min_feature_prop = 0.01, max_features = Inf)
 
-\S4method{dmFilter}{dmSQTLdata}(x, min_samps_gene_expr, min_samps_feature_prop,
-  minor_allele_freq, min_gene_expr = 1, min_feature_prop = 0.1,
-  max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+\S4method{dmFilter}{dmSQTLdata}(x, min_samps_gene_expr, min_samps_feature_expr,
+  min_samps_feature_prop, minor_allele_freq, min_gene_expr = 20,
+  min_feature_expr = 20, min_feature_prop = 0.05, max_features = Inf,
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
 \item{x}{\code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.}
@@ -24,10 +26,15 @@ dmFilter(x, ...)
 \item{min_samps_gene_expr}{Minimal number of samples where genes should 
 be expressed. See Details.}
 
+\item{min_samps_feature_expr}{Minimal number of samples where features should 
+be expressed. See Details.}
+
 \item{min_samps_feature_prop}{Minimal number of samples where features
 should be expressed. See details.}
 
-\item{min_gene_expr}{Minimal gene expression in CPM \code{\link[edgeR]{cpm}}.}
+\item{min_gene_expr}{Minimal gene expression.}
+
+\item{min_feature_expr}{Minimal feature expression.}
 
 \item{min_feature_prop}{Minimal proportion for feature expression. This value
 should be between 0 and 1.}
@@ -47,11 +54,11 @@ Filtering of genes and features with low expression. Additionally, for the dmSQT
 \details{
 Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
 
-\code{min_samps_gene_expr} defines the minimal number of samples where gene is required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. On the other hand, such strict requirement would lead to elimination of genes where, for example, expression is low in only few samples. A value that leads to a balanced solution is needed.
+\code{min_samps_gene_expr} defines the minimal number of samples where genes are required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. Similarly, \code{min_samps_feature_expr} defines the minimal number of samples where features are required to be expressed at the minimal level of \code{min_feature_expr}.
 
-In differential splicing analysis, we suggest using \code{min_samps_gene_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+In differential splicing analysis, we suggest using \code{min_samps_feature_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
 
-In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 1}, only genes with expression of at least 1 cpm in at least 70 samples are kept, and samples with expression lower than 1 cpm have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples.
+In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 20}, only genes with expression of at least 20 in at least 70 samples are kept, and samples with expression lower than 20 have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples.
 }
 \examples{
 ###################################
@@ -63,7 +70,7 @@ d <- data_dmDSdata
 ### Filtering
 # Check what is the minimal number of replicates per condition 
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, min_samps_feature_prop = 3)
 plotData(d)
 }
 #############################
@@ -74,8 +81,9 @@ plotData(d)
 d <- data_dmSQTLdata
 \donttest{
 ### Filtering
-d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5, 
-   minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5, 
+ min_samps_feature_prop = 5, minor_allele_freq = 5, 
+ BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 plotData(d)
 }
 }

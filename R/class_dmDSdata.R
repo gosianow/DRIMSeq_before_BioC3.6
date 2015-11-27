@@ -291,13 +291,16 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @details 
 #' Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
 #'
-#' \code{min_samps_gene_expr} defines the minimal number of samples where gene is required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. On the other hand, such strict requirement would lead to elimination of genes where, for example, expression is low in only few samples. A value that leads to a balanced solution is needed.
+#' \code{min_samps_gene_expr} defines the minimal number of samples where genes are required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. Similarly, \code{min_samps_feature_expr} defines the minimal number of samples where features are required to be expressed at the minimal level of \code{min_feature_expr}.
 #' 
-#' In differential splicing analysis, we suggest using \code{min_samps_gene_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+#' In differential splicing analysis, we suggest using \code{min_samps_feature_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
 #' 
 #' @param min_samps_gene_expr Minimal number of samples where genes should 
 #'   be expressed. See Details.
 #' @param min_gene_expr Minimal gene expression.
+#' @param min_samps_feature_expr Minimal number of samples where features should 
+#'   be expressed. See Details.
+#' @param min_feature_expr Minimal feature expression.
 #' @param min_samps_feature_prop Minimal number of samples where features
 #'   should be expressed. See details.
 #' @param min_feature_prop Minimal proportion for feature expression. This value
@@ -314,22 +317,24 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, min_samps_feature_prop = 3)
 #' plotData(d)
 #' }
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_prop = 0.01, max_features = Inf){
+setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0.01, max_features = Inf){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
   stopifnot(min_gene_expr >= 0)
+  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= nrow(x@counts))
+  stopifnot(min_feature_expr >= 0)
   stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= nrow(x@counts))
   stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
   stopifnot(max_features >= 2)
   
-  data_filtered <- dmDS_filter(counts = x@counts, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features)
+  data_filtered <- dmDS_filter(counts = x@counts, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_expr = min_samps_feature_expr, min_feature_expr = min_feature_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features)
   
   return(data_filtered)
   

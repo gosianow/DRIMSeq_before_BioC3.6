@@ -79,7 +79,8 @@ d[1:20, 1:3]
 ### Filtering
 # Check what is the minimal number of replicates per condition 
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
+ min_samps_feature_prop = 3)
 plotData(d)
 
 ### Calculate dispersion

@@ -77,8 +77,9 @@ d[1:10, ]
 d[1:10, 1:10]
 
 ### Filtering
-d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5, 
-   minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5, 
+   min_samps_feature_prop = 5, minor_allele_freq = 5, 
+   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 plotData(d)
 
 
