@@ -1,5 +1,6 @@
+# counts must have rownames corresponding to features
 
-dm_plotProportion <- function(counts, group, sample_id, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
+dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
   
   labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)

@@ -15,7 +15,7 @@ dmDispersion(x, ...)
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
   disp_moderation = "common", disp_prior_df = 1, disp_span = 0.3,
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmDispersion}{dmSQTLdata}(x, mean_expression = TRUE,
@@ -24,7 +24,7 @@ dmDispersion(x, ...)
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
   disp_moderation = "none", disp_prior_df = 1, disp_span = 0.3,
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   speed = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
@@ -64,7 +64,7 @@ dmDispersion(x, ...)
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical. Whether to display more progress messages.}
+\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 - no messages, 1 - main messages, 2 - message for every gene fitting.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 

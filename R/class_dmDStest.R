@@ -360,9 +360,21 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
   
   col_pv <- colnames(x@results)[grepl("pvalue", colnames(x@results)) & !grepl("adj_pvalue", colnames(x@results))]
   
-  for(i in 1:length(col_pv))
-    dm_plotTable(pvalues = x@results[, col_pv[i]], name = col_pv[i], out_dir = out_dir)
-  
+  for(i in 1:length(col_pv)){
+    
+      ggp <- dm_plotPvalues(pvalues = x@results[, col_pv[i]])
+    
+    if(!is.null(out_dir))
+      pdf(paste0(out_dir, "hist_", col_pv[i], ".pdf"))
+    
+    print(ggp)
+    
+    
+    if(!is.null(out_dir))
+      dev.off()
+    
+  }
+ 
 })
 
 

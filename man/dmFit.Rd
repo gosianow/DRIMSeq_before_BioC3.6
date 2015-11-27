@@ -10,11 +10,11 @@
 dmFit(x, ...)
 
 \S4method{dmFit}{dmDSdispersion}(x, dispersion = "genewise_dispersion",
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
 \S4method{dmFit}{dmSQTLdispersion}(x, dispersion = "genewise_dispersion",
-  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE,
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
@@ -28,7 +28,7 @@ dmFit(x, ...)
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Logical. Whether to display more progress messages.}
+\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 - no messages, 1 - main messages, 2 - message for every gene fitting.}
 
 \item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
 }

@@ -371,7 +371,18 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' @export
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
-  dmDS_plotData(counts = x@counts, out_dir = out_dir)
+  tt <- width(x@counts)
+  
+  ggp <- dm_plotDataFeatures(tt = tt)
+  
+  if(!is.null(out_dir))
+    pdf(paste0(out_dir, "hist_features.pdf"))
+  
+  print(ggp)
+  
+  if(!is.null(out_dir))
+    dev.off()
+  
   
 })
 
