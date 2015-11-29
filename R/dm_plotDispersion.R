@@ -15,7 +15,7 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features 
       theme_bw() +
       xlab("Log10 of mean expression") +
       ylab("Log10 of gamma_+") +
-      geom_point(size = 1.2, alpha = 0.7, na.rm = TRUE) +
+      geom_point(size = 1.3, alpha = 0.8, na.rm = TRUE, shape = 1) +
       theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top") +
       guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
       scale_colour_gradient(limits = c(2, max(breaks)), breaks = breaks, low = "royalblue2", high="red2", name = "Number of features", na.value = "red2")
@@ -29,7 +29,7 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features 
       theme_bw() +
       xlab("Log10 of mean expression") +
       ylab("Log10 of gamma_+") +
-      geom_point(size = 1.2, alpha = 0.4, na.rm = TRUE) +
+      geom_point(size = 1.3, alpha = 0.5, na.rm = TRUE, shape = 1) +
       theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top")
 
   }
