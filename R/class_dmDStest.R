@@ -393,9 +393,7 @@ setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", ord
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
   stopifnot(is.logical(plot_null))
-  stopifnot(is.logical(plot_main))
-  
-  
+
   i <- compared_groups
   compared_groups <- x@compared_groups
   

@@ -27,35 +27,38 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples, 
     
     main <- NULL
     
-    if(plot_main){
-      
-      mean_expression_gene <- mean(colSums(counts_gene), na.rm = TRUE)
-      
-      main <- paste0(gene, " : ", snp, " : ", block,  "\n Mean expression = ", round(mean_expression_gene))
-      
-      if(length(dispersion) > 0){
+    
+    if(class(plot_main) == "logical"){
+      if(plot_main){
         
-        if(class(dispersion) == "numeric")
-          dispersion_gene <- dispersion
-        else
-          dispersion_gene <- dispersion[[gene]][block]
+        mean_expression_gene <- mean(colSums(counts_gene), na.rm = TRUE)
         
-        main <- paste0(main, ", Dispersion = ", round(dispersion_gene, 2))
+        main <- paste0(gene, " : ", snp, " : ", block,  "\n Mean expression = ", round(mean_expression_gene))
+        
+        if(length(dispersion) > 0){
+          
+          if(class(dispersion) == "numeric")
+            dispersion_gene <- dispersion
+          else
+            dispersion_gene <- dispersion[[gene]][block]
+          
+          main <- paste0(main, ", Dispersion = ", round(dispersion_gene, 2))
+          
+        }
+        
+        if(!is.null(table)){
+          
+          table_tmp <- table[table$gene_id == gene & table$block_id == block & table$snp_id == snp, ]
+          
+          main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
+          
+        }
         
       }
-      
-      if(!is.null(table)){
-        
-        table_tmp <- table[table$gene_id == gene & table$block_id == block & table$snp_id == snp, ]
-        
-        main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
-        
-      }
-      
-      
+    }else{
+      main <- as.character(plot_main)
     }
-    
-    
+
     
     pi_full <- fit_full[[gene]][[block]][, levels(group), drop = FALSE]
     pi_null <- fit_null[[gene]][[block]]

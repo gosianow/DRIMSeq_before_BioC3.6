@@ -213,7 +213,7 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @param plot_type Character defining the type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
-#' @param plot_main Logical. Whether to plot a title with the information about the Dirichlet-multinomial estimates.
+#' @param plot_main Logical or character. Whether to plot a title with the information about the Dirichlet-multinomial estimates or a title itself.
 #' 
 #' @examples 
 #' 
@@ -260,7 +260,6 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", orde
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
-  stopifnot(is.logical(plot_main))
   
   
   dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)

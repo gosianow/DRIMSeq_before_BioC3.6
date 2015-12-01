@@ -38,7 +38,7 @@ plotFit(x, ...)
 
 \item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
 
-\item{plot_main}{Logical. Whether to plot a title with the information about the Dirichlet-multinomial estimates.}
+\item{plot_main}{Logical or character. Whether to plot a title with the information about the Dirichlet-multinomial estimates or a title itself.}
 
 \item{out_dir}{Directory where the plot should be saved. If \code{NULL} the plot is printed.}
 

@@ -185,8 +185,7 @@ setMethod("plotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "box
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
-  stopifnot(is.logical(plot_main))
-  
+  stopifnot(is.logical(plot_null))
   
   dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = x@fit_null, table = x@results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
   
