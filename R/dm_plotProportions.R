@@ -60,8 +60,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       geom_bar(data = prop_samp, aes_string(x = "feature_id", y = "proportion", group = "sample_id", fill = "group"), stat = "identity", position = position_dodge(width = width)) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
-      ylab("Proportions") +
-      coord_cartesian(ylim = c(-0.1, 1.1))
+      ylab("Proportions")
     
     if(!is.null(pi_null)){
       ggp <- ggp +
@@ -89,7 +88,6 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       ggtitle(main) +     
       geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE, na.rm = TRUE) +
       geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.2, lwd = 0.5) +
-      coord_cartesian(ylim = c(-0.1, 1.1))  +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
@@ -122,7 +120,6 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
       ggtitle(main) +     
       geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id"), width = 1) + 
-      coord_cartesian(ylim = c(-0.1, 1.1)) +
       scale_fill_manual(name = "Features", values = values) +
       scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
       guides(fill = guide_legend(nrow = 20)) +
@@ -148,7 +145,6 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title =element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +
       geom_line(data = prop_samp, aes_string(x = "feature_id", y = "proportion", group = "sample_id", colour = "group"), size = 1.1) +
-      coord_cartesian(ylim = c(-0.1, 1.1)) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
