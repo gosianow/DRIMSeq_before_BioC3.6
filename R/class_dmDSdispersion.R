@@ -315,7 +315,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   stopifnot(length(prop_tol) == 1)
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
-
+  
   
   if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
@@ -406,21 +406,21 @@ setMethod("plotDispersion", "dmDSdispersion", function(x, out_dir = NULL){
   if(!length(x@genewise_dispersion) == length(x@mean_expression))
     stop("Mean expression must be estimated for each gene!")
   
-    if(length(x@common_dispersion) == 0){
-      common_dispersion <- NULL
-      }else{
-        common_dispersion <- x@common_dispersion
-      }
+  if(length(x@common_dispersion) == 0){
+    common_dispersion <- NULL
+  }else{
+    common_dispersion <- x@common_dispersion
+  }
   
   ggp <- dm_plotDispersion(genewise_dispersion = x@genewise_dispersion, mean_expression = x@mean_expression, nr_features = width(x@counts), common_dispersion = common_dispersion)
   
-  if(!is.null(out_dir))
+  if(!is.null(out_dir)){
     pdf(paste0(out_dir, "dispersion_vs_mean.pdf"))
-  
-  print(ggp)
-  
-  if(!is.null(out_dir))
+    print(ggp)
     dev.off()
+  }else{
+    return(ggp)  
+  }
   
 })
 

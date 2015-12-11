@@ -211,7 +211,7 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 
 
 #' @inheritParams plotData
-#' @param gene_id Vector of gene IDs to be plotted.
+#' @param gene_id Character indicating a gene ID to be plotted.
 #' @param plot_type Character defining the type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' @param plot_full Logical. Whether to plot the proportions estimated by the full model.
@@ -259,12 +259,11 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' @export
 setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  stopifnot(all(gene_id %in% names(x@counts)))
+  stopifnot(gene_id %in% names(x@counts))
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
   stopifnot(is.logical(plot_main))
-  
   
   dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
   

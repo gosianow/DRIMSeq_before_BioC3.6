@@ -70,9 +70,10 @@ return(ggp)
 
 
 
-### Plot the frequency of present features
-# info data.frame with gene_id and feature_id of ALL features
-# ds_info data.frame with gene_id and feature_id of ONLY DS features
+#' Plot the frequency of present features
+#'
+#' @param info Data frame with \code{gene_id} and \code{feature_id} of ALL features
+#' @param ds_info Data frame with \code{gene_id} and \code{feature_id} of ONLY DS features
 
 dm_plotDataDSInfo <- function(info, ds_info){
   

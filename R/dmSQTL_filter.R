@@ -1,5 +1,5 @@
 
-# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 20; min_samps_feature_expr = 5; min_feature_expr = 20; min_samps_feature_prop = 5; min_feature_prop = 0.05; max_features = Inf; minor_allele_freq = 5; BPPARAM = BiocParallel::MulticoreParam(workers = 5)
+# counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; min_samps_gene_expr = 70; min_gene_expr = 20; min_samps_feature_expr = 5; min_feature_expr = 20; min_samps_feature_prop = 5; min_feature_prop = 0.05; max_features = Inf; minor_allele_freq = 5; BPPARAM = BiocParallel::MulticoreParam(workers = 1)
 
 dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_expr = 70, min_gene_expr = 20, min_samps_feature_expr = 5, min_feature_expr = 20, min_samps_feature_prop = 5, min_feature_prop = 0.05, max_features = Inf, minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   

@@ -56,8 +56,8 @@ setValidity("dmSQTLdata", function(object){
     return(paste0("Unequal number of samples in 'counts' and 'genotypes' ", ncol(object@counts), " and ", ncol(object@genotypes)))
   
   ### Mystery: This does not pass
-#   if(!all(colnames(object@blocks) %in% c("block_id", "snp_id")))
-#     return(paste0("'blocks' must contain 'block_id' and 'snp_id' variables"))
+  #   if(!all(colnames(object@blocks) %in% c("block_id", "snp_id")))
+  #     return(paste0("'blocks' must contain 'block_id' and 'snp_id' variables"))
   
   if(!all(names(object@counts) == names(object@genotypes)))
     return(paste0("'genotypes' and 'counts' do not contain the same genes"))
@@ -96,7 +96,7 @@ setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmSQTLdata-method
+#' @aliases [,dmSQTLdata-method [,dmSQTLdata,ANY-method
 #' @rdname dmSQTLdata-class
 #' @export
 setMethod("[", "dmSQTLdata", function(x, i, j){
@@ -118,7 +118,7 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
       genotypes <- x@genotypes[i, j, drop = FALSE]
       blocks <- x@blocks[i, , drop = FALSE]
     }
-
+    
     samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, , drop = FALSE]
@@ -196,7 +196,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
   stopifnot( mode( counts ) %in% c("numeric"))
-
+  
   stopifnot( class( gene_id ) %in% c("character", "factor"))
   stopifnot( class( feature_id ) %in% c("character", "factor"))
   stopifnot( length(gene_id) == length(feature_id) )
@@ -226,7 +226,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   genotypes <- genotypes[genes2keep, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[genes2keep]
   snp_id <- snp_id[genes2keep]
-
+  
   ### order genes in counts and in genotypes
   if(class(gene_id) == "character")
     gene_id <- factor(gene_id, levels = unique(gene_id))
@@ -241,13 +241,13 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   genotypes <- genotypes[order_genotypes, , drop = FALSE]
   gene_id_genotypes <- gene_id_genotypes[order_genotypes]
   snp_id <- snp_id[order_genotypes]
-
+  
   colnames(counts) <- sample_id
   rownames(counts) <- feature_id
   
   colnames(genotypes) <- sample_id
   rownames(genotypes) <- snp_id
-
+  
   inds_counts <- 1:length(gene_id)
   names(inds_counts) <- feature_id
   partitioning_counts <- split(inds_counts, gene_id)
@@ -255,7 +255,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   inds_genotypes <- 1:length(gene_id_genotypes)
   names(inds_genotypes) <- snp_id
   partitioning_genotypes <- split(inds_genotypes, gene_id_genotypes)
-
+  
   counts <- new( "MatrixList", unlistData = counts, partitioning = partitioning_counts)
   genotypes <- new( "MatrixList", unlistData = genotypes, partitioning = partitioning_genotypes)
   
@@ -306,7 +306,7 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 #' @rdname dmSQTLdata
 #' @export
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genotypes, snp_id, snp_ranges, sample_id, window = 5e3, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
-
+  
   stopifnot( class( counts ) %in% c("matrix", "data.frame"))
   counts <- as.matrix(counts)
   stopifnot( mode( counts ) %in% c("numeric"))
@@ -335,7 +335,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
   
   stopifnot(is.numeric(window))
   stopifnot(window >= 0)
-
+  
   rownames(genotypes) <- snp_id
   gene_ranges <- GenomicRanges::resize(gene_ranges, GenomicRanges::width(gene_ranges) + 2 * window, fix = "center")
   
@@ -348,7 +348,7 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
   genotypes <- genotypes[s, ]
   snp_id <- snp_id[s]
   gene_id_genotypes <- names(gene_ranges)[q]
-
+  
   data <- dmSQTLdata(counts = counts, gene_id = gene_id, feature_id = feature_id, genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id = snp_id, sample_id = sample_id, BPPARAM = BPPARAM)
   
   return(data)
@@ -422,44 +422,33 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_f
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
   tt <- width(x@counts)
-  
-  ggp <- dm_plotDataFeatures(tt)
-  
-  
-  if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_features.pdf"))
-  
-  print(ggp)
-  
-  if(!is.null(out_dir))
-    dev.off()
+  ggp1 <- dm_plotDataFeatures(tt)
   
   
   tt <- width(x@blocks)
-  
-  ggp <- dm_plotDataSnps(tt)
-  
-  if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_snps.pdf"))
-  
-  print(ggp)
-  
-  if(!is.null(out_dir))
-    dev.off()
+  ggp2 <- dm_plotDataSnps(tt)
   
   
   tt <- width(x@genotypes)
+  ggp3 <- dm_plotDataBlocks(tt)
   
-  ggp <- dm_plotDataBlocks(tt)
   
-  
-  if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_blocks.pdf"))
-  
-  print(ggp)
-  
-  if(!is.null(out_dir))
+  if(!is.null(out_dir)){
+    pdf(paste0(out_dir, "hist_features.pdf"))
+    print(ggp1)
     dev.off()
+    
+    pdf(paste0(out_dir, "hist_snps.pdf"))
+    print(ggp2)
+    dev.off()
+    
+    pdf(paste0(out_dir, "hist_blocks.pdf"))
+    print(ggp3)
+    dev.off()
+  }else{
+    return(list(ggp1, ggp2, ggp3))
+  }
+  
   
 })
 

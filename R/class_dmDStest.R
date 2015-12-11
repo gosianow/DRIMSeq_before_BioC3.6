@@ -20,9 +20,9 @@ NULL
 #' @param x dmDStest object.
 #' @param ... Other parameters that can be defined by methods using this generic.
 #' 
-#' @slot compared_groups List of vectors specifying which group comparisons are performed.
-#' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.
-#' @slot results Data frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for each comparison specified in \code{compared_groups}.
+#' @slot compared_groups Character vector specifying which groups/conditions should be compared. By default, the comparison is done among all the groups specified by \code{group} column in \code{samples(x)}. 
+#' @slot fit_null \code{\linkS4class{MatrixList}}. Contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.
+#' @slot results Data frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for comparison specified in \code{compared_groups}.
 #' 
 #' @examples 
 #' 
@@ -59,8 +59,8 @@ NULL
 #' @seealso \code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}
 setClass("dmDStest", 
          contains = "dmDSfit",
-         representation(compared_groups = "list",
-                        fit_null = "list",
+         representation(compared_groups = "character",
+                        fit_null = "MatrixList",
                         results = "data.frame"))
 
 
@@ -70,13 +70,7 @@ setClass("dmDStest",
 setValidity("dmDStest", function(object){
   # has to return TRUE when valid object!
   
-  if(!length(object@compared_groups) == length(object@fit_null))
-    return(paste0("'fit_null' must have the same length as 'compared_groups'"))
-  
-  if(!all(lapply(object@fit_null, class) == "MatrixList"))
-    return(paste0("'fit_null' must be a list of MatrixLists"))
-  
-  if(!all(lapply(object@fit_null, length) == length(object@counts)))
+  if(!length(object@fit_null) == length(object@counts))
     return(paste0("Different number of genes in 'counts' and in 'fit_null' elements"))
   
   if(!nrow(object@results) == length(object@counts))
@@ -94,24 +88,7 @@ setValidity("dmDStest", function(object){
 #' @export
 setMethod("proportions", "dmDStest", function(x){
   
-  nc <- length(x@compared_groups)
-  
-  if(nc == 1){
-    
-    prop_null <- x@fit_null[[1]]@unlistData
-    
-  }else{
-    
-    prop_null <- do.call(cbind, lapply(x@fit_null, function(f) f@unlistData))
-    
-    if(is.null(names(x@compared_groups)))
-      suffix <- 1:nc
-    else
-      suffix <- names(x@compared_groups)
-    
-    colnames(prop_null) <- paste0("null_", suffix)
-    
-  } 
+  prop_null <- x@fit_null@unlistData
   
   data.frame(gene_id = rep(names(x@counts), width(x@counts)), feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, prop_null, stringsAsFactors = FALSE, row.names = NULL)
   
@@ -123,29 +100,10 @@ setMethod("proportions", "dmDStest", function(x){
 #' @export
 setMethod("statistics", "dmDStest", function(x){
   
-  nc <- length(x@compared_groups)
-  
-  if(nc == 1){
-    
-    stats_null <- x@fit_null[[1]]@metadata
-    colnames(stats_null) <- c("lik_null", "df")
-    
-  }else{
-    
-    stats_null <- do.call(cbind, lapply(x@fit_null, function(f) f@metadata))
-    
-    if(is.null(names(x@compared_groups)))
-      suffix <- 1:nc
-    else
-      suffix <- names(x@compared_groups)
-    
-    colnames(stats_null) <- paste0(colnames(stats_null), "_null_", rep(suffix, each = 2))
-    
-  } 
-  
+  stats_null <- x@fit_null@metadata
+  colnames(stats_null) <- c("lik_null", "df")
   
   df <- data.frame(gene_id = names(x@counts), x@fit_full@metadata, stats_null, stringsAsFactors = FALSE, row.names = NULL)
-  colnames(df)[2:(ncol(x@fit_full@metadata)+1)] <- paste0("lik_", colnames(x@fit_full@metadata))
   
   return(df)
   
@@ -191,7 +149,7 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
 
 #' @inheritParams dmFit
-#' @param compared_groups Vector or a list of vectors that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in these vectors should indicate levels or numbers of the levels in \code{samples(x)$group}.
+#' @param compared_groups Vector that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vector should indicate levels or numbers of levels in \code{samples(x)$group}.
 #' 
 #' @return Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @examples 
@@ -229,7 +187,7 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 #' @rdname dmTest
 #' @export
-setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(length(prop_mode) == 1)
   stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
@@ -237,70 +195,36 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = 1:nlevels(samples(x
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
   
-  if(!is.list(compared_groups))
-    compared_groups <- list(compared_groups)
   
-  for(i in 1:length(compared_groups)){
+  if(is.numeric(compared_groups)){
     
-    if(is.numeric(compared_groups[i])){
-      
-      if(!all(compared_groups[i] %in% as.numeric(x@samples$group)))
-        stop(paste0("Levels in comparison ", i, " do not match groups defined in samples"))
-    }
+    if(!all(compared_groups %in% as.numeric(x@samples$group)))
+      stop(paste0("Levels in 'compare_groups' do not match groups defined in samples"))
     
-    if(is.character(compared_groups[i])){
-      
-      if(!all(compared_groups[i] %in% x@samples$group))
-        stop(paste0("Levels in comparison ", i, " do not match groups defined in samples"))
-      
-    }
-    }
-  
-  nc <- length(compared_groups)
-  
-  fit_null <- vector("list", nc)
-  names(fit_null) <- names(compared_groups)
-  tables <- vector("list", nc)
-  
-  suffix <- NULL
-  
-  if(nc > 1){
-    if(is.null(names(compared_groups)))
-      suffix <- 1:nc
-    else
-      suffix <- names(compared_groups)
-  }
-  
-  
-  for(i in 1:nc){
-    # i = 1
-    
-    if(mode(compared_groups[[i]]) == "numeric")
-      samps <- as.numeric(x@samples$group) %in% compared_groups[[i]]
-    if(mode(compared_groups[[i]]) == "character")
-      samps <- x@samples$group %in% compared_groups[[i]]
-    
-    samples = x@samples[samps, ]
-    samples$sample_id <- factor(samples$sample_id)
-    samples$group <- factor(samples$group)
-    
-    message("Running comparison ", suffix[i], " between groups: ", paste0(levels(samples$group), collapse = ", "))
-    
-    
-    fit_null[[i]] <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = 1, BPPARAM = BPPARAM)
-    
-    tables[[i]] <- dmDS_test(stats_full = x@fit_full@metadata[, compared_groups[[i]]], stats_null = fit_null[[i]]@metadata)
-    
-    if(nc > 1)
-      names(tables[[i]])[-1] <- paste0(names(tables[[i]])[-1], "_", suffix[i])
-    
+    compared_groups <- levels(x@samples$group)[compared_groups]
     
   }
   
-  if(nc > 1)
-    results <- Reduce(function(...) merge(..., by = "gene_id", all = TRUE, sort = FALSE), tables)
-  else
-    results <- tables[[1]]
+  if(is.character(compared_groups)){
+    
+    if(!all(compared_groups %in% x@samples$group))
+      stop(paste0("Levels in 'compare_groups' do not match groups defined in samples"))
+    
+  }
+  
+  
+  samps <- x@samples$group %in% compared_groups
+  
+  samples = x@samples[samps, ]
+  samples$sample_id <- factor(samples$sample_id)
+  samples$group <- factor(samples$group)
+  
+  
+  message("Running comparison between groups: ", paste0(levels(samples$group), collapse = ", "))
+  
+  fit_null <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = 1, BPPARAM = BPPARAM)
+  
+  results <- dmDS_test(stats_full = x@fit_full@metadata[, compared_groups], stats_null = fit_null@metadata)
   
   
   return(new("dmDStest", compared_groups = compared_groups, fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full,  mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
@@ -361,23 +285,16 @@ setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 #' @export
 setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
   
-  col_pv <- colnames(x@results)[grepl("pvalue", colnames(x@results)) & !grepl("adj_pvalue", colnames(x@results))]
+  ggp <- dm_plotPvalues(pvalues = x@results[, "pvalue"])
   
-  for(i in 1:length(col_pv)){
-    
-      ggp <- dm_plotPvalues(pvalues = x@results[, col_pv[i]])
-    
-    if(!is.null(out_dir))
-      pdf(paste0(out_dir, "hist_", col_pv[i], ".pdf"))
-    
+  if(!is.null(out_dir)){
+    pdf(paste0(out_dir, "hist_pvalues.pdf"))
     print(ggp)
-    
-    
-    if(!is.null(out_dir))
-      dev.off()
-    
+    dev.off()
+  }else{
+    return(ggp)  
   }
- 
+  
 })
 
 
@@ -385,11 +302,10 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
 ### plotFit
 ################################################################################
 
-#' @param compared_groups Numeric or character indicating comparison, defined in \code{\link{dmTest}}, that should be plotted.
 #' @param plot_null Logical. Whether to plot the proportions estimated by the null model.
 #' @rdname plotFit
 #' @export
-setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, compared_groups = 1, plot_main = TRUE, out_dir = NULL){
+setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(all(gene_id %in% names(x@counts)))
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
@@ -399,41 +315,17 @@ setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", ord
   stopifnot(is.logical(plot_main))
   
   
-  i <- compared_groups
   compared_groups <- x@compared_groups
   
-  
-  if(mode(compared_groups[[i]]) == "numeric")
-    samps <- as.numeric(x@samples$group) %in% compared_groups[[i]]
-  if(mode(compared_groups[[i]]) == "character")
-    samps <- x@samples$group %in% compared_groups[[i]]
+  samps <- x@samples$group %in% compared_groups
   
   samples = x@samples[samps, ]
   samples$sample_id <- factor(samples$sample_id)
   samples$group <- factor(samples$group)
   
+  results <- x@results
   
-  if(length(compared_groups) > 1){
-    
-    if(is.null(names(compared_groups))){
-      suffix <- i
-    }else{
-      if(mode(i) == "numeric")
-        suffix <- names(compared_groups)[i]
-      else
-        suffix <- i
-    }
-    
-    which_cols <- grepl(paste0("_", suffix), colnames(x@results)) | grepl("gene_id", colnames(x@results)) 
-    results <- x@results[, which_cols]
-    colnames(results) <- gsub(paste0("_", suffix), "", colnames(results))
-    
-  }else{
-    results <- x@results
-  }
-  
-  
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full[, compared_groups[[i]]], proportions_null = x@fit_null[[i]], table = results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), proportions_full = x@fit_full[, compared_groups], proportions_null = x@fit_null, table = results, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = plot_null, plot_main = plot_main, out_dir = out_dir)
   
   
 })

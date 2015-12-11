@@ -115,7 +115,7 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmDSdata-method
+#' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
 #' @rdname dmDSdata-class
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
@@ -132,7 +132,7 @@ setMethod("[", "dmDSdata", function(x, i, j){
     }else{
       counts <- x@counts[i, j, drop = FALSE]
     }
-
+    
     samples <- x@samples
     rownames(samples) <- samples$sample_id
     samples <- samples[j, , drop = FALSE]
@@ -360,7 +360,7 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
 #################################
 
-#' @param out_dir Directory where the plot should be saved. If \code{NULL} the plot is printed. 
+#' @param out_dir Character string that is used to save the plot in \code{paste0(out_dir, plot_name, ".pdf")} file. \code{plot_name} depends on type of a plot produced, for example, \code{plot_name = "hist_features"} for histogram with number of features per gene. If \code{NULL}, the plot is returned as \code{ggplot} object and can be further modified, for example, using \code{theme()}.
 #' @examples 
 #' ###################################
 #' ### Differential splicing analysis
@@ -380,14 +380,13 @@ setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
   ggp <- dm_plotDataFeatures(tt = tt)
   
-  if(!is.null(out_dir))
+  if(!is.null(out_dir)){
     pdf(paste0(out_dir, "hist_features.pdf"))
-  
-  print(ggp)
-  
-  if(!is.null(out_dir))
+    print(ggp)
     dev.off()
-  
+  }else{
+    return(ggp)
+  }
   
 })
 

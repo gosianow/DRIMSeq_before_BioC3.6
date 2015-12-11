@@ -83,27 +83,23 @@ setMethod("dmFit", "dmSQTLdispersion", function(x, dispersion = "genewise_disper
 ################################################################################
 
 
-#' @param snp_id Vector of SNP IDs to be plotted. \code{snp_id} must match \code{gene_id}.
+#' @param snp_id Character indicating a SNP ID to be plotted. \code{snp_id} must match \code{gene_id}.
 #' @rdname plotFit
 #' @export
 setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  stopifnot(all(gene_id %in% names(x@blocks)))
-  stopifnot(length(gene_id) == length(snp_id))
+  stopifnot(gene_id %in% names(x@blocks))
   
-  for(i in 1:length(gene_id)){
-    
-    if(!snp_id[i] %in% x@blocks[[gene_id[i], "snp_id"]])
-      stop(paste0("gene ",gene_id[i], " and SNP ", snp_id[i], " do not match!"))
-    
-  }
-  
+  if(!snp_id %in% x@blocks[[gene_id, "snp_id"]])
+    stop(paste0("gene ",gene_id, " and SNP ", snp_id, " do not match!"))
+
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
   stopifnot(is.logical(plot_main))
   
   dmSQTL_plotFit(gene_id = gene_id, snp_id = snp_id, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, dispersion = slot(x, x@dispersion), fit_full = x@fit_full, fit_null = NULL, table = NULL, plot_type = plot_type, order = order, plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, out_dir = out_dir)
+  
   
 })
 

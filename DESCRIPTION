@@ -28,7 +28,7 @@ Imports:
     reshape2,
     grid
 LazyData: true
-ByteCompile: true
+ByteCompile: false
 VignetteBuilder: knitr
 Suggests:
     pasilla,

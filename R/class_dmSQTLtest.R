@@ -151,15 +151,13 @@ setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
   
   ggp <- dm_plotPvalues(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"])
   
-  if(!is.null(out_dir))
-    pdf(paste0(out_dir, "hist_", "pvalues", ".pdf"))
-  
-  print(ggp)
-  
-  
-  if(!is.null(out_dir))
+  if(!is.null(out_dir)){
+    pdf(paste0(out_dir, "hist_pvalues.pdf"))
+    print(ggp)
     dev.off()
-  
+  }else{
+    return(ggp)  
+  }
   
 })
 
@@ -172,20 +170,15 @@ setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
 #' @export
 setMethod("plotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "boxplot1", order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
   
-  ### Parameters check:
-  stopifnot(all(gene_id %in% names(x@blocks)))
-  stopifnot(length(gene_id) == length(snp_id))
+  stopifnot(gene_id %in% names(x@blocks))
   
-  for(i in 1:length(gene_id)){
-    
-    if(!snp_id[i] %in% x@blocks[[gene_id[i], "snp_id"]])
-      stop(paste0("gene ",gene_id[i], " and SNP ", snp_id[i], " do not match!"))
-    
-  }
+  if(!snp_id %in% x@blocks[[gene_id, "snp_id"]])
+    stop(paste0("gene ",gene_id, " and SNP ", snp_id, " do not match!"))
   
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
+  stopifnot(is.logical(plot_null))
   stopifnot(is.logical(plot_main))
   
   

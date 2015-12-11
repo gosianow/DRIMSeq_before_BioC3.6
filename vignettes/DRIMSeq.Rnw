@@ -188,8 +188,9 @@ Filtering at the gene level ensures that the observed feature ratios have some m
 <<DSdmFilter>>=
 # Check what is the minimal number of replicates per condition
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 3, min_gene_expr = 1,
-  min_samps_feature_prop = 3, min_feature_prop = 0.01, max_features = Inf)
+
+d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3,
+  min_samps_feature_prop = 3)
 plotData(d)
 @
 
@@ -204,7 +205,7 @@ In the default setting all of them are computed and common dispersion is used as
 This step of our pipeline is the most time consuming, thus consider increasing the number of workers in \Robject{BPPARAM}. 
 
 <<DSdmDispersion>>=
-d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
 d
 head(mean_expression(d), 3)
 common_dispersion(d)
@@ -566,10 +567,59 @@ d
 
 In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. We identify SNPs with identical genotypes across the samples and assign them to blocks. Estimation and testing is done at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block. 
 
-Here, the data summary plot produces three histograms: the number of features per gene, the number of SNPs per gene and the number of blocks per gene. Total number of tests done in this analysis is equal to the total number of blocks.
+Here, the data summary plot produces three histograms: the number of features per gene, the number of SNPs per gene and the number of blocks per gene. Total number of tests done in this analysis is equal to the total number of blocks. You can use the \Rcode{multiplot} function from \url{http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/} to plot this three figures next to each other.
+
+<<multiplot, echo = FALSE>>=
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+@
+
 
 <<SQTLdmSQTLdata_plot, out.width = "16cm", fig.width = 16>>=
-plotData(d)
+multiplot(plotlist = plotData(d), cols = 3)
 @
 
 
@@ -582,10 +632,11 @@ Ideally, we would like that genes were expressed at some minimal level in all sa
 
 
 <<SQTLdmFilter, out.width = "16cm", fig.width = 16>>=
-d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_prop = 5,
-   minor_allele_freq = 5, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5,
+    min_samps_feature_prop = 5, minor_allele_freq = 5, 
+    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-plotData(d)
+multiplot(plotlist = plotData(d), cols = 3)
 @
 
 

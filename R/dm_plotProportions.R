@@ -1,11 +1,30 @@
-# counts must have rownames corresponding to features
+#' Plot feature proportions
+#' 
+#' Plot observed and/or estimated feature proportions.
+#' 
+#' @param counts Matrix with rows corresponding to features and columns corresponding to samples. Row names are used as labels on the plot.
+#' @param group Factor that groups samples into conditions.
+#' @param pi_full Matrix of estimated proportions with rows corresponding to features and columns corresponding to conditions defined by factor \code{group}. If \code{NULL}, nothing is plotted.
+#' @param pi_null Matrix of estimated proportions with rows corresponding to features and one column. If \code{NULL}, nothing is plotted.
+#' @param main Character vector with main title for the plot. If \code{NULL}, nothing is plotted.
+#' @param plot_type Character defining the type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.
+#' @param order Logical. Whether to plot the features ordered by their expression.
+#' 
+#' @return 
+#' ggplot object with the observed and/or estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
+
 
 dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
+  
+  stopifnot(ncol(counts) == length(group))
   
   labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)
   
-  prop_samp <- data.frame( feature_id = labels, prop.table(counts, 2), stringsAsFactors = FALSE) 
+  proportions <- prop.table(counts, 2)
+  proportions[proportions == "NaN"] <- NA
+  
+  prop_samp <- data.frame(feature_id = labels, proportions, stringsAsFactors = FALSE) 
   
   if(!is.null(pi_full))
     prop_est_full <- data.frame(feature_id = labels, pi_full, stringsAsFactors = FALSE)
@@ -55,13 +74,12 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
     ggp <- ggplot() +
       theme_bw() + 
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +
       geom_bar(data = prop_samp, aes_string(x = "feature_id", y = "proportion", group = "sample_id", fill = "group"), stat = "identity", position = position_dodge(width = width)) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
-      ylab("Proportions") +
-      coord_cartesian(ylim = c(-0.1, 1.1))
+      ylab("Proportions")
     
     if(!is.null(pi_null)){
       ggp <- ggp +
@@ -85,11 +103,10 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
     ggp <- ggplot() +
       theme_bw() + 
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +     
       geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE, na.rm = TRUE) +
       geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.2, lwd = 0.5) +
-      coord_cartesian(ylim = c(-0.1, 1.1))  +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
@@ -122,7 +139,6 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
       ggtitle(main) +     
       geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id"), width = 1) + 
-      coord_cartesian(ylim = c(-0.1, 1.1)) +
       scale_fill_manual(name = "Features", values = values) +
       scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
       guides(fill = guide_legend(nrow = 20)) +
@@ -145,10 +161,9 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
     ggp <- ggplot() +
       theme_bw() +
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=14), axis.title =element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title = element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +
       geom_line(data = prop_samp, aes_string(x = "feature_id", y = "proportion", group = "sample_id", colour = "group"), size = 1.1) +
-      coord_cartesian(ylim = c(-0.1, 1.1)) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
@@ -203,7 +218,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
 
     ggp <- ggplot() +
       theme_bw() +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=16), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +    
       coord_cartesian(ylim = c(-0.1, 1.1)) + 
       coord_cartesian(ylim = c(-0.1, 1.1)) +
