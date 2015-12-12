@@ -326,11 +326,11 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @export
 setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0.01, max_features = Inf){
   
-  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
+  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)
-  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= nrow(x@counts))
+  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= ncol(x@counts))
   stopifnot(min_feature_expr >= 0)
-  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= nrow(x@counts))
+  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= ncol(x@counts))
   stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
   stopifnot(max_features >= 2)
   

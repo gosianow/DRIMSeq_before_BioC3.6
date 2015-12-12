@@ -14,9 +14,22 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     
     expr_features <- counts[[g]]
     
+    ### no genes with no expression
+    if(sum(expr_features, na.rm = TRUE) == 0)
+      return(NULL)
+    
     ### genes with min expression
     if(! sum(colSums(expr_features) >= min_gene_expr, na.rm = TRUE) >= min_samps_gene_expr )
       return(NULL)
+    
+    ### no features with no expression
+    features2keep <- rowSums(expr_features > 0, na.rm = TRUE) > 0
+    
+    ### no genes with one feature
+    if(sum(features2keep) <= 1)
+      return(NULL)
+      
+    expr_features <- expr_features[features2keep, , drop = FALSE]
     
     ### features with min expression
     features2keep <- rowSums(expr_features >= min_feature_expr, na.rm = TRUE) >= min_samps_feature_expr
@@ -31,9 +44,10 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
     ### genes with zero expression
     samps2keep <- colSums(expr_features) > 0 & !is.na(expr_features[1, ])
     
-    if(sum(samps2keep) == 0)
+    if(sum(samps2keep) < max(1, min_samps_feature_prop))
       return(NULL)
     
+    ### consider only samples that have min gene expression, to other assign NAs
     samps2keep <- colSums(expr_features) >= min_gene_expr & !is.na(expr_features[1, ])
     
     if(sum(samps2keep) < max(1, min_samps_feature_prop))
@@ -65,6 +79,10 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   names(counts_new) <- names(counts)[inds]
   NULLs <- !sapply(counts_new, is.null)
   counts_new <- counts_new[NULLs]
+  
+  if(length(counts_new) == 0)
+    stop("!No genes left after filtering!")
+  
   counts_new <- MatrixList(counts_new)
   
   ########################################################
@@ -118,6 +136,10 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples, min_samps_gene_exp
   names(genotypes_new) <- names(genotypes)
   NULLs <- !sapply(genotypes_new, is.null)
   genotypes_new <- genotypes_new[NULLs]
+  
+  if(length(genotypes_new) == 0)
+    stop("!No SNPs left after filtering!")
+  
   genotypes_new <- MatrixList(genotypes_new)
   counts_new <- counts_new[NULLs]
   

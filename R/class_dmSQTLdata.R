@@ -385,14 +385,14 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @export
 setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 20, min_feature_expr = 20, min_feature_prop = 0.05, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= nrow(x@counts))
+  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)
-  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= nrow(x@counts))
+  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= ncol(x@counts))
   stopifnot(min_feature_expr >= 0)
-  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= nrow(x@counts))
+  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= ncol(x@counts))
   stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
   stopifnot(max_features >= 2)
-  stopifnot(minor_allele_freq >= 1 && minor_allele_freq <= floor(nrow(x@counts)/2))
+  stopifnot(minor_allele_freq >= 1 && minor_allele_freq <= floor(ncol(x@counts)/2))
   
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, min_gene_expr = min_gene_expr, min_samps_feature_expr = min_samps_feature_expr, min_feature_expr = min_feature_expr, min_samps_feature_prop = min_samps_feature_prop, min_feature_prop = min_feature_prop, max_features = max_features, minor_allele_freq = minor_allele_freq, BPPARAM = BPPARAM)
