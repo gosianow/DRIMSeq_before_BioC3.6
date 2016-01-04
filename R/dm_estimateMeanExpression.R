@@ -5,7 +5,7 @@
 dm_estimateMeanExpression <- function(counts, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ### calculate mean expression of genes 
-  cat("* Calculating mean gene expression.. \n")
+  if(verbose) cat("* Calculating mean gene expression.. \n")
   
   inds <- 1:length(counts)
 
@@ -17,7 +17,7 @@ dm_estimateMeanExpression <- function(counts, verbose = FALSE, BPPARAM = BiocPar
   
   names(mean_expression) <- names(counts)
 
-  cat("Took ", time["elapsed"], " seconds.\n")
+  if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
   if(verbose) cat("*** Mean gene expression: ", head(mean_expression), "... \n")
   
   

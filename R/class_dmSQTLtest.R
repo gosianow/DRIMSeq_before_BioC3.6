@@ -112,9 +112,9 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
   
-  fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = 1, BPPARAM = BPPARAM)
+  fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
-  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, BPPARAM = BPPARAM)
+  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, verbose = verbose, BPPARAM = BPPARAM)
   colnames(results)[colnames(results) == "snp_id"] <- "block_id" 
   results_spl <- split(results, factor(results$gene_id, levels = names(x@blocks)))
   

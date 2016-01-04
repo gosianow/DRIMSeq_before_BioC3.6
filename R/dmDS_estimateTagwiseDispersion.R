@@ -4,7 +4,7 @@
 
 # counts = x@counts; samples = x@samples; disp_adjust = TRUE; disp_mode = c("optimize", "optim", "constrOptim", "grid")[4]; disp_interval = c(0, 1e+5); disp_tol = 1e-08; disp_init = 100; disp_init_weirMoM = TRUE; disp_grid_length = 21; disp_grid_range = c(-10, 10); disp_moderation = c("none", "common", "trended")[1]; disp_prior_df = 10; disp_span = 0.3; prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
-dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
   
@@ -18,7 +18,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
   
   
   ### Find optimized dispersion
-  cat("* Estimating genewise dispersion.. \n")
+  if(verbose) cat("* Estimating genewise dispersion.. \n")
   time <- system.time(
     switch(
       disp_mode, 
@@ -215,7 +215,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
       }))
   
-  cat("Took ", time["elapsed"], " seconds.\n")
+  if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
   if(verbose) cat("*** Genewise dispersion: ", head(dispersion), "... \n")
   
   return(dispersion)

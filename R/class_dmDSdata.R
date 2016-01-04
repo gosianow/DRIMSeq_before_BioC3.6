@@ -115,7 +115,7 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
+#' @aliases [,dmDSdata-method
 #' @rdname dmDSdata-class
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
@@ -151,18 +151,18 @@ setMethod("[", "dmDSdata", function(x, i, j){
 ### dmDSdata
 ################################################################################
 
-#'  Create dmDSdata object
+#' Create dmDSdata object
 #'  
-#'  Constructor function for a \code{\linkS4class{dmDSdata}} object. 
+#' Constructor function for a \code{\linkS4class{dmDSdata}} object.
 #'  
-#'  @param counts Numeric matrix or data frame of counts. Rows represent features, for example, exons,
+#' @param counts Numeric matrix or data frame of counts. Rows represent features, for example, exons,
 #'    exonic bins or transcripts. Columns represent samples.
-#'  @param gene_id Vector of gene IDs corresponding to \code{counts}.
-#'  @param feature_id Vector of feature IDs corresponding to \code{counts}.
-#'  @param sample_id Vector of unique sample IDs corresponding to the columns in \code{counts}.
-#'  @param group Vector that defines the grouping of samples.
-#'  @return Returns a \linkS4class{dmDSdata} object.
-#'  @examples
+#' @param gene_id Vector of gene IDs corresponding to \code{counts}.
+#' @param feature_id Vector of feature IDs corresponding to \code{counts}.
+#' @param sample_id Vector of unique sample IDs corresponding to the columns in \code{counts}.
+#' @param group Vector that defines the grouping of samples.
+#' @return Returns a \linkS4class{dmDSdata} object.
+#' @examples
 #'  
 #' #############################
 #' ### Create dmDSdata object
@@ -203,9 +203,9 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #' 
 #' plotData(d)
 #' 
-#'  @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
-#'  @author Malgorzata Nowicka
-#'  @export
+#' @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+#' @author Malgorzata Nowicka
+#' @export
 dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
   
   stopifnot(class(counts) %in% c("matrix", "data.frame"))

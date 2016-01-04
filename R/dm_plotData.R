@@ -4,7 +4,8 @@
 dm_plotDataFeatures <- function(tt){
   
   df <- data.frame(tt = tt)
-  binwidth <- ceiling(max(df$tt)/50)
+  # binwidth <- ceiling(max(df$tt)/50)
+  binwidth <- 1
   
   ggp <- ggplot(df, aes_string(x = "tt")) +
     theme_bw() +
@@ -27,7 +28,7 @@ dm_plotDataBlocks <- function(tt){
   
   
   df <- data.frame(tt = tt)
-  binwidth <- ceiling(max(df$tt)/50)
+  binwidth <- ceiling(max(df$tt)/100)
   
   ggp <- ggplot(df, aes_string(x = "tt")) +
     theme_bw() +
@@ -48,7 +49,7 @@ return(ggp)
 dm_plotDataSnps <- function(tt){
   
   df <- data.frame(tt = tt)
-  binwidth <- ceiling(max(df$tt)/50)
+  binwidth <- ceiling(max(df$tt)/100)
   
   ggp <- ggplot(df, aes_string(x = "tt")) +
     theme_bw() +

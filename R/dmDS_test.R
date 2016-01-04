@@ -5,10 +5,10 @@
 
 # stats_full = x@fit_full@metadata; stats_null = x@fit_null[[1]]@metadata
 
-dmDS_test <- function(stats_full, stats_null){
+dmDS_test <- function(stats_full, stats_null, verbose = FALSE){
 
   ## calculate lr
-  cat("* Calculating likelihood ratio statistics.. \n")
+  if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
   
   lr <- 2*(rowSums(stats_full) - stats_null[, "lik"])
@@ -32,7 +32,7 @@ dmDS_test <- function(stats_full, stats_null){
   rownames(table) <- NULL
 
   time_end <- Sys.time()
-  cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
+  if(verbose) cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
 
   return(table)
   

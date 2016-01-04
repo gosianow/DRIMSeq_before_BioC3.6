@@ -4,10 +4,10 @@
 # fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 
-dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
-  cat("* Calculating likelihood ratio statistics.. \n")
+  if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
   
   inds <- 1:length(fit_full)
@@ -44,7 +44,7 @@ dmSQTL_test <- function(fit_full, fit_null, BPPARAM = BiocParallel::MulticorePar
   rownames(table) <- NULL
   
   time_end <- Sys.time()
-  cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
+  if(verbose) cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
   
   return(table)
   
