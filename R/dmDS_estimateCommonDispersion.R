@@ -9,7 +9,7 @@ dmDS_estimateCommonDispersion <- function(counts, samples, disp_adjust = TRUE, d
   if(verbose) cat("* Estimating common dispersion.. \n")
 
   time <- system.time(optimum <- optimize(f = dmDS_profileLikCommon, interval = disp_interval,
-                  counts = counts, samples = samples, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM,
+                  counts = counts, samples = samples, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = max(0, verbose-1), BPPARAM = BPPARAM,
                   maximum = TRUE, tol = disp_tol) )
   
                   dispersion <- optimum$maximum

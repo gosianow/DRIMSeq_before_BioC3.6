@@ -25,7 +25,7 @@ NULL
 #' @slot blocks MatrixList with two columns \code{block_id} and \code{snp_id}. For each gene, it identifies SNPs with identical genotypes across the samples and assigns them to blocks.
 #' @slot samples Data frame with information about samples. It contains unique sample names \code{sample_id}.
 #' 
-#'  @examples 
+#' @examples 
 #' #############################
 #' ### sQTL analysis
 #' #############################
@@ -96,7 +96,7 @@ setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmSQTLdata-method
+#' @aliases [,dmSQTLdata-method [,dmSQTLdata,ANY-method
 #' @rdname dmSQTLdata-class
 #' @export
 setMethod("[", "dmSQTLdata", function(x, i, j){
@@ -135,11 +135,10 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 ### dmSQTLdata
 ################################################################################
 
-#'  Create dmSQTLdata object 
+#'  Create dmSQTLdata object
 #'  
 #'  Constructor functions for a \code{\linkS4class{dmSQTLdata}} object. dmSQTLdata requires that SNPs are already matched to corresponding genes. dmSQTLdataFromRanges does the matching by assigning to a gene all the SNPs that are located in a given surrounding (\code{window}) of this gene.
 #'  
-#'  @details 
 #'  It is quite common that sample grouping defined by some of the SNPs is identical. Compare \code{dim(genotypes)} and \code{dim(unique(genotypes))}. In our sQTL analysis, we do not repeat tests for the SNPs that define the same grouping of samples. Each grouping is tested only once. SNPs that define such unique groupings are aggregated into blocks. P-values and adjusted p-values are estimated at the block level, but the returned results are extended to a SNP level by repeating the block statistics for each SNP that belongs to a given block.
 #'  
 #'  @inheritParams dmDSdata
@@ -147,47 +146,34 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
 #'  @param gene_id_genotypes Vector of gene IDs corresponding to \code{genotypes}.
 #'  @param snp_id Vector of SNP IDs corresponding to \code{genotypes}.
 #'  @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
+#'  
 #'  @return Returns a \code{\linkS4class{dmSQTLdata}} object.
+#'  
 #'  @examples 
 #'  
 #' #############################
 #' ### Create dmSQTLdata object
 #' #############################
 #' 
-#' library(GenomicRanges)
-#' library(rtracklayer)
+#' # Use subsets of data defined in GeuvadisTranscriptExpr package
+#' library(GeuvadisTranscriptExpr)
 #' 
-#' data_dir  <- system.file("extdata", package = "DRIMSeq")
+#' counts <- GeuvadisTranscriptExpr::counts
+#' genotypes <- GeuvadisTranscriptExpr::genotypes
+#' gene_ranges <- GeuvadisTranscriptExpr::gene_ranges
+#' snp_ranges <- GeuvadisTranscriptExpr::snp_ranges
 #' 
-#' 
-#' # gene_ranges with names!
-#' gene_ranges <- import(paste0(data_dir, "/genes_subset.bed"))
-#' names(gene_ranges) <- mcols(gene_ranges)$name
-#' 
-#' counts <- read.table(paste0(data_dir, "/TrQuantCount_CEU_subset.tsv"), 
-#'    header = TRUE, sep = "\t", as.is = TRUE)
-#' 
-#' genotypes <- read.table(paste0(data_dir, "/genotypes_CEU_subset.tsv"), 
-#'    header = TRUE, sep = "\t", as.is = TRUE)
-#' 
-#' # snp_ranges with names!
-#' snp_ranges <- GRanges(Rle(genotypes$chr), IRanges(genotypes$start, 
-#'    genotypes$end))
-#' names(snp_ranges) <- genotypes$snpId 
-#' 
-#' ## Check if samples in count and genotypes are in the same order
-#' all(colnames(counts[, -(1:2)]) == colnames(genotypes[, -(1:4)]))
+#' # Make sure that samples in counts and genotypes are in the same order
 #' sample_id <- colnames(counts[, -(1:2)])
 #' 
-#' 
-#' d <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId, 
-#'    feature_id = counts$trId, gene_ranges = gene_ranges, 
-#'    genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId, 
-#'    snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3, 
-#'    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmSQTLdataFromRanges(counts = counts[, sample_id], 
+#'    gene_id = counts$Gene_Symbol, feature_id = counts$TargetID, 
+#'    gene_ranges = gene_ranges, genotypes = genotypes[, sample_id], 
+#'    snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, 
+#'    window = 5e3, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' plotData(d)
-#'  
+#' 
 #'  @seealso \code{\link{data_dmSQTLdata}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #'  @author Malgorzata Nowicka
 #'  @export
@@ -365,25 +351,25 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, genot
 #' @param BPPARAM Parallelization method used by \code{\link[BiocParallel]{bplapply}}.
 #' @details 
 #' 
-#' In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing experiment. Our example data set consists of 91 samples. Again, requiring that genes are expressed in all samples is too stringent, especially because there may be missing values in the data and for some genes you do not observe 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. Additionally, we do not use with too low expression in the estimation. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 20}, only genes with expression of at least 20 in at least 70 samples are kept, and samples with expression lower than 20 have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples. 
+#' In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing assay. Our example data set consists of 91 samples. Requiring that genes are expressed in all samples may be too stringent, especially since there may be missing values in the data and for some genes you may not observe counts in all 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 10}, only genes with expression of at least 10 in at least 70 samples are kept. Samples with expression lower than 10 have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples. 
 #' 
 #' @examples 
 #' #############################
 #' ### sQTL analysis
 #' #############################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmSQTLdata
 #' \donttest{
 #' ### Filtering
 #' d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5, 
-#'  min_samps_feature_prop = 5, minor_allele_freq = 5, 
-#'  BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#'  min_samps_feature_prop = 0, minor_allele_freq = 5, 
+#'  BPPARAM = BiocParallel::SerilaParam())
 #' plotData(d)
 #' }
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 20, min_feature_expr = 20, min_feature_prop = 0.05, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, minor_allele_freq, min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0, max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)

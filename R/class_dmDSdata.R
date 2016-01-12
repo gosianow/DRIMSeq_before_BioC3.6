@@ -115,7 +115,7 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmDSdata-method
+#' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
 #' @rdname dmDSdata-class
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
@@ -163,45 +163,33 @@ setMethod("[", "dmDSdata", function(x, i, j){
 #' @param group Vector that defines the grouping of samples.
 #' @return Returns a \linkS4class{dmDSdata} object.
 #' @examples
-#'  
+#' 
 #' #############################
-#' ### Create dmDSdata object
+#' ### Create dmDSdata object 
 #' #############################
-#' ### Get HTSeq exonic bin counts from 'pasilla' package
+#' ### Get kallisto transcript counts from 'PasillaTranscriptExpr' package
 #' 
-#' library(pasilla)
+#' library(PasillaTranscriptExpr)
 #' 
-#' data_dir  <- system.file("extdata", package="pasilla")
-#' count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
-#' count_files
+#' data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 #' 
-#' # Create a data frame with htseq counts
-#' htseq_list <- lapply(1:length(count_files), function(i){
-#'   # i = 1
-#'   htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
-#'   colnames(htseq) <- c("group_id", gsub("fb.txt", "", 
-#'      strsplit(count_files[i], "extdata/")[[1]][2]))
-#'   return(htseq)
-#' })
+#' metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+#' metadata
 #' 
-#' htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE, 
-#'    sort = FALSE), htseq_list)
-#' tail(htseq_counts)
-#' htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+#' counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+#' head(counts)
 #' 
-#' group_split <- limma::strsplit2(htseq_counts[, 1], ":")
-#' 
-#' d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1], 
-#'    feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1], 
-#'    group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+#' # Create a dmDSdata object
+#' d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
 #' 
 #' plotData(d)
 #' 
 #' # Use a subset of genes, which is defined in the following file
-#' genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
-#' d <- d[names(d) %in% genes_subset, ]
+#' gene_id_subset <- readLines(file.path(data_dir, "gene_id_subset.txt"))
+#' d <- d[names(d) %in% gene_id_subset, ]
 #' 
 #' plotData(d)
+#' 
 #' 
 #' @seealso \code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
@@ -291,9 +279,11 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' @details 
 #' Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition. 
 #'
-#' \code{min_samps_gene_expr} defines the minimal number of samples where genes are required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. Similarly, \code{min_samps_feature_expr} defines the minimal number of samples where features are required to be expressed at the minimal level of \code{min_feature_expr}.
+#' \code{min_samps_gene_expr} defines the minimal number of samples where genes are required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios. 
 #' 
-#' In differential splicing analysis, we suggest using \code{min_samps_feature_expr} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set this parameter to 3. The same for \code{min_samps_feature_prop}, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+#' Similarly, \code{min_samps_feature_expr} and \code{min_samps_feature_prop} defines the minimal number of samples where features are required to be expressed at the minimal levels of counts \code{min_feature_expr} or proportions \code{min_feature_prop}. In differential splicing analysis, we suggest using \code{min_samps_feature_expr} and \code{min_samps_feature_prop} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set these parameters to 3, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+#' 
+#' By default, we do not use filtering based on feature proportions. Therefore, \code{min_samps_feature_prop} and \code{min_feature_prop} equals 0.
 #' 
 #' @param min_samps_gene_expr Minimal number of samples where genes should 
 #'   be expressed. See Details.
@@ -317,14 +307,14 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
 #' plotData(d)
 #' }
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export
-setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0.01, max_features = Inf){
+setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr, min_samps_feature_expr, min_samps_feature_prop, min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0, max_features = Inf){
   
   stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)

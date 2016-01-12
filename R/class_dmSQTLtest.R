@@ -26,23 +26,23 @@ NULL
 #' #############################
 #' ### sQTL analysis
 #' #############################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmSQTLdata
 #' \donttest{
 #' ### Filtering
 #' d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5, 
-#'    min_samps_feature_prop = 5, minor_allele_freq = 5, 
-#'    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#'    min_samps_feature_prop = 0, minor_allele_freq = 5, 
+#'    BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for sQTLs
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' plotTest(d)
 #' 
 #' head(results(d))

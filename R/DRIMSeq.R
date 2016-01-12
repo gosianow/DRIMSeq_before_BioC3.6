@@ -1,14 +1,6 @@
+#' @import methods
 #' @import BiocGenerics
-#' @import methods 
-#' @import BiocParallel
-#' @import edgeR
-#' @import GenomicRanges
-#' @import S4Vectors
-#' @import ggplot2
-#' @importFrom reshape2 melt
-#' @import grid
 NULL
-
 
 
 
@@ -17,19 +9,17 @@ NULL
 ### Data documentation
 ################################################################################
 
-
-
 #' Sample data for differential splicing analysis
 #'
-#' We use a subset of HTSeq exonic bin counts from \code{pasilla} package.
+#' We use a subset of kallisto transcript counts from \code{PasillaTranscriptExpr} package.
 #' 
 #' @format 
 #' \code{data_dmDSdata} is a \code{\linkS4class{dmDSdata}} object. See Examples.
 #' 
 #' @source 
-#' Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory map between Drosophila and mammals. Genome Res. 2011;21(2):193-202.
-#' 
-#' \code{pasilla} package.
+#' Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory map between Drosophila and mammals. Genome Res. 2011;21(2):193-202
+#'
+#' \code{PasillaTranscriptExpr} package
 #' 
 #' @return 
 #' \code{data_dmDSdata}
@@ -37,50 +27,37 @@ NULL
 #' @examples 
 #' 
 #' #############################
-#' ### Create dmDSdata object
+#' ### Create dmDSdata object 
 #' #############################
-#' ### Get HTSeq exonic bin counts from 'pasilla' package
+#' ### Get kallisto transcript counts from 'PasillaTranscriptExpr' package
 #' 
-#' library(pasilla)
+#' library(PasillaTranscriptExpr)
 #' 
-#' data_dir  <- system.file("extdata", package="pasilla")
-#' count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
-#' count_files
+#' data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 #' 
-#' # Create a data frame with htseq counts
-#' htseq_list <- lapply(1:length(count_files), function(i){
-#'   # i = 1
-#'   htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
-#'   colnames(htseq) <- c("group_id", gsub("fb.txt", "", strsplit(count_files[i], 
-#'      "extdata/")[[1]][2]))
-#'   return(htseq)
-#' })
+#' metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+#' metadata
 #' 
-#' htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE, 
-#'    sort = FALSE), htseq_list)
-#' tail(htseq_counts)
-#' htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+#' counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+#' head(counts)
 #' 
-#' group_split <- limma::strsplit2(htseq_counts[, 1], ":")
-#' 
-#' d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1], 
-#'    feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1], 
-#'    group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+#' # Create a dmDSdata object
+#' d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
 #' 
 #' plotData(d)
 #' 
 #' # Use a subset of genes, which is defined in the following file
-#' genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
-#' d <- d[names(d) %in% genes_subset, ]
+#' gene_id_subset <- readLines(file.path(data_dir, "gene_id_subset.txt"))
+#' d <- d[names(d) %in% gene_id_subset, ]
 #' 
 #' plotData(d)
 #' 
-#' ## data_dmDSdata <- d
+#' data_dmDSdata <- d
 #' 
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' 
@@ -94,12 +71,12 @@ NULL
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' 
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
 #' plotData(d)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' plotDispersion(d)
 #' 
 #' head(mean_expression(d))
@@ -107,13 +84,13 @@ NULL
 #' head(genewise_dispersion(d))
 #' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' head(proportions(d))
 #' head(statistics(d))
 #' 
 #' ### Fit null model proportions and test for DS
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' plotTest(d)
 #' 
 #' head(proportions(d))
@@ -130,7 +107,6 @@ NULL
 #' plotFit(d, gene_id = gene_id, plot_type = "lineplot")
 #' plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 #' 
-#' 
 "data_dmDSdata"
 
 
@@ -140,17 +116,15 @@ NULL
 
 #' Sample data for sQTL analysis
 #'
-#' A subset of data from GEUVADIS project where 462 RNA-Seq samples from lymphoblastoid cell lines were obtained. The genome sequencing data of the same individuals is provided by the 1000 Genomes Project. The samples in this project come from five populations: CEPH (CEU), Finns (FIN), British (GBR), Toscani (TSI) and Yoruba (YRI). Here, we make available subsets of bi-allelic SNPs and transcript expected counts for CEPH population (91 individuals) that correspond to 50 randomly selected genes from chromosome 19. For the details on how this data was preprocessed, see the vignette.
+#' A subset of data from GEUVADIS project where 462 RNA-Seq samples from lymphoblastoid cell lines were obtained. The genome sequencing data of the same individuals is provided by the 1000 Genomes Project. The samples in this project come from five populations: CEPH (CEU), Finns (FIN), British (GBR), Toscani (TSI) and Yoruba (YRI). Here, we use a subset of CEPH data from chromosome 19 available in \code{GeuvadisTranscriptExpr} package.
 #' 
 #' @format 
 #' \code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object. See Examples.
 #' 
 #' @source 
-#' Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and genome sequencing uncovers functional variation in humans. Nature. 2013;501(7468):506-11.
+#' Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and genome sequencing uncovers functional variation in humans. Nature. 2013;501(7468):506-11
 #' 
-#' Genotypes and transcript quantification were downloaded from http://www.ebi.ac.uk/Tools/geuvadis-das/.
-#' 
-#' Gene annotation Gencode v12 from http://www.gencodegenes.org/releases/12.html.
+#' \code{GeuvadisTranscriptExpr} package
 #' 
 #' @return 
 #' \code{data_dmSQTLdata}
@@ -161,47 +135,31 @@ NULL
 #' ### Create dmSQTLdata object
 #' #############################
 #' 
-#' library(GenomicRanges)
-#' library(rtracklayer)
+#' # Use subsets of data defined in GeuvadisTranscriptExpr package
+#' library(GeuvadisTranscriptExpr)
 #' 
-#' data_dir  <- system.file("extdata", package = "DRIMSeq")
+#' counts <- GeuvadisTranscriptExpr::counts
+#' genotypes <- GeuvadisTranscriptExpr::genotypes
+#' gene_ranges <- GeuvadisTranscriptExpr::gene_ranges
+#' snp_ranges <- GeuvadisTranscriptExpr::snp_ranges
 #' 
-#' 
-#' # gene_ranges with names!
-#' gene_ranges <- import(paste0(data_dir, "/genes_subset.bed"))
-#' names(gene_ranges) <- mcols(gene_ranges)$name
-#' 
-#' counts <- read.table(paste0(data_dir, "/TrQuantCount_CEU_subset.tsv"), 
-#'    header = TRUE, sep = "\t", as.is = TRUE)
-#' 
-#' genotypes <- read.table(paste0(data_dir, "/genotypes_CEU_subset.tsv"), 
-#'    header = TRUE, sep = "\t", as.is = TRUE)
-#' 
-#' # snp_ranges with names!
-#' snp_ranges <- GRanges(Rle(genotypes$chr), IRanges(genotypes$start, 
-#'    genotypes$end))
-#' names(snp_ranges) <- genotypes$snpId 
-#' 
-#' ## Check if samples in count and genotypes are in the same order
-#' all(colnames(counts[, -(1:2)]) == colnames(genotypes[, -(1:4)]))
+#' # Make sure that samples in counts and genotypes are in the same order
 #' sample_id <- colnames(counts[, -(1:2)])
 #' 
-#' 
-#' d <- dmSQTLdataFromRanges(counts = counts[, -(1:2)], gene_id = counts$geneId, 
-#'    feature_id = counts$trId, gene_ranges = gene_ranges, 
-#'    genotypes = genotypes[, -(1:4)], snp_id = genotypes$snpId, 
-#'    snp_ranges = snp_ranges, sample_id = sample_id, window = 5e3, 
-#'    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmSQTLdataFromRanges(counts = counts[, sample_id], 
+#'    gene_id = counts$Gene_Symbol, feature_id = counts$TargetID, 
+#'    gene_ranges = gene_ranges, genotypes = genotypes[, sample_id], 
+#'    snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, 
+#'    window = 5e3, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' plotData(d)
 #' 
-#' 
-#' ## data_dmSQTLdata <- d
+#' data_dmSQTLdata <- d
 #' 
 #' #############################
 #' ### sQTL analysis
 #' #############################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmSQTLdata
 #' 
@@ -212,22 +170,20 @@ NULL
 #' 
 #' ### Filtering
 #' d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5, 
-#'    min_samps_feature_prop = 5, minor_allele_freq = 5, 
-#'    BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#'    min_samps_feature_prop = 0, minor_allele_freq = 5, 
+#'    BPPARAM = BiocParallel::SerialParam())
 #' plotData(d)
 #' 
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 3))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' plotDispersion(d)
 #' 
-#' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#' 
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for sQTLs
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' plotTest(d)
 #' 
 #' head(results(d))

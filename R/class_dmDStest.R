@@ -29,24 +29,24 @@ NULL
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for DS
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' plotTest(d)
 #' 
 #' head(proportions(d))
@@ -157,24 +157,24 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #'
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for DS
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' plotTest(d)
 #' 
 #' head(proportions(d))
@@ -256,24 +256,24 @@ setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #'
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for DS
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #'
 #' plotTest(d)
 #' 

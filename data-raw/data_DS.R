@@ -1,10 +1,8 @@
 # Prepare data for examples and vignette 
 
-# setwd("/home/gosia/R/multinomial_project/package_devel/DM/data-raw/simulations_sim5_drosophila_noDE_noNull/")
-
+setwd("/home/gosia/R/multinomial_project/package_devel/DRIMSeq")
 
 library(DRIMSeq)
-
 library(devtools)
 
 
@@ -16,35 +14,29 @@ library(devtools)
 #############################
 ### Create dmDSdata object
 #############################
-### Get HTSeq exonic bin counts from 'pasilla' package
+### Get kallisto transcript counts from 'PasillaTranscriptExpr' package
 
-library(pasilla)
+library(PasillaTranscriptExpr)
 
-data_dir  <- system.file("extdata", package="pasilla")
-count_files <- list.files(data_dir, pattern="fb.txt$", full.names=TRUE)
-count_files
+data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 
-# Create a data frame with htseq counts
-htseq_list <- lapply(1:length(count_files), function(i){
-  # i = 1
-  htseq <- read.table(count_files[i], header = FALSE, as.is = TRUE)
-  colnames(htseq) <- c("group_id", gsub("fb.txt", "", strsplit(count_files[i], "extdata/")[[1]][2]))
-  return(htseq)
-})
+metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+metadata
 
-htseq_counts <- Reduce(function(...) merge(..., by = "group_id", all=TRUE, sort = FALSE), htseq_list)
-tail(htseq_counts)
-htseq_counts <- htseq_counts[!grepl(pattern = "_", htseq_counts$group_id), ]
+counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+head(counts)
 
-group_split <- limma::strsplit2(htseq_counts[, 1], ":")
 
-d <- dmDSdata(counts = htseq_counts[, -1], gene_id = group_split[, 1], feature_id = group_split[, 2], sample_id = colnames(htseq_counts)[-1], group = gsub("[1-4]", "", colnames(htseq_counts)[-1]))
+# Create a dmDSdata object
+d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
+d
 
 plotData(d)
 
-### Use a subset of genes, which is defined in the following file
-genes_subset = readLines(file.path(data_dir, "geneIDsinsubset.txt"))
-d <- d[names(d) %in% genes_subset, ]
+# Use a subset of genes, which is defined in the following file
+gene_id_subset <- readLines(file.path(data_dir, "gene_id_subset.txt"))
+d <- d[names(d) %in% gene_id_subset, ]
+d
 
 plotData(d)
 
@@ -55,7 +47,7 @@ use_data(data_dmDSdata, overwrite = TRUE)
 ###################################
 ### Differential splicing analysis
 ###################################
-# If possible, increase the number of workers in BPPARAM
+# If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 
 d <- data_dmDSdata
 
@@ -69,11 +61,11 @@ d[1:20, 1:3]
 ### Filtering
 # Check what is the minimal number of replicates per condition 
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 3, min_samps_feature_prop = 3)
+d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
 plotData(d)
 
 ### Calculate dispersion
-d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dmDispersion(d, verbose = 0, BPPARAM = BiocParallel::SerialParam())
 plotDispersion(d)
 
 head(mean_expression(d))
@@ -81,13 +73,13 @@ common_dispersion(d)
 head(genewise_dispersion(d))
 
 ### Fit full model proportions
-d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dmFit(d, verbose = 0, BPPARAM = BiocParallel::SerialParam())
 
 head(proportions(d))
 head(statistics(d))
 
 ### Fit null model proportions and test for DS
-d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 2))
+d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 plotTest(d)
 
 head(proportions(d))

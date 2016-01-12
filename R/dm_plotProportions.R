@@ -1,3 +1,4 @@
+
 #' Plot feature proportions
 #' 
 #' Plot observed and/or estimated feature proportions.
@@ -11,8 +12,9 @@
 #' @param order Logical. Whether to plot the features ordered by their expression.
 #' 
 #' @return 
-#' ggplot object with the observed and/or estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
-
+#' \code{ggplot} object with the observed and/or estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
+#' @import ggplot2
+#' @importFrom reshape2 melt
 
 dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
   
@@ -105,7 +107,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       theme_bw() + 
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +     
-      geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE, na.rm = TRUE) +
+      geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show.legend = FALSE, na.rm = TRUE) +
       geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.2, lwd = 0.5) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
@@ -171,7 +173,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
     if(!is.null(pi_null)){
       ggp <- ggp +
-        geom_point(data = prop_est_null, aes_string(x = "feature_id", y = "proportion", fill = "group"), size = 3.5, shape = 22, show_guide = FALSE) +
+        geom_point(data = prop_est_null, aes_string(x = "feature_id", y = "proportion", fill = "group"), size = 3.5, shape = 22, show.legend = FALSE) +
         guides(colour=FALSE)
     }
     

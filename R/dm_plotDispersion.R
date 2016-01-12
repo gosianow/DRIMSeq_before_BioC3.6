@@ -1,4 +1,4 @@
-
+#' @import ggplot2
 
 
 dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features = NULL, common_dispersion = NULL){

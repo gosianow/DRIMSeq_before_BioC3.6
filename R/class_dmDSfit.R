@@ -26,21 +26,21 @@ NULL
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SrialParam())
 #' 
 #' head(proportions(d))
 #' head(statistics(d))
@@ -150,21 +150,21 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' head(proportions(d))
 #' head(statistics(d))
@@ -185,7 +185,7 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
 
-  fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = 1, BPPARAM = BPPARAM)
+  fit_full <- dmDS_fitOneModel(counts = x@counts, samples = x@samples, dispersion = slot(x, dispersion), model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
   return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))
   
@@ -222,24 +222,24 @@ setGeneric("plotFit", function(x, ...) standardGeneric("plotFit"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit full model proportions
-#' d <- dmFit(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmFit(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Fit null model proportions and test for DS
-#' d <- dmTest(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' ### Plot feature proportions for top DS gene
 #' res <- results(d)

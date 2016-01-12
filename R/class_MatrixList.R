@@ -287,7 +287,7 @@ setMethod("$", "MatrixList", function(x, name){
 
 ################################
 
-#' @aliases [,MatrixList-method
+#' @aliases [,MatrixList-method [,MatrixList,ANY-method
 #' @rdname MatrixList-class
 #' @export
 setMethod("[", signature(x = "MatrixList"), function(x, i, j){

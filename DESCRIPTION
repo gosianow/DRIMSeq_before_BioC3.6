@@ -2,10 +2,11 @@ Package: DRIMSeq
 Type: Package
 Title: Differential splicing and sQTL analyses with Dirichlet-multinomial model
     in RNA-Seq
-Version: 0.3.3
-Date: 2015-10-13
-Author: Malgorzata Nowicka and Mark Robinson, both at University Zurich.
-Maintainer: Malgorzata Nowicka <gosia.nowicka@uzh.ch>
+Version: 0.3.4
+Date: 2016-01-11
+Authors@R: c(person(given = "Malgorzata", family = "Nowicka", 
+    role = c("aut", "cre"),
+    email = "gosia.nowicka@uzh.ch"))
 Description: The package provides two frameworks. One for the differential
     splicing analysis between different conditions and one for the sQTL analysis.
     Both are based on modeling the counts of genomic features (i.e., transcripts,
@@ -13,30 +14,28 @@ Description: The package provides two frameworks. One for the differential
     makes available functions for visualization and exploration of the data and
     results.
 biocViews: SNP, AlternativeSplicing, DifferentialSplicing, Genetics, RNASeq,
-    MultipleComparison
+    Sequencing, WorkflowStep, MultipleComparison
 License: GPL (>= 3)
 Depends:
-    R (>= 3.2),
+    R (>= 3.3.0),
     BiocGenerics
 Imports:
     methods,
     BiocParallel,
     edgeR,
     GenomicRanges,
-    S4Vectors,
     ggplot2,
-    reshape2,
-    grid
-LazyData: true
-ByteCompile: false
-VignetteBuilder: knitr
+    reshape2
 Suggests:
-    pasilla,
-    limma,
-    rtracklayer,
+    PasillaTranscriptExpr,
+    GeuvadisTranscriptExpr,
+    grid,
     BiocStyle,
     knitr,
     testthat
+LazyData: true
+ByteCompile: false
+VignetteBuilder: knitr
 Collate:
     'DRIMSeq.R'
     'class_show_utils.R'

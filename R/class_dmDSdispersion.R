@@ -31,18 +31,18 @@ NULL
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' plotDispersion(d)
 #' 
 #' head(mean_expression(d))
@@ -261,18 +261,18 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' plotDispersion(d)
 #' 
 #' head(mean_expression(d))
@@ -285,7 +285,7 @@ setGeneric("dmDispersion", function(x, ...) standardGeneric("dmDispersion"))
 #' @author Malgorzata Nowicka
 #' @rdname dmDispersion
 #' @export
-setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "common", disp_prior_df = 1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "common", disp_prior_df = 0.1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ### Parameter checks:
   stopifnot(is.logical(mean_expression))
@@ -375,22 +375,20 @@ setGeneric("plotDispersion", function(x, ...) standardGeneric("plotDispersion"))
 #' ###################################
 #' ### Differential splicing analysis
 #' ###################################
-#' # If possible, increase the number of workers in BPPARAM
+#' # If possible, use BPPARAM = BiocParallel::MulticoreParam() with more workers
 #' 
 #' d <- data_dmDSdata
 #' \donttest{
 #' ### Filtering
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
-#' d <- dmFilter(d, min_samps_gene_expr = 6, min_samps_feature_expr = 3, 
-#'  min_samps_feature_prop = 3)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' 
 #' ### Calculate dispersion
-#' d <- dmDispersion(d, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
-#' 
+#' d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 #' 
 #' plotDispersion(d)
-#' 
 #' 
 #' }
 #' 
