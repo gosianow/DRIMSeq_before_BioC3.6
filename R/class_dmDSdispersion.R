@@ -158,7 +158,11 @@ setGeneric("genewise_dispersion<-", function(x, value) standardGeneric("genewise
 #' @export
 setMethod("genewise_dispersion<-", "dmDSdispersion", function(x, value){
   
-  return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = value, counts = x@counts, samples = x@samples))
+  stopifnot(all(c("gene_id", "genewise_dispersion") %in% colnames(value)))
+  stopifnot(all(names(x@counts) %in% value[,"gene_id"]))
+  order <- match(names(x@counts), value[,"gene_id"])
+  
+  return(new("dmDSdispersion", mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = value[order, "genewise_dispersion"], counts = x@counts, samples = x@samples))
   
 })
 

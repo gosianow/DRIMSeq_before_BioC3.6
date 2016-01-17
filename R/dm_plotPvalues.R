@@ -6,7 +6,7 @@ dm_plotPvalues <- function(pvalues){
   
   ggp <- ggplot(df, aes_string(x = "pvalues")) +
     theme_bw() +
-    xlab("p-values") +
+    xlab("P-values") +
     ylab("Frequency") +
     geom_histogram(binwidth = 0.01, fill = "deeppink4") +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=16, face="bold")) +
