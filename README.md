@@ -9,7 +9,7 @@
 To install the latest development version, use the `devtool` package (available [here](https://github.com/hadley/devtools))
 
 ```
-devtools::install_github("markrobinsonuzh/DM_package")
+devtools::install_github("markrobinsonuzh/DRIMSeq")
 ```
 
 # Vignette
@@ -20,4 +20,5 @@ The vignette contains all the instructions on how to use the DRIMSeq package for
 browseVignettes("DRIMSeq")
 ```
 
+In order to run the examples from the vignette and the manual, you need to install two data packages [PasillaTranscriptExpr](https://github.com/markrobinsonuzh/PasillaTranscriptExpr) and [GeuvadisTranscriptExpr](https://github.com/markrobinsonuzh/GeuvadisTranscriptExpr).
 
