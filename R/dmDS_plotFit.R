@@ -37,8 +37,12 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
       
       table_tmp <- table[table$gene_id == gene, ]
       
-      main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
-      
+      if("lr" %in% names(table_tmp)){
+        main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))  
+        }else{
+          main <- paste0(main, "\n F = ", round(table_tmp["f"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"])) 
+        }
+
     }
   }
   

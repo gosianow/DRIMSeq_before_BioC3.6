@@ -36,7 +36,8 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              names_snps <- rownames(snps)
              
              pi <- matrix(NA, nrow = n_y * n_snps, ncol = ngroups_g, dimnames = list(rep(rownames(y), n_snps), lgroups_g))
-             stats <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, lgroups_g))
+             liks <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, paste0("lik_", lgroups_g)))
+             devs <- matrix(NA, n_snps, ngroups_g, dimnames = list(names_snps, paste0("dev_", lgroups_g)))
              
              for(i in 1:n_snps){          
               # i = 1
@@ -57,15 +58,17 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
               ipi <- (i-1)*n_y + 1
               
               pi[ipi:(ipi+n_y-1), lgroups] <- f$pi
-              stats[i, lgroups] <- f$stats
-              
+              liks[i, paste0("lik_", lgroups)] <- f$stats[1:ngroups]
+              devs[i, paste0("dev_", lgroups)] <- f$stats[(ngroups+1):length(f$stats)]
+
              }
+             
+             stats <- cbind(liks, devs)
              
              partitioning <- split(1:nrow(pi), factor(rep(1:n_snps, each = n_y)))
              names(partitioning) <- names_snps
              
              ff <- new("MatrixList", unlistData = pi, partitioning = partitioning, metadata = stats)
-             
              
              return(ff)
               
@@ -92,7 +95,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = c("full", 
              names_snps <- rownames(snps)
              
              pi <- matrix(NA, nrow = n_y * n_snps, ncol = 1, dimnames = list(rep(rownames(y), n_snps), "null"))
-             stats <- matrix(NA, n_snps, 2, dimnames = list(names_snps, c("lik", "df")))
+             stats <- matrix(NA, n_snps, 3, dimnames = list(names_snps, c("lik", "df", "dev")))
              
              
              for(i in 1:n_snps){          

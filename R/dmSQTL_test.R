@@ -4,7 +4,7 @@
 # fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 
-dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
   if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
@@ -13,25 +13,69 @@ dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParal
   inds <- 1:length(fit_full)
   gene_list <- names(fit_full)
   
-  table_list <- BiocParallel::bplapply(inds, function(g){
-    # g = 662
+  switch(test, 
     
-    lr <- 2*(rowSums(fit_full[[g]]@metadata, na.rm = TRUE) - fit_null[[g]]@metadata[, "lik"])
+    lr = {
+      
+      table_list <- BiocParallel::bplapply(inds, function(g){
+        # g = 662
+        
+        lik_full <- fit_full[[g]]@metadata[, grepl("lik_", colnames(fit_full[[g]]@metadata)), drop = FALSE]
+        lik_null <- fit_null[[g]]@metadata[, "lik"]
+        
+        lr <- 2*(rowSums(lik_full, na.rm = TRUE) - lik_null)
+        
+        nrgroups <- rowSums(!is.na(lik_full))
+        
+        df <- (nrgroups - 1)*fit_null[[g]]@metadata[, "df"] ### negative when NAs in all groups in lik
+        
+        df[nrgroups == 0] <- NA 
+        lr[nrgroups == 0] <- NA 
+        
+        pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
+        
+        tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, stringsAsFactors = FALSE)
+        
+        }, BPPARAM = BPPARAM)
+      
+    },
     
-    nrgroups <- rowSums(!is.na(fit_full[[g]]@metadata))
+    f = {
+
+      table_list <- BiocParallel::bplapply(inds, function(g){
+        # g = 662
+        
+        dev_full <- fit_full[[g]]@metadata[, grepl("dev_", colnames(fit_full[[g]]@metadata)), drop = FALSE]
+        dev_null <- fit_null[[g]]@metadata[, "dev"]
+
+        # lr <- dev_null - rowSums(dev_full, na.rm = TRUE) ### This gives negative values!
+
+        lik_full <- fit_full[[g]]@metadata[, grepl("lik_", colnames(fit_full[[g]]@metadata)), drop = FALSE]
+        lik_null <- fit_null[[g]]@metadata[, "lik"]
+        
+        lr <- 2*(rowSums(lik_full, na.rm = TRUE) - lik_null)
+      
+        nrgroups <- rowSums(!is.na(dev_full))
+        
+        df1 <- (nrgroups - 1) * fit_null[[g]]@metadata[, "df"]
+        df2 <- n[g] - nrgroups * fit_null[[g]]@metadata[, "df"]
+        
+        qdisp <- rowSums(dev_full, na.rm = TRUE) / df2
+        
+        f = (lr / df1) / qdisp
+        
+        pvalue <- pf(f, df1 = df1, df2 = df2, lower.tail = FALSE, log.p = FALSE)
+        
+        tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), f = f, df1 = df1, df2 = df2, pvalue = pvalue, stringsAsFactors = FALSE)
+        
+        
+        }, BPPARAM = BPPARAM)
+      
+    }
     
-    df <- (nrgroups - 1)*fit_null[[g]]@metadata[, "df"] ### negative when NAs in all groups in lik
-    
-    df[nrgroups == 0] <- NA 
-    lr[nrgroups == 0] <- NA 
-    
-    pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
-    
-    tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, stringsAsFactors = FALSE)
-    
-    }, BPPARAM = BPPARAM)
+    )
   
-  
+
   table <- do.call(rbind, table_list)
   
   adj_pvalue <- p.adjust(table[, "pvalue"], method="BH")

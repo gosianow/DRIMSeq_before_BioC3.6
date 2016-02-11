@@ -101,7 +101,7 @@ setMethod("proportions", "dmDStest", function(x){
 setMethod("statistics", "dmDStest", function(x){
   
   stats_null <- x@fit_null@metadata
-  colnames(stats_null) <- c("lik_null", "df")
+  colnames(stats_null) <- c("lik_null", "df", "dev_null")
   
   df <- data.frame(gene_id = names(x@counts), x@fit_full@metadata, stats_null, stringsAsFactors = FALSE, row.names = NULL)
   
@@ -150,6 +150,7 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 
 #' @inheritParams dmFit
 #' @param compared_groups Vector that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vector should indicate levels or numbers of levels in \code{samples(x)$group}.
+#' @param test Character specifying which test to use. \code{"LR"} - likelihood ratio test, \code{"F"} - F-test.
 #' 
 #' @return Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
 #' @examples 
@@ -187,7 +188,7 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 #' @rdname dmTest
 #' @export
-setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$group), prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$group), test = "lr", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(length(prop_mode) == 1)
   stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
@@ -223,8 +224,9 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$g
   message("Running comparison between groups: ", paste0(levels(samples$group), collapse = ", "))
   
   fit_null <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+
   
-  results <- dmDS_test(stats_full = x@fit_full@metadata[, compared_groups], stats_null = fit_null@metadata, verbose = verbose)
+  results <- dmDS_test(stats_full = x@fit_full@metadata[, c(paste0("lik_" , compared_groups), paste0("dev_", compared_groups))], stats_null = fit_null@metadata, test = test, n = nrow(samples), verbose = verbose)
   
   
   return(new("dmDStest", compared_groups = compared_groups, fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full,  mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))

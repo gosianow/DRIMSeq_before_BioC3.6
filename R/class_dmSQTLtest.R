@@ -104,7 +104,7 @@ setMethod("show", "dmSQTLtest", function(object){
 
 #' @rdname dmTest
 #' @export
-setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(length(prop_mode) == 1)
   stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
@@ -114,24 +114,55 @@ setMethod("dmTest", "dmSQTLfit", function(x, prop_mode = "constrOptimG", prop_to
   
   fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
-  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, verbose = verbose, BPPARAM = BPPARAM)
+  ### Number of samples used for the analysis
+  n <- unlist(lapply(1:length(x@counts), function(g){
+    sum(!is.na(x@counts[[g]][1, ]))
+    }))
+  
+  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
   colnames(results)[colnames(results) == "snp_id"] <- "block_id" 
   results_spl <- split(results, factor(results$gene_id, levels = names(x@blocks)))
   
   inds <- 1:length(results_spl)
   
-  results_new <- lapply(inds, function(i){
-    # i = 1
+  
+  switch(test, 
+    lr = {
+      
+      results_new <- lapply(inds, function(i){
+        # i = 1
+        
+        res <- results_spl[[i]]
+        blo <- x@blocks[[i]]
+        matching <- match(blo[, "block_id"], res[, "block_id"])
+        snp_id <- blo[, "snp_id"]
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue")])
+        
+        return(res_new)
+        
+      })
+      
+      },
     
-    res <- results_spl[[i]]
-    blo <- x@blocks[[i]]
-    matching <- match(blo[, "block_id"], res[, "block_id"])
-    snp_id <- blo[, "snp_id"]
-    res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue")])
+    f = {
+      
+      results_new <- lapply(inds, function(i){
+        # i = 1
+        
+        res <- results_spl[[i]]
+        blo <- x@blocks[[i]]
+        matching <- match(blo[, "block_id"], res[, "block_id"])
+        snp_id <- blo[, "snp_id"]
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue")])
+        
+        return(res_new)
+        
+      })
+      
+    }
     
-    return(res_new)
-    
-  })
+    )
+
   
   results_new <- do.call(rbind, results_new)
   

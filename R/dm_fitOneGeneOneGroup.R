@@ -10,12 +10,12 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   # NAs for genes with one feature
   kk <- nrow(y)
   if(kk < 2 || is.na(gamma0)) 
-    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA)))
+    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA, dev = NA)))
   
   ### check for 0s in rows (features)
   keep_row <- rowSums(y) > 0
   if(sum(keep_row) < 2) 
-    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA))) ## must be at least two features
+    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA, dev = NA))) ## must be at least two features
   
   y <- y[keep_row, , drop=FALSE]
   
@@ -32,9 +32,13 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
     pi <- keep_row
     
     df <- k - 1
-    lik <- dm_likG(pi = pi_init[-k], gamma0 = gamma0, y = y)
+    lik <- dm_likG(pi = pi_init[-k], gamma0 = gamma0, y = y) # likelihood
+    dev <- dm_devG(pi = pi_init[-k], gamma0 = gamma0, y = y) # deviance
     
-    return(list(pi = pi, stats = c(lik = lik, df = df)))
+    stats <- c(lik, df, dev)
+    names(stats) <- c("lik", "df", "dev")
+
+    return(list(pi = pi, stats = stats))
   }
   
   switch(prop_mode, 
@@ -51,6 +55,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            co <- constrOptim(pi_init[-k], f = dm_lik, grad = dm_score, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par
+           dev <- dm_devG(pi = pi, gamma0 = gamma0, y = y) 
            pi <- c(pi, 1-sum(pi))
            lik <- co$value
            
@@ -67,6 +72,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            co <- constrOptim(pi_init[-k], f = dm_likG, grad = dm_scoreG, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par
+           dev <- dm_devG(pi = pi, gamma0 = gamma0, y = y)
            pi <- c(pi, 1-sum(pi))
            lik <- co$value
            
@@ -77,7 +83,10 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   
   df <- k - 1
   
-  return(list(pi = pi, stats = c(lik = lik, df = df)))
+  stats <- c(lik, df, dev)
+  names(stats) <- c("lik", "df", "dev")
+  
+  return(list(pi = pi, stats = stats))
   
 }
 

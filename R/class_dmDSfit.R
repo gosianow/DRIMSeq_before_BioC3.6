@@ -72,7 +72,7 @@ setValidity("dmDSfit", function(object){
   if(!ncol(object@fit_full) == nlevels(object@samples$group))
     return(paste0("Wrong number of groups in 'fit_full'"))
   
-  if(!ncol(object@fit_full@metadata) == nlevels(object@samples$group))
+  if(!ncol(object@fit_full@metadata) == 2 * nlevels(object@samples$group))
     return(paste0("Wrong number of groups in 'fit_full@metadata'"))
 
   return(TRUE)
@@ -108,7 +108,6 @@ setGeneric("statistics", function(x, ...) standardGeneric("statistics"))
 setMethod("statistics", "dmDSfit", function(x){
   
   df <- data.frame(gene_id = names(x@counts), x@fit_full@metadata, stringsAsFactors = FALSE, row.names = NULL)
-  colnames(df)[-1] <- paste0("lik_", colnames(x@fit_full@metadata))
   return(df)
   
 })

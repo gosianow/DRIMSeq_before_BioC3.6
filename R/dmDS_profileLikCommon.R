@@ -11,7 +11,7 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE, p
   
   fit_full <- dmDS_fitOneModel(counts = counts, samples = samples, dispersion = gamma0, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
-  lik <- sum(fit_full@metadata, na.rm = TRUE) ### liks
+  lik <- sum(fit_full@metadata[, grepl("lik_", colnames(fit_full@metadata))], na.rm = TRUE) ### liks
   
   if(verbose >= 2) cat("lik:", lik, fill = TRUE)
   

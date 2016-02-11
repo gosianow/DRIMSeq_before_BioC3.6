@@ -10,7 +10,7 @@ dm_profileLikTagwise <- function(gamma0, y, ngroups, lgroups, igroups, disp_adju
 
   fit <- dm_fitOneGeneManyGroups(y = y, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose) 
   
-  lik <- sum(fit$stats, na.rm = TRUE)
+  lik <- sum(fit$stats[1:ngroups], na.rm = TRUE) # likelihoods are at the first ngroups positions
   
   if(!disp_adjust)
     return(lik)

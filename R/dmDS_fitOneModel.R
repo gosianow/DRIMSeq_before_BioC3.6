@@ -33,18 +33,17 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
               cat(paste0(" Gene:", g))
 
              f <- dm_fitOneGeneManyGroups(y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0[g], prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
-             
-             
+
              return(f)
              
            }, BPPARAM = BPPARAM))
            
            names(ff) <- names(counts)
            
-           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: liks
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: liks and devs
            rownames(stats) <- names(counts)
            
-           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pis and liks
+           fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pis, liks and devs
            
            if(verbose >= 2) cat("\n")
            if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
@@ -71,9 +70,9 @@ dmDS_fitOneModel <- function(counts, samples, dispersion, model = c("full", "nul
            
            names(ff) <- names(counts)
            
-           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: lik, df
+           stats <- do.call(rbind, lapply(ff, function(f) f[[2]])) ### stats: lik, df, dev
            rownames(stats) <- names(counts)
-           colnames(stats) <- c("lik", "df")
+           colnames(stats) <- c("lik", "df", "dev")
            
            fff <- MatrixList(lapply(ff, function(f) f[[1]]), metadata = stats) ### pi 
            

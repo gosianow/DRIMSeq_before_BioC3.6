@@ -70,6 +70,7 @@ Collate:
     'dm_adjustmentOneGeneManyGroups.R'
     'dm_adjustmentOneGeneOneGroup.R'
     'dm_colorb.R'
+    'dm_deviance.R'
     'dm_estimateMeanExpression.R'
     'dm_fitOneGeneManyGroups.R'
     'dm_fitOneGeneOneGroup.R'

@@ -11,3 +11,4 @@ vignettes/*
 !vignettes/*.pdf
 !vignettes/figure
 !vignettes/*.bib
+*/._*
