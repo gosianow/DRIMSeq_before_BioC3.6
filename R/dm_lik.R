@@ -15,7 +15,7 @@ dm_likG <- function(pi, gamma0, y){
   
   pi <- c(pi, 1 - sum(pi))
   
-  l <- sum( colSums( lgamma(y + pi * gamma0) - lgamma(pi * gamma0) ) )
+  l <- sum(lgamma(y + pi * gamma0) - lgamma(pi * gamma0) )
   
   l <- N * lgamma(gamma0) - sum(lgamma(S + gamma0)) + l
   

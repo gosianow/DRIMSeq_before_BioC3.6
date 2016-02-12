@@ -25,8 +25,6 @@ dmDS_test <- function(stats_full, stats_null, test = "lr", n, verbose = FALSE){
       
       lr <- 2 * (rowSums(lik_full) - lik_null)
       
-      # lr <- dev_null - rowSums(dev_full) ## based on deviance
-      
       df <- (nrgroups - 1) * stats_null[, "df"]
       
       df[nrgroups == 0] <- NA 
@@ -42,10 +40,12 @@ dmDS_test <- function(stats_full, stats_null, test = "lr", n, verbose = FALSE){
       
       f = {
         
-        lr <- dev_null - rowSums(dev_full)
+        # lr <- dev_null - rowSums(dev_full) ## based on deviance
+        
+        lr <- 2 * (rowSums(lik_full) - lik_null)
         
         df1 <- (nrgroups - 1) * stats_null[, "df"]
-        df2 <- n - nrgroups * stats_null[, "df"]
+        df2 <- n * (stats_null[, "df"] + 1) - nrgroups * stats_null[, "df"]
         
         qdisp <- rowSums(dev_full) / df2
         

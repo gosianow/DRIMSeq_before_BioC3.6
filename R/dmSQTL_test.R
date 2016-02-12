@@ -58,7 +58,7 @@ dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPP
         nrgroups <- rowSums(!is.na(dev_full))
         
         df1 <- (nrgroups - 1) * fit_null[[g]]@metadata[, "df"]
-        df2 <- n[g] - nrgroups * fit_null[[g]]@metadata[, "df"]
+        df2 <- n[g] * (fit_null[[g]]@metadata[, "df"] + 1) - nrgroups * fit_null[[g]]@metadata[, "df"]
         
         qdisp <- rowSums(dev_full, na.rm = TRUE) / df2
         
