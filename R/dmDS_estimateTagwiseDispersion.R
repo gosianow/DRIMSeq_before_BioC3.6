@@ -132,6 +132,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
         loglikL <- BiocParallel::bplapply(inds, function(g){
           # g = 1237
+          # print(g)
           
           ll <- numeric(disp_grid_length)
           

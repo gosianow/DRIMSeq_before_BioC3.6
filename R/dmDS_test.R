@@ -38,6 +38,32 @@ dmDS_test <- function(stats_full, stats_null, test = "lr", n, verbose = FALSE){
       
       },
       
+      fql = {
+        
+        # lr <- dev_null - rowSums(dev_full) ## based on deviance
+        
+        lr <- 2 * (rowSums(lik_full) - lik_null)
+        
+        df1 <- (nrgroups - 1) * stats_null[, "df"]
+        df2 <- (n - nrgroups) * stats_null[, "df"] ### (n-J)*(q-1)
+        
+        qdisp <- rowSums(dev_full) 
+        
+        lr[nrgroups == 0] <- NA 
+        df1[nrgroups == 0] <- NA 
+        qdisp[nrgroups == 0] <- NA
+        
+        
+        f = (lr / df1) / (qdisp / df2)
+        
+        pvalue <- pf(f, df1 = df1, df2 = df2, lower.tail = FALSE, log.p = FALSE)
+        
+        adj_pvalue <- p.adjust(pvalue, method="BH")
+        
+        table <- data.frame(gene_id = rownames(stats_full), f = f, df1 = df1, df2 = df2, pvalue = pvalue, adj_pvalue = adj_pvalue, stringsAsFactors = FALSE)
+        
+      },
+      
       f = {
         
         # lr <- dev_null - rowSums(dev_full) ## based on deviance
@@ -45,16 +71,12 @@ dmDS_test <- function(stats_full, stats_null, test = "lr", n, verbose = FALSE){
         lr <- 2 * (rowSums(lik_full) - lik_null)
         
         df1 <- (nrgroups - 1) * stats_null[, "df"]
-        df2 <- n * (stats_null[, "df"] + 1) - nrgroups * stats_null[, "df"]
-        
-        qdisp <- rowSums(dev_full) / df2
+        df2 <- (n - nrgroups) * stats_null[, "df"] ### (n-J)*(q-1)
         
         lr[nrgroups == 0] <- NA 
         df1[nrgroups == 0] <- NA 
-        qdisp[nrgroups == 0] <- NA
         
-        
-        f = (lr / df1) / qdisp
+        f <- lr / df1
         
         pvalue <- pf(f, df1 = df1, df2 = df2, lower.tail = FALSE, log.p = FALSE)
         

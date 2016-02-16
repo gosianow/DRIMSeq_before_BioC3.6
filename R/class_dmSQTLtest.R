@@ -144,6 +144,23 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
       
       },
     
+    fql = {
+      
+      results_new <- lapply(inds, function(i){
+        # i = 1
+        
+        res <- results_spl[[i]]
+        blo <- x@blocks[[i]]
+        matching <- match(blo[, "block_id"], res[, "block_id"])
+        snp_id <- blo[, "snp_id"]
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue")])
+        
+        return(res_new)
+        
+      })
+      
+    },
+    
     f = {
       
       results_new <- lapply(inds, function(i){

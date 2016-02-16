@@ -24,6 +24,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   y <- y[, keep_col, drop=FALSE]
   
   pi_init <- rowSums(y)/sum(y)
+  
   k <- length(pi_init) ## k - number of features
   
   if(sum(keep_col) == 1){
@@ -40,6 +41,42 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
 
     return(list(pi = pi, stats = stats))
   }
+
+  ### Use more strict constrains (based on observed data) for the proportions
+  # pi_init_m <- y/matrix(colSums(y), nrow = nrow(y), ncol = ncol(y), byrow = TRUE)
+  # pi_init <- rowMeans(pi_init_m)
+  # pi_init <- pi_init/sum(pi_init)
+
+  # pi_init_minmax <- apply(pi_init_m, MARGIN = 1, function(x){  
+  #   c(min(x, na.rm = TRUE), max(x, na.rm = TRUE))
+  #   })
+  
+  # pi_init_minmax[1, ] <- pi_init_minmax[1, ] - 0.001
+  # pi_init_minmax[1, pi_init_minmax[1, ] < 0] <- 0
+  # pi_init_minmax[2, ] <- pi_init_minmax[2, ] + 0.001
+  # pi_init_minmax[2, pi_init_minmax[2, ] > 1] <- 1
+  
+  # ### Make sure that the initial value is within the interval
+  # # print(all(pi_init > pi_init_minmax[1, ] & pi_init < pi_init_minmax[2, ]))
+
+  # if(!all(pi_init > pi_init_minmax[1, ])){
+    
+  #   indx_replace <- pi_init <= pi_init_minmax[1, ]
+  #   # print(indx_replace)
+  #   pi_init_minmax[1, indx_replace] <- pi_init[indx_replace] - 0.001
+  #   pi_init_minmax[1, pi_init_minmax[1, ] < 0] <- 0
+    
+  # }
+  
+  # if(!all(pi_init < pi_init_minmax[2, ])){
+    
+  #   indx_replace <- pi_init >= pi_init_minmax[2, ]
+  #   # print(indx_replace)
+  #   pi_init_minmax[2, indx_replace] <- pi_init[indx_replace] + 0.001
+  #   pi_init_minmax[2, pi_init_minmax[2, ] > 1] <- 1
+    
+  # }
+  
   
   switch(prop_mode, 
          
@@ -49,9 +86,7 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            
            ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
            ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
-           #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
-           #         ci <- c(rep(0, k-1), rep(-1, k-1))
-           
+
            co <- constrOptim(pi_init[-k], f = dm_lik, grad = dm_score, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par
@@ -66,9 +101,10 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
            
            ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
            ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
-           #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
-           #         ci <- c(rep(0, k-1), rep(-1, k-1))
            
+           # ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
+           # ci <- c(pi_init_minmax[1, 1:(k-1)], - pi_init_minmax[2, 1:(k-1)], -1 + .Machine$double.eps) 
+
            co <- constrOptim(pi_init[-k], f = dm_likG, grad = dm_scoreG, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
            
            pi <- co$par

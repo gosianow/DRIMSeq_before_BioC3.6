@@ -36,11 +36,13 @@ dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPP
         
         tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, stringsAsFactors = FALSE)
         
+        return(tt)
+        
         }, BPPARAM = BPPARAM)
       
     },
     
-    f = {
+    fql = {
 
       table_list <- BiocParallel::bplapply(inds, function(g){
         # g = 662
@@ -55,19 +57,47 @@ dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPP
         
         lr <- 2*(rowSums(lik_full, na.rm = TRUE) - lik_null)
       
-        nrgroups <- rowSums(!is.na(dev_full))
+        nrgroups <- rowSums(!is.na(lik_full))
         
         df1 <- (nrgroups - 1) * fit_null[[g]]@metadata[, "df"]
-        df2 <- n[g] * (fit_null[[g]]@metadata[, "df"] + 1) - nrgroups * fit_null[[g]]@metadata[, "df"]
+        df2 <- (n[g] - nrgroups) * fit_null[[g]]@metadata[, "df"] ### (n-J)*(q-1)
         
-        qdisp <- rowSums(dev_full, na.rm = TRUE) / df2
+        qdisp <- rowSums(dev_full, na.rm = TRUE) 
         
-        f = (lr / df1) / qdisp
+        f = (lr / df1) / (qdisp / df2)
         
         pvalue <- pf(f, df1 = df1, df2 = df2, lower.tail = FALSE, log.p = FALSE)
         
         tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), f = f, df1 = df1, df2 = df2, pvalue = pvalue, stringsAsFactors = FALSE)
         
+        return(tt)
+        
+        }, BPPARAM = BPPARAM)
+      
+    },
+    
+    f = {
+
+      table_list <- BiocParallel::bplapply(inds, function(g){
+        # g = 662
+        
+        lik_full <- fit_full[[g]]@metadata[, grepl("lik_", colnames(fit_full[[g]]@metadata)), drop = FALSE]
+        lik_null <- fit_null[[g]]@metadata[, "lik"]
+        
+        lr <- 2*(rowSums(lik_full, na.rm = TRUE) - lik_null)
+      
+        nrgroups <- rowSums(!is.na(lik_full))
+        
+        df1 <- (nrgroups - 1) * fit_null[[g]]@metadata[, "df"]
+        df2 <- (n[g] - nrgroups) * fit_null[[g]]@metadata[, "df"] ### (n-J)*(q-1)
+        
+        f <- lr / df1
+        
+        pvalue <- pf(f, df1 = df1, df2 = df2, lower.tail = FALSE, log.p = FALSE)
+        
+        tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), f = f, df1 = df1, df2 = df2, pvalue = pvalue, stringsAsFactors = FALSE)
+        
+        return(tt)
         
         }, BPPARAM = BPPARAM)
       
