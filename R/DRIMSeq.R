@@ -4,9 +4,8 @@
 #' @import edgeR
 #' @import GenomicRanges
 #' @import S4Vectors
-#' @import ggplot2
-#' @importFrom reshape2 melt
 #' @import grid
+#' @importFrom utils head tail
 NULL
 
 

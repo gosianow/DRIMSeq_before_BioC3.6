@@ -1,3 +1,4 @@
+#' @importFrom ggplot2 ggplot aes_string theme_bw xlab ylab geom_histogram theme element_text coord_cartesian geom_text geom_bar scale_fill_manual
 
 
 

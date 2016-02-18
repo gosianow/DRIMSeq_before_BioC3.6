@@ -4,6 +4,8 @@
 
 # counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; disp_interval = c(0, 1e+5); disp_tol = 1e+01; prop_mode = "constrOptimG"; prop_tol = 1e-12; verbose = TRUE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
+#' @importFrom stats optimize
+
 dmSQTL_estimateCommonDispersion <- function(counts, genotypes, disp_adjust = TRUE, disp_interval = c(0, 1e+5), disp_tol = 1e+01, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   if(verbose) cat("* Estimating common dispersion.. \n")

@@ -5,6 +5,8 @@
 
 # stats_full = x@fit_full@metadata; stats_null = x@fit_null[[1]]@metadata
 
+#' @importFrom stats pchisq p.adjust pf
+
 dmDS_test <- function(stats_full, stats_null, test = "lr", n, verbose = FALSE){
 
   ## calculate lr
