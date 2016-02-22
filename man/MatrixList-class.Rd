@@ -53,31 +53,38 @@
 \arguments{
 \item{x}{MatrixList object.}
 
-\item{value,i,j,name}{Parameters used for subsetting and assigning new attributes to x.}
+\item{value,i,j,name}{Parameters used for subsetting and assigning new
+  attributes to x.}
 }
 \value{
-\itemize{
-  \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
-  \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData slot.
-  \item \code{length(x)}: Get the number of matrices in a list.
-  \item \code{width(x)}: Get the number of rows of each of the matrices.
-  \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the dimensions, number of rows or number of columns of unlistData slot.
-  \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
-  \item \code{x$name}: Shortcut for \code{x[["name"]]}.
-  \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j.
-}
+\itemize{ \item \code{names(x)}, \code{names(x) <- value}: Get or set names
+of matrices. \item \code{rownames(x)}, \code{rownames(x) <- value},
+\code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or
+column names of unlistData slot. \item \code{length(x)}: Get the number of
+matrices in a list. \item \code{width(x)}: Get the number of rows of each of
+the matrices. \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the
+dimensions, number of rows or number of columns of unlistData slot. \item
+\code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only
+columns j of this matrix. \item \code{x$name}: Shortcut for
+\code{x[["name"]]}. \item \code{x[i, j]}: Get a subset of MatrixList that
+consists of matrices i with columns j. }
 }
 \description{
-A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in \code{metadata} matrix.
+A MatrixList object is a container for a list of matrices which have the same
+number of columns but can have varying number of rows. Additionally, one can
+store an extra information corresponding to each of the matrices in
+\code{metadata} matrix.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{unlistData}}{Matrix which is a row binding of all the matrices in a list.}
 
-\item{\code{partitioning}}{List of indexes which defines the row partitioning of unlistData matrix into the original matrices.}
+\item{\code{partitioning}}{List of indexes which defines the row partitioning of
+  unlistData matrix into the original matrices.}
 
-\item{\code{metadata}}{Matrix of additional information where each row corresponds to one of the matrices in a list.}
+\item{\code{metadata}}{Matrix of additional information where each row corresponds to
+one of the matrices in a list.}
 }}
 \author{
 Malgorzata Nowicka

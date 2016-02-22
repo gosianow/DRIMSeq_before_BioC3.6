@@ -2,7 +2,8 @@
 # adjustements to profile likelihood
 ##############################################################################
 
-dm_adjustmentOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, gamma0, pi){  
+dm_adjustmentOneGeneManyGroups <- function(y, ngroups, lgroups, igroups, 
+  gamma0, pi){  
   
   if(all(is.na(pi[1, ])))
     return(NA)

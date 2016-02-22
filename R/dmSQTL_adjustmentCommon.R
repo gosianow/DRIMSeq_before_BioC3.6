@@ -3,11 +3,12 @@
 ##############################################################################
 
 
-dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, 
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
   
-  adj <- BiocParallel::bplapply(inds, function(g){  
+  adj <- BiocParallel::bplapply(inds, function(g, counts, genotypes, pi, gamma0){  
     # g = 1; y = data@counts[[g]]; snps = data@genotypes[[g]]
     
     y = counts[[g]]
@@ -34,12 +35,14 @@ dmSQTL_adjustmentCommon <- function(gamma0, counts, genotypes, pi, BPPARAM = Bio
       igroups <- lapply(lgroups, function(gr){which(group == gr)})
       names(igroups) <- lgroups
       
-      adj[i] <- dm_adjustmentOneGeneManyGroups(y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = pig[[i]]) 
+      adj[i] <- dm_adjustmentOneGeneManyGroups(y = yg, ngroups = ngroups, 
+        lgroups = lgroups, igroups = igroups, gamma0 = gamma0, pi = pig[[i]]) 
       
     }
     return(adj)
     
-  }, BPPARAM = BPPARAM)
+  }, counts = counts, genotypes = genotypes, pi = pi, gamma0 = gamma0, 
+    BPPARAM = BPPARAM)
   
   
   adj <- unlist(adj)

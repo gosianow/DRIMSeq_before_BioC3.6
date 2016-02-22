@@ -2,20 +2,20 @@
 #  group testing
 #######################################################
 
-
-# stats_full = x@fit_full@metadata; stats_null = x@fit_null[[1]]@metadata
+#' @importFrom stats pchisq p.adjust
 
 dmDS_test <- function(stats_full, stats_null, verbose = FALSE){
 
   ## calculate lr
-  if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
+  if(verbose) message("* Calculating likelihood ratio statistics.. \n")
+  
   time_start <- Sys.time()
   
   lr <- 2*(rowSums(stats_full) - stats_null[, "lik"])
   
   nrgroups <- rowSums(!is.na(stats_full))
 
-  df <- (nrgroups - 1)*stats_null[, "df"]
+  df <- (nrgroups - 1) * stats_null[, "df"]
   
   df[nrgroups == 0] <- NA 
   lr[nrgroups == 0] <- NA 
@@ -24,7 +24,8 @@ dmDS_test <- function(stats_full, stats_null, verbose = FALSE){
   
   adj_pvalue <- p.adjust(pvalue, method="BH")
   
-  table <- data.frame(gene_id = rownames(stats_full), lr = lr, df = df, pvalue = pvalue, adj_pvalue = adj_pvalue, stringsAsFactors = FALSE)
+  table <- data.frame(gene_id = rownames(stats_full), lr = lr, df = df, 
+    pvalue = pvalue, adj_pvalue = adj_pvalue, stringsAsFactors = FALSE)
 
   # o <- order(table[, "pvalue"])
   # table <- table[o,]
@@ -32,7 +33,8 @@ dmDS_test <- function(stats_full, stats_null, verbose = FALSE){
   rownames(table) <- NULL
 
   time_end <- Sys.time()
-  if(verbose) cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
+  
+  if(verbose) message("Took ", as.numeric(time_end - time_start), " seconds.\n")
 
   return(table)
   

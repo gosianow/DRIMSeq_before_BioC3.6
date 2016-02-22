@@ -1,13 +1,13 @@
 ##############################################################################
-## Computes the MoM estimate of theta (and std. error) / similar as in dirmult package / use as starting values for gamma0 = (1-mom)/mom
+## Computes the MoM estimate of theta (and std. error)
+## similar as in dirmult package
+## use as starting values for gamma0 = (1-mom)/mom
 ##############################################################################
 
 
 
 dm_weirMoM <- function(y, se = FALSE){
 
-#   y <- t(y)
-  
   y <- y[rowSums(y) > 0, colSums(y) > 0, drop = FALSE]
   
   K <- ncol(y)

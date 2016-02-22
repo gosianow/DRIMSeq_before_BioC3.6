@@ -4,11 +4,13 @@
 \name{data_dmDSdata}
 \alias{data_dmDSdata}
 \title{Sample data for differential splicing analysis}
-\format{\code{data_dmDSdata} is a \code{\linkS4class{dmDSdata}} object. See Examples.}
+\format{\code{data_dmDSdata} is a \code{\linkS4class{dmDSdata}} object. See
+  Examples.}
 \source{
-Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory map between Drosophila and mammals. Genome Res. 2011;21(2):193-202
+Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory
+  map between Drosophila and mammals. Genome Res. 2011;21(2):193-202
 
-\code{PasillaTranscriptExpr} package
+  \code{PasillaTranscriptExpr} package
 }
 \usage{
 data_dmDSdata
@@ -17,7 +19,8 @@ data_dmDSdata
 \code{data_dmDSdata}
 }
 \description{
-We use a subset of kallisto transcript counts from \code{PasillaTranscriptExpr} package.
+We use a subset of kallisto transcript counts from
+\code{PasillaTranscriptExpr} package.
 }
 \examples{
 #############################
@@ -29,14 +32,18 @@ library(PasillaTranscriptExpr)
 
 data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 
-metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+metadata <- read.table(file.path(data_dir, "metadata.txt"),
+ header = TRUE, as.is = TRUE)
 metadata
 
-counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+counts <- read.table(file.path(data_dir, "counts.txt"),
+ header = TRUE, as.is = TRUE)
 head(counts)
 
 # Create a dmDSdata object
-d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
+d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id,
+ feature_id = counts$feature_id, sample_id = metadata$SampleName,
+ group = metadata$condition)
 
 plotData(d)
 
@@ -66,7 +73,8 @@ d[1:20, 1:3]
 # Check what is the minimal number of replicates per condition
 table(samples(d)$group)
 
-d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
+d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3,
+ min_samps_feature_prop = 0)
 plotData(d)
 
 ### Calculate dispersion

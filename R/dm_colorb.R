@@ -1,6 +1,10 @@
 colorb <- function(n){
   
-  clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "darkorange1" ,"blueviolet", "firebrick2", "deepskyblue",  "orchid2", "chartreuse3", "gold", "slateblue1", "tomato" , "blue", "magenta", "green3", "yellow", "purple3", "red" ,"darkslategray1", "lightpink1", "lightgreen", "khaki1", "plum3", "salmon")
+  clrs <- c("dodgerblue3", "maroon2",  "forestgreen", "darkorange1" ,
+    "blueviolet", "firebrick2", "deepskyblue",  "orchid2", "chartreuse3", 
+    "gold", "slateblue1", "tomato" , "blue", "magenta", "green3", "yellow", 
+    "purple3", "red" ,"darkslategray1", "lightpink1", "lightgreen", "khaki1", 
+    "plum3", "salmon")
   
   nc <- length(clrs)
   

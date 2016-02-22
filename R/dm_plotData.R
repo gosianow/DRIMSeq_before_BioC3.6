@@ -1,4 +1,5 @@
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot aes_string theme_bw xlab ylab geom_histogram theme
+#'   element_text coord_cartesian geom_text geom_bar scale_fill_manual
 
 
 dm_plotDataFeatures <- function(tt){
@@ -12,12 +13,17 @@ dm_plotDataFeatures <- function(tt){
     xlab("Number of features per gene") +
     ylab("Frequency") +
     geom_histogram(fill = "seagreen4", binwidth = binwidth) +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
+    theme(axis.text = element_text(size=16), 
+      axis.title = element_text(size=18, face="bold"), 
+      plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
-    geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n ", sum(tt) , " features   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
+    geom_text(data = data.frame(x = Inf, y = Inf, 
+      label = paste0(length(tt), " genes   \n ", sum(tt) , " features   ")), 
+      aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, 
+      size = 6)
   
   
-return(ggp)
+  return(ggp)
   
 }
 
@@ -35,11 +41,16 @@ dm_plotDataBlocks <- function(tt){
     xlab("Number of blocks per gene") +
     ylab("Frequency") +
     geom_histogram(fill = "mediumpurple4", binwidth = binwidth) +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
+    theme(axis.text = element_text(size=16), 
+      axis.title = element_text(size=18, face="bold"), 
+      plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
-    geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n", sum(tt) , " blocks   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
+    geom_text(data = data.frame(x = Inf, y = Inf, 
+      label = paste0(length(tt), " genes   \n", sum(tt) , " blocks   ")), 
+      aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, 
+      size = 6)
   
-return(ggp)
+  return(ggp)
   
   
 }
@@ -56,13 +67,18 @@ dm_plotDataSnps <- function(tt){
     xlab("Number of SNPs per gene") +
     ylab("Frequency") +
     geom_histogram(fill = "royalblue4", binwidth = binwidth) +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
+    theme(axis.text = element_text(size=16), 
+      axis.title = element_text(size=18, face="bold"), 
+      plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
-    geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n", sum(tt) , " SNPs   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
-
-
-return(ggp)
-    
+    geom_text(data = data.frame(x = Inf, y = Inf, 
+      label = paste0(length(tt), " genes   \n", sum(tt) , " SNPs   ")), 
+      aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, 
+      size = 6)
+  
+  
+  return(ggp)
+  
   
 }
 
@@ -72,11 +88,13 @@ return(ggp)
 
 
 #' Plot the frequency of present features
-#'
-#' @param info Data frame with \code{gene_id} and \code{feature_id} of ALL features
-#' @param ds_info Data frame with \code{gene_id} and \code{feature_id} of ONLY DS features
-#'
-#' @return \code{ggplot} object 
+#' 
+#' @param info Data frame with \code{gene_id} and \code{feature_id} of ALL
+#'   features
+#' @param ds_info Data frame with \code{gene_id} and \code{feature_id} of ONLY
+#'   DS features
+#'   
+#' @return \code{ggplot} object
 
 dm_plotDataDSInfo <- function(info, ds_info){
   
@@ -100,22 +118,27 @@ dm_plotDataDSInfo <- function(info, ds_info){
   names(tas)[1] <- "NoGene"
   
   
-  df <- data.frame(x = factor(names(tas), levels = names(tas)), y = as.numeric(tas), colors = "2", stringsAsFactors = FALSE)
+  df <- data.frame(x = factor(names(tas), levels = names(tas)), 
+    y = as.numeric(tas), colors = "2", stringsAsFactors = FALSE)
   df[df$x == "NoGene" | df$x == "0", "colors"] <- "1"
   df$colors <- factor(df$colors)
   
-  ggp <- ggplot(data = df, aes_string(x = "x", y = "y", label = "y", fill = "colors")) +
+  ggp <- ggplot(data = df, 
+    aes_string(x = "x", y = "y", label = "y", fill = "colors")) +
     geom_bar(stat = "identity") +
     geom_text(hjust = 0.5, vjust = 0, size = 6) +
     theme_bw() +
     xlab("Number of DS features left within DS gene") +
     ylab("Number of DS genes") +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold"), legend.position = "none") +
+    theme(axis.text = element_text(size=16), 
+      axis.title = element_text(size=18, face="bold"), 
+      plot.title = element_text(size=18, face="bold"), 
+      legend.position = "none") +
     scale_fill_manual(values = c("darkred", "grey"))
   
-
+  
   return(ggp)
-
+  
 }
 
 

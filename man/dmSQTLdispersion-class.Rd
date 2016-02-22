@@ -5,7 +5,10 @@
 \alias{dmSQTLdispersion-class}
 \title{dmSQTLdispersion object}
 \description{
-dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) counts for each gene-SNP pair in the sQTL analysis. Result of \code{\link{dmDispersion}}.
+dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the
+dispersion estimates of Dirichlet-multinomial distribution used to model the
+feature (e.g., transcript, exon, exonic bin) counts for each gene-SNP pair in
+the sQTL analysis. Result of \code{\link{dmDispersion}}.
 }
 \section{Slots}{
 
@@ -14,12 +17,15 @@ dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispe
 
 \item{\code{common_dispersion}}{Numeric value of estimated common dispersion.}
 
-\item{\code{genewise_dispersion}}{List of estimated gene-wise dispersions. Each element of this list is a vector of dispersions estimated for all the genotype blocks assigned to a given gene.}
+\item{\code{genewise_dispersion}}{List of estimated gene-wise dispersions. Each
+element of this list is a vector of dispersions estimated for all the
+genotype blocks assigned to a given gene.}
 }}
 \author{
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
+\code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}},
+  \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 }
 

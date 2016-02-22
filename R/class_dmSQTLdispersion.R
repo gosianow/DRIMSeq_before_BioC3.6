@@ -7,18 +7,24 @@ NULL
 
 #' dmSQTLdispersion object
 #' 
-#' dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the dispersion estimates of Dirichlet-multinomial distribution used to model the feature (e.g., transcript, exon, exonic bin) counts for each gene-SNP pair in the sQTL analysis. Result of \code{\link{dmDispersion}}.
+#' dmSQTLdispersion extends the \code{\linkS4class{dmSQTLdata}} by adding the
+#' dispersion estimates of Dirichlet-multinomial distribution used to model the
+#' feature (e.g., transcript, exon, exonic bin) counts for each gene-SNP pair in
+#' the sQTL analysis. Result of \code{\link{dmDispersion}}.
 #' 
 #' @slot mean_expression Numeric vector of mean gene expression.
 #' @slot common_dispersion Numeric value of estimated common dispersion.
-#' @slot genewise_dispersion List of estimated gene-wise dispersions. Each element of this list is a vector of dispersions estimated for all the genotype blocks assigned to a given gene.
+#' @slot genewise_dispersion List of estimated gene-wise dispersions. Each
+#'   element of this list is a vector of dispersions estimated for all the
+#'   genotype blocks assigned to a given gene.
 #' @author Malgorzata Nowicka
-#' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
+#' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}},
+#'   \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLdispersion", 
-         contains = "dmSQTLdata",
-         representation(mean_expression = "numeric", 
-                        common_dispersion = "numeric",
-                        genewise_dispersion = "list"))
+  contains = "dmSQTLdata",
+  representation(mean_expression = "numeric", 
+    common_dispersion = "numeric",
+    genewise_dispersion = "list"))
 
 
 #################################
@@ -32,10 +38,10 @@ setValidity("dmSQTLdispersion", function(object){
       if(all(names(object@mean_expression) == names(object@counts)))
         out <- TRUE
       else
-        return(paste0("Different names of 'counts' and 'mean_expression'"))
+        return("Different names of 'counts' and 'mean_expression'")
     }
     else 
-      return(paste0("Unequal length of 'counts' and 'mean_expression'"))
+      return("Unequal length of 'counts' and 'mean_expression'")
   }
   
   if(length(object@genewise_dispersion) > 0){
@@ -43,17 +49,17 @@ setValidity("dmSQTLdispersion", function(object){
       if(all(lapply(object@genewise_dispersion, length) == width(object@genotypes)))
         out <- TRUE
       else
-        return(paste0("Different numbers of blocks in 'genotypes' and in 'genewise_dispersion'"))
+        return("Different numbers of blocks in 'genotypes' and in 'genewise_dispersion'")
     }
     else 
-      return(paste0("Unequal number of genes in 'counts' and in 'genewise_dispersion'"))
+      return("Unequal number of genes in 'counts' and in 'genewise_dispersion'")
   }
   
   if(length(object@common_dispersion) > 0){
     if(length(object@common_dispersion) == 1)
       out <- TRUE
     else
-      return(paste0("'common_dispersion' must be a vector of length 1'"))
+      return("'common_dispersion' must be a vector of length 1")
   }
   
   return(out)
@@ -78,9 +84,19 @@ setMethod("show", "dmSQTLdispersion", function(object){
 ################################################################################
 
 #' @rdname dmDispersion
-#' @param speed Logical. If \code{FALSE}, dispersion is calculated per each gene-block. Such calculation may take a long time, since there can be hundreds of SNPs/blocks per gene. If \code{TRUE}, there will be only one dipsersion calculated per gene and it will be assigned to all the blocks matched with this gene. 
+#' @param speed Logical. If \code{FALSE}, dispersion is calculated per each
+#'   gene-block. Such calculation may take a long time, since there can be
+#'   hundreds of SNPs/blocks per gene. If \code{TRUE}, there will be only one
+#'   dipsersion calculated per gene and it will be assigned to all the blocks
+#'   matched with this gene.
 #' @export
-setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 0.1, disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, speed = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, 
+  common_dispersion = TRUE, genewise_dispersion = TRUE, disp_adjust = TRUE, 
+  disp_mode = "grid", disp_interval = c(0, 1e+4), disp_tol = 1e-08, 
+  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, 
+  disp_grid_range = c(-10, 10), disp_moderation = "none", disp_prior_df = 0.1, 
+  disp_span = 0.3, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, 
+  speed = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   
   ### Parameter checks:
@@ -113,8 +129,10 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
   stopifnot(verbose %in% 0:2)
   stopifnot(is.logical(speed))
   
-  if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
-    mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
+  if(mean_expression || (genewise_dispersion && disp_mode == "grid" && 
+      disp_moderation == "trended")){
+    mean_expression <- dm_estimateMeanExpression(counts = x@counts, 
+      verbose = verbose, BPPARAM = BPPARAM)
   }else{
     mean_expression <- numeric()
   }
@@ -123,9 +141,15 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
     
     ### only one SNP per gene (null model)
     inds <- 1:length(x@genotypes)
-    genotypes <- new( "MatrixList", unlistData = matrix(1, nrow = length(x@genotypes), ncol = ncol(x@genotypes)), partitioning = split(inds, factor(names(x@genotypes), levels = names(x@genotypes))) )
+    genotypes <- new( "MatrixList", 
+      unlistData = matrix(1, nrow = length(x@genotypes), ncol = ncol(x@genotypes)), 
+      partitioning = split(inds, factor(names(x@genotypes), 
+        levels = names(x@genotypes))) )
     
-    common_dispersion <- dmSQTL_estimateCommonDispersion(counts = x@counts, genotypes = genotypes, disp_adjust = disp_adjust, disp_interval = disp_interval, disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    common_dispersion <- dmSQTL_estimateCommonDispersion(counts = x@counts, 
+      genotypes = genotypes, disp_adjust = disp_adjust, disp_interval = disp_interval, 
+      disp_tol = 1e+01, prop_mode = prop_mode, prop_tol = prop_tol, 
+      verbose = verbose, BPPARAM = BPPARAM)
     
   }else{
     common_dispersion <- numeric()
@@ -135,7 +159,8 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
   if(genewise_dispersion){
     
     if(length(common_dispersion)){
-      message("! Using common_dispersion = ", round(common_dispersion, 2), " as disp_init !")
+      message("! Using common_dispersion = ", round(common_dispersion, 2), 
+        " as disp_init !")
       disp_init <- common_dispersion
     }
     
@@ -143,16 +168,36 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
       
       ### only one SNP per gene (null model)
       inds <- 1:length(x@genotypes)
-      genotypes <- new( "MatrixList", unlistData = matrix(1, nrow = length(x@genotypes), ncol = ncol(x@genotypes)), partitioning = split(inds, factor(names(x@genotypes), levels = names(x@genotypes))) )
+      genotypes <- new( "MatrixList", 
+        unlistData = matrix(1, nrow = length(x@genotypes), ncol = ncol(x@genotypes)), 
+        partitioning = split(inds, factor(names(x@genotypes), 
+          levels = names(x@genotypes))) )
       
-      genewise_dispersion <- dmSQTL_estimateTagwiseDispersion(counts = x@counts, genotypes = genotypes, mean_expression = mean_expression, disp_adjust = disp_adjust, disp_mode = disp_mode, disp_interval = disp_interval, disp_tol = disp_tol, disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+      genewise_dispersion <- dmSQTL_estimateTagwiseDispersion(counts = x@counts, 
+        genotypes = genotypes, mean_expression = mean_expression, 
+        disp_adjust = disp_adjust, disp_mode = disp_mode, 
+        disp_interval = disp_interval, disp_tol = disp_tol, 
+        disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, 
+        disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, 
+        disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, 
+        disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, 
+        verbose = verbose, BPPARAM = BPPARAM)
       
       ### because we keep only one SNP per gene (null model)
-      genewise_dispersion <- relist(rep(unlist(genewise_dispersion), times = width(x@genotypes)), x@genotypes@partitioning)
+      genewise_dispersion <- relist(rep(unlist(genewise_dispersion), 
+        times = width(x@genotypes)), x@genotypes@partitioning)
       
     }else{
       
-      genewise_dispersion <- dmSQTL_estimateTagwiseDispersion(counts = x@counts, genotypes = x@genotypes, mean_expression = mean_expression, disp_adjust = disp_adjust, disp_mode = disp_mode, disp_interval = disp_interval, disp_tol = disp_tol, disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+      genewise_dispersion <- dmSQTL_estimateTagwiseDispersion(counts = x@counts, 
+        genotypes = x@genotypes, mean_expression = mean_expression, 
+        disp_adjust = disp_adjust, disp_mode = disp_mode, 
+        disp_interval = disp_interval, disp_tol = disp_tol, 
+        disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, 
+        disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, 
+        disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, 
+        disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, 
+        verbose = verbose, BPPARAM = BPPARAM)
       
     }
     
@@ -161,7 +206,9 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
   }
   
   
-  return(new("dmSQTLdispersion", mean_expression = mean_expression, common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
+  return(new("dmSQTLdispersion", mean_expression = mean_expression, 
+    common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, 
+    counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
   
   
 })
@@ -174,6 +221,7 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
 
 #' @rdname plotDispersion
 #' @export
+#' @importFrom grDevices pdf dev.off
 setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   
   w <- sapply(x@genewise_dispersion, length)
@@ -190,7 +238,9 @@ setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   }
   
   
-  ggp <- dm_plotDispersion(genewise_dispersion = genewise_dispersion, mean_expression = mean_expression, nr_features = nr_features, common_dispersion = common_dispersion)
+  ggp <- dm_plotDispersion(genewise_dispersion = genewise_dispersion, 
+    mean_expression = mean_expression, nr_features = nr_features, 
+    common_dispersion = common_dispersion)
   
   if(!is.null(out_dir)){
     pdf(paste0(out_dir, "dispersion_vs_mean.pdf"))
@@ -200,7 +250,7 @@ setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
     return(ggp)
   }
   
-
+  
 })
 
 

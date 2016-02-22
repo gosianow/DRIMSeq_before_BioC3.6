@@ -18,25 +18,39 @@ dmTest(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.}
+\item{x}{\code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}}
+object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using this
+generic.}
 
-\item{compared_groups}{Vector that defines which experimental conditions should be tested for differential splicing. By default, we test for a difference between any of the groups specified in \code{samples(x)$group}. Values in this vector should indicate levels or numbers of levels in \code{samples(x)$group}.}
+\item{compared_groups}{Vector that defines which experimental conditions
+  should be tested for differential splicing. By default, we test for a
+  difference between any of the groups specified in \code{samples(x)$group}.
+  Values in this vector should indicate levels or numbers of levels in
+  \code{samples(x)$group}.}
 
-\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible
+values \code{"constrOptim"} and \code{"constrOptimG"}.}
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 - no messages, 1 - main messages, 2 - message for every gene fitting.}
+\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 -
+no messages, 1 - main messages, 2 - message for every gene fitting.}
 
-\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
+\item{BPPARAM}{Parallelization method used by
+  \code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
-Returns a \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}} object.
+Returns a \code{\linkS4class{dmDStest}} or
+  \code{\linkS4class{dmSQTLtest}} object.
 }
 \description{
-First, estimate the null Dirichlet-multinomial model proportions, i.e., feature ratios are estimated based on pooled (no grouping into conditions) counts. Use the likelihood ratio statistic to test for the difference between feature proportions in different groups to identify the differentially spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
+First, estimate the null Dirichlet-multinomial model proportions, i.e.,
+feature ratios are estimated based on pooled (no grouping into conditions)
+counts. Use the likelihood ratio statistic to test for the difference between
+feature proportions in different groups to identify the differentially
+spliced genes (differential splicing analysis) or the sQTLs (sQTL analysis).
 }
 \examples{
 ###################################
@@ -72,6 +86,7 @@ head(results(d))
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}},
+  \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 }
 

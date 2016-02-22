@@ -26,28 +26,43 @@ plotFit(x, ...)
   out_dir = NULL)
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} object.}
+\item{x}{\code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}} or
+\code{\linkS4class{dmSQTLfit}}, \code{\linkS4class{dmSQTLtest}} object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using this
+generic.}
 
 \item{gene_id}{Character indicating a gene ID to be plotted.}
 
-\item{plot_type}{Character defining the type of the plot produced. Possible values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"}, \code{"lineplot"}, \code{"ribbonplot"}.}
+\item{plot_type}{Character defining the type of the plot produced. Possible
+values \code{"barplot"}, \code{"boxplot1"}, \code{"boxplot2"},
+\code{"lineplot"}, \code{"ribbonplot"}.}
 
-\item{order}{Logical. Whether to plot the features ordered by their expression.}
+\item{order}{Logical. Whether to plot the features ordered by their
+expression.}
 
-\item{plot_full}{Logical. Whether to plot the proportions estimated by the full model.}
+\item{plot_full}{Logical. Whether to plot the proportions estimated by the
+full model.}
 
-\item{plot_main}{Logical. Whether to plot a title with the information about the Dirichlet-multinomial estimates.}
+\item{plot_main}{Logical. Whether to plot a title with the information about
+  the Dirichlet-multinomial estimates.}
 
-\item{out_dir}{Character string that is used to save the plot in \code{paste0(out_dir, plot_name, ".pdf")} file. \code{plot_name} depends on type of a plot produced, for example, \code{plot_name = "hist_features"} for histogram with number of features per gene. If \code{NULL}, the plot is returned as \code{ggplot} object and can be further modified, for example, using \code{theme()}.}
+\item{out_dir}{Character string that is used to save the plot
+in \code{paste0(out_dir, plot_name, ".pdf")} file. \code{plot_name} depends
+on type of a plot produced, for example, \code{plot_name = "hist_features"}
+for histogram with number of features per gene. If \code{NULL},
+the plot is returned as \code{ggplot} object and can be further modified,
+for example, using \code{theme()}.}
 
-\item{plot_null}{Logical. Whether to plot the proportions estimated by the null model.}
+\item{plot_null}{Logical. Whether to plot the proportions estimated by the
+null model.}
 
-\item{snp_id}{Character indicating a SNP ID to be plotted. \code{snp_id} must match \code{gene_id}.}
+\item{snp_id}{Character indicating a SNP ID to be plotted. \code{snp_id} must
+match \code{gene_id}.}
 }
 \value{
-Plot, per gene, the observed and estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
+Plot, per gene, the observed and estimated with Dirichlet-multinomial
+model feature ratios. Estimated proportions are marked with diamond shapes.
 }
 \description{
 Plot feature proportions
@@ -91,6 +106,8 @@ plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}},
+  \code{\link{plotData}}, \code{\link{plotDispersion}},
+  \code{\link{plotTest}}
 }
 

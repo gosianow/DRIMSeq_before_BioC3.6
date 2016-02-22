@@ -1,5 +1,8 @@
-#' @import methods
 #' @import BiocGenerics
+#' @import methods
+#' @import BiocParallel
+#' @import edgeR
+#' @import GenomicRanges
 NULL
 
 
@@ -10,20 +13,20 @@ NULL
 ################################################################################
 
 #' Sample data for differential splicing analysis
-#'
-#' We use a subset of kallisto transcript counts from \code{PasillaTranscriptExpr} package.
 #' 
-#' @format 
-#' \code{data_dmDSdata} is a \code{\linkS4class{dmDSdata}} object. See Examples.
+#' We use a subset of kallisto transcript counts from 
+#' \code{PasillaTranscriptExpr} package.
 #' 
-#' @source 
-#' Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory map between Drosophila and mammals. Genome Res. 2011;21(2):193-202
-#'
-#' \code{PasillaTranscriptExpr} package
-#' 
-#' @return 
-#' \code{data_dmDSdata}
-#' 
+#' @format \code{data_dmDSdata} is a \code{\linkS4class{dmDSdata}} object. See 
+#'   Examples.
+#'   
+#' @source Brooks AN, Yang L, Duff MO, et al. Conservation of an RNA regulatory 
+#'   map between Drosophila and mammals. Genome Res. 2011;21(2):193-202
+#'   
+#'   \code{PasillaTranscriptExpr} package
+#'   
+#' @return \code{data_dmDSdata}
+#'   
 #' @examples 
 #' 
 #' #############################
@@ -35,14 +38,18 @@ NULL
 #' 
 #' data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 #' 
-#' metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+#' metadata <- read.table(file.path(data_dir, "metadata.txt"), 
+#'  header = TRUE, as.is = TRUE)
 #' metadata
 #' 
-#' counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+#' counts <- read.table(file.path(data_dir, "counts.txt"), 
+#'  header = TRUE, as.is = TRUE)
 #' head(counts)
 #' 
 #' # Create a dmDSdata object
-#' d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
+#' d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, 
+#'  feature_id = counts$feature_id, sample_id = metadata$SampleName, 
+#'  group = metadata$condition)
 #' 
 #' plotData(d)
 #' 
@@ -72,7 +79,8 @@ NULL
 #' # Check what is the minimal number of replicates per condition 
 #' table(samples(d)$group)
 #' 
-#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
+#' d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, 
+#'  min_samps_feature_prop = 0)
 #' plotData(d)
 #' 
 #' ### Calculate dispersion
@@ -115,19 +123,24 @@ NULL
 
 
 #' Sample data for sQTL analysis
-#'
-#' A subset of data from GEUVADIS project where 462 RNA-Seq samples from lymphoblastoid cell lines were obtained. The genome sequencing data of the same individuals is provided by the 1000 Genomes Project. The samples in this project come from five populations: CEPH (CEU), Finns (FIN), British (GBR), Toscani (TSI) and Yoruba (YRI). Here, we use a subset of CEPH data from chromosome 19 available in \code{GeuvadisTranscriptExpr} package.
 #' 
-#' @format 
-#' \code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object. See Examples.
+#' A subset of data from GEUVADIS project where 462 RNA-Seq samples from
+#' lymphoblastoid cell lines were obtained. The genome sequencing data of the
+#' same individuals is provided by the 1000 Genomes Project. The samples in this
+#' project come from five populations: CEPH (CEU), Finns (FIN), British (GBR),
+#' Toscani (TSI) and Yoruba (YRI). Here, we use a subset of CEPH data from
+#' chromosome 19 available in \code{GeuvadisTranscriptExpr} package.
 #' 
-#' @source 
-#' Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and genome sequencing uncovers functional variation in humans. Nature. 2013;501(7468):506-11
+#' @format \code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object.
+#' See Examples.
+#' 
+#' @source Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and
+#' genome sequencing uncovers functional variation in humans. Nature.
+#' 2013;501(7468):506-11
 #' 
 #' \code{GeuvadisTranscriptExpr} package
 #' 
-#' @return 
-#' \code{data_dmSQTLdata}
+#' @return \code{data_dmSQTLdata}
 #' 
 #' @examples 
 #' 

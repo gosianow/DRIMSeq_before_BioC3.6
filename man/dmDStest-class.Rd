@@ -20,26 +20,39 @@ results(x, ...)
 \arguments{
 \item{x}{dmDStest object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using this
+  generic.}
 }
 \value{
-\itemize{
- \item \code{proportions(x)}: Get a data frame with estimated feature ratios for full model and null models specified in \code{\link{dmTest}} with \code{compared_groups} parameter.
- \item \code{statistics(x)}: Get a data frame with full and null log-likelihoods and degrees of freedom.
- \item \code{results(x)}: Get a data frame with results. See Slots.
-}
+\itemize{ \item \code{proportions(x)}: Get a data frame with estimated
+feature ratios for full model and null models specified in
+\code{\link{dmTest}} with \code{compared_groups} parameter. \item
+\code{statistics(x)}: Get a data frame with full and null log-likelihoods and
+degrees of freedom. \item \code{results(x)}: Get a data frame with results.
+See Slots. }
 }
 \description{
-dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null model Dirichlet-multinomial feature proportion estimates and the results of testing for differential splicing. Proportions are calculated for each gene from pooled (no grouping into conditions) counts. Result of \code{\link{dmTest}}.
+dmDStest extends the \code{\linkS4class{dmDSfit}} class by adding the null
+model Dirichlet-multinomial feature proportion estimates and the results of
+testing for differential splicing. Proportions are calculated for each gene
+from pooled (no grouping into conditions) counts. Result of
+\code{\link{dmTest}}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{compared_groups}}{Character vector specifying which groups/conditions should be compared. By default, the comparison is done among all the groups specified by \code{group} column in \code{samples(x)}.}
+\item{\code{compared_groups}}{Character vector specifying which groups/conditions
+should be compared. By default, the comparison is done among all the groups
+specified by \code{group} column in \code{samples(x)}.}
 
-\item{\code{fit_null}}{\code{\linkS4class{MatrixList}}. Contains null proportions, likelihoods and degrees of freedom for a comparison specified with \code{compared_groups}.}
+\item{\code{fit_null}}{\code{\linkS4class{MatrixList}}. Contains null proportions,
+likelihoods and degrees of freedom for a comparison specified with
+\code{compared_groups}.}
 
-\item{\code{results}}{Data frame with \code{gene_id} - gene IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values for comparison specified in \code{compared_groups}.}
+\item{\code{results}}{Data frame with \code{gene_id} - gene IDs, \code{lr} -
+  likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue}
+  - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values
+  for comparison specified in \code{compared_groups}.}
 }}
 \examples{
 ###################################
@@ -74,6 +87,7 @@ head(results(d))
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}
+\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdata}},
+  \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}
 }
 

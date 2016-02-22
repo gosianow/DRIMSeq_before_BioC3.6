@@ -8,8 +8,9 @@ dm_likG <- function(pi, gamma0, y){
   ## pi has length of k-1
   ## gamma0 has length 1
   ## y has k rows and any number of columns n
-  ## This function returns likelihhod without normalizing component, but it is OK for LR test.
-   
+  ## This function returns likelihhod without normalizing component, 
+  ## but it is OK for LR test.
+  
   N <- ncol(y)
   S <- colSums(y)
   
@@ -30,7 +31,8 @@ dm_lik_regG <- function(b, x, gamma0, y){
   ## b has length of p * (q-1)
   ## gamma0 has length 1
   ## y has q rows and n columns
-  ## This function returns likelihhod without normalizing component, but it is OK for LR test.
+  ## This function returns likelihhod without normalizing component, 
+  ## but it is OK for LR test.
   
   y <- t(y)
   
@@ -47,7 +49,7 @@ dm_lik_regG <- function(b, x, gamma0, y){
   s <- rowSums(y)
   
   l <- sum(rowSums(lgamma(y + gamma0 * pi) - lgamma(pi * gamma0)))
-
+  
   l <- n * lgamma(gamma0) - sum(lgamma(s + gamma0)) + l
   
   # normalizing_part <- sum(lgamma(s + 1) - rowSums(lgamma(y + 1)))
@@ -71,7 +73,7 @@ dm_lik <- function(pi, gamma0, y){
   N <- ncol(y)
   S <- colSums(y)  
   l <- 0
-
+  
   pi <- c(pi, 1 - sum(pi))
   
   for(j in 1:N){  

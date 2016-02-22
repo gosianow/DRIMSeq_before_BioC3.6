@@ -2,8 +2,10 @@
 ## estimate pi for given dispersion
 ##############################################################################
 
+#' @importFrom stats constrOptim
 
-dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "constrOptimG")[2], prop_tol = 1e-12, verbose = FALSE){
+dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", 
+  "constrOptimG")[2], prop_tol = 1e-12, verbose = FALSE){
   ### y must be features vs. samples
   ### If something is wrong, return NAs
   
@@ -38,39 +40,43 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim", "const
   }
   
   switch(prop_mode, 
-         
-         ### must have constraint for SUM pi = 1 --> sum(pi) < 1 + eps & sum(pi) > 1 - eps
-         constrOptim = { ## for k-1 parameters
-           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = TRUE)
-           
-           ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
-           ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
-           #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
-           #         ci <- c(rep(0, k-1), rep(-1, k-1))
-           
-           co <- constrOptim(pi_init[-k], f = dm_lik, grad = dm_score, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
-           
-           pi <- co$par
-           pi <- c(pi, 1-sum(pi))
-           lik <- co$value
-           
-         }, 
-         
-         constrOptimG = { ## for k-1 parameters with Gamma functions
-           # if(verbose) cat("\n gene:", colnames(y)[1], "gamma0:", gamma0, fill = TRUE)
-           
-           ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
-           ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
-           #         ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
-           #         ci <- c(rep(0, k-1), rep(-1, k-1))
-           
-           co <- constrOptim(pi_init[-k], f = dm_likG, grad = dm_scoreG, ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), gamma0 = gamma0, y = y)
-           
-           pi <- co$par
-           pi <- c(pi, 1-sum(pi))
-           lik <- co$value
-           
-         })
+    
+    ### must have constraint for SUM pi = 1 --> sum(pi) < 1 + eps & sum(pi) > 1 - eps
+    constrOptim = { ## for k-1 parameters
+      # if(verbose) message("\n gene:", colnames(y)[1], "gamma0:", gamma0)
+      
+      ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
+      ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
+      # ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
+      # ci <- c(rep(0, k-1), rep(-1, k-1))
+      
+      co <- constrOptim(pi_init[-k], f = dm_lik, grad = dm_score, 
+        ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), 
+        gamma0 = gamma0, y = y)
+      
+      pi <- co$par
+      pi <- c(pi, 1-sum(pi))
+      lik <- co$value
+      
+    }, 
+    
+    constrOptimG = { ## for k-1 parameters with Gamma functions
+      # if(verbose) message("\n gene:", colnames(y)[1], "gamma0:", gamma0)
+      
+      ui <- rbind(diag(rep(1, k-1), k-1), diag(rep(-1, k-1), k-1), rep(-1, k-1))
+      ci <- c(rep(0, k-1), rep(-1, k-1), -1 + .Machine$double.eps) 
+      # ui <- rbind(diag(rep(1, k-1)), diag(rep(-1, k-1)))
+      # ci <- c(rep(0, k-1), rep(-1, k-1))
+      
+      co <- constrOptim(pi_init[-k], f = dm_likG, grad = dm_scoreG, 
+        ui = ui, ci = ci, control = list(fnscale = -1, reltol = prop_tol), 
+        gamma0 = gamma0, y = y)
+      
+      pi <- co$par
+      pi <- c(pi, 1-sum(pi))
+      lik <- co$value
+      
+    })
   
   keep_row[keep_row] <- pi
   pi <- keep_row

@@ -39,28 +39,61 @@ should be expressed. See details.}
 \item{min_feature_prop}{Minimal proportion for feature expression. This value
 should be between 0 and 1.}
 
-\item{max_features}{Maximum number of features, which pass the filtering criteria, that should be kept for each gene. If equal to \code{Inf}, all features that pass the filtering criteria are kept.}
+\item{max_features}{Maximum number of features, which pass the filtering
+criteria, that should be kept for each gene. If equal to \code{Inf},
+all features that pass the filtering criteria are kept.}
 
-\item{minor_allele_freq}{Minimal number of samples where each of the genotypes has to be present.}
+\item{minor_allele_freq}{Minimal number of samples where each of the
+genotypes has to be present.}
 
-\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
+\item{BPPARAM}{Parallelization method used by
+\code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
-Returns filtered \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
+Returns filtered \code{\linkS4class{dmDSdata}} or
+\code{\linkS4class{dmSQTLdata}} object.
 }
 \description{
-Filtering of genes and features with low expression. Additionally, for the dmSQTLdata object, filtering of genotypes with low frequency.
+Filtering of genes and features with low expression.
+Additionally, for the dmSQTLdata object, filtering of genotypes
+with low frequency.
 }
 \details{
-Filtering parameters should be adjusted according to the sample size of the experiment data and the number of replicates per condition.
+Filtering parameters should be adjusted according to the sample size of
+ the experiment data and the number of replicates per condition.
 
-\code{min_samps_gene_expr} defines the minimal number of samples where genes are required to be expressed at the minimal level of \code{min_gene_expr} in order to be included in the downstream analysis. Ideally, we would like that genes were expressed at some minimal level in all samples because this would lead to good estimates of feature ratios.
+\code{min_samps_gene_expr} defines the minimal number of samples where genes
+are required to be expressed at the minimal level of \code{min_gene_expr}
+in order to be included in the downstream analysis. Ideally, we would like
+that genes were expressed at some minimal level in all samples because this
+would lead to good estimates of feature ratios.
 
-Similarly, \code{min_samps_feature_expr} and \code{min_samps_feature_prop} defines the minimal number of samples where features are required to be expressed at the minimal levels of counts \code{min_feature_expr} or proportions \code{min_feature_prop}. In differential splicing analysis, we suggest using \code{min_samps_feature_expr} and \code{min_samps_feature_prop} equal to the minimal number of replicates in any of the conditions. For example, in an assay with 3 versus 5 replicates, we would set these parameters to 3, which allows a situation where a feature is expressed in one condition but may not be expressed at all in another one, which is an example of differential splicing.
+Similarly, \code{min_samps_feature_expr} and \code{min_samps_feature_prop}
+defines the minimal number of samples where features are required
+ to be expressed at the minimal levels of counts \code{min_feature_expr}
+ or proportions \code{min_feature_prop}. In differential splicing analysis,
+ we suggest using \code{min_samps_feature_expr} and \code{min_samps_feature_prop}
+ equal to the minimal number of replicates in any of the conditions.
+ For example, in an assay with 3 versus 5 replicates, we would set
+ these parameters to 3, which allows a situation where a feature is expressed
+ in one condition but may not be expressed at all in another one, which is
+ an example of differential splicing.
 
-By default, we do not use filtering based on feature proportions. Therefore, \code{min_samps_feature_prop} and \code{min_feature_prop} equals 0.
+By default, we do not use filtering based on feature proportions.
+Therefore, \code{min_samps_feature_prop} and \code{min_feature_prop} equals 0.
 
-In sQTL analysis, usually, we deal with data that has many more replicates than data from a standard differential splicing assay. Our example data set consists of 91 samples. Requiring that genes are expressed in all samples may be too stringent, especially since there may be missing values in the data and for some genes you may not observe counts in all 91 samples. Slightly lower threshold ensures that we do not eliminate such genes. For example, if \code{min_samps_gene_expr = 70} and \code{min_gene_expr = 10}, only genes with expression of at least 10 in at least 70 samples are kept. Samples with expression lower than 10 have \code{NA}s assigned and are skipped in the analysis of this gene. \code{minor_allele_freq} indicates the minimal number of samples for the minor allele presence. Usually, it is equal to 5\% of total samples.
+In sQTL analysis, usually, we deal with data that has many more replicates
+than data from a standard differential splicing assay. Our example data set
+consists of 91 samples. Requiring that genes are expressed in all samples may
+be too stringent, especially since there may be missing values in the data
+and for some genes you may not observe counts in all 91 samples. Slightly
+lower threshold ensures that we do not eliminate such genes. For example, if
+\code{min_samps_gene_expr = 70} and \code{min_gene_expr = 10}, only genes
+with expression of at least 10 in at least 70 samples are kept. Samples with
+expression lower than 10 have \code{NA}s assigned and are skipped in the
+analysis of this gene. \code{minor_allele_freq} indicates the minimal number
+of samples for the minor allele presence. Usually, it is equal to 5\% of
+total samples.
 }
 \examples{
 ###################################
@@ -72,7 +105,8 @@ d <- data_dmDSdata
 ### Filtering
 # Check what is the minimal number of replicates per condition
 table(samples(d)$group)
-d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3, min_samps_feature_prop = 0)
+d <- dmFilter(d, min_samps_gene_expr = 7, min_samps_feature_expr = 3,
+ min_samps_feature_prop = 0)
 plotData(d)
 }
 #############################
@@ -93,6 +127,8 @@ plotData(d)
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}},
+\code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}},
+\code{\link{dmTest}}
 }
 

@@ -1,20 +1,22 @@
 
-# gene_id = gene_id; counts = x@counts; samples = x@samples; dispersion = slot(x, x@dispersion); proportions_full = x@fit_full; proportions_null = NULL; table = NULL; plot_type = "barplot"; order = FALSE; plot_full = TRUE; plot_null = FALSE; out_dir = "~/"
+#' @importFrom grDevices pdf dev.off
 
-
-dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), proportions_full = NULL, proportions_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(proportions_full), FALSE, TRUE), plot_null = ifelse(is.null(proportions_null), FALSE, TRUE), plot_main = TRUE, out_dir = NULL){
-  
+dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), 
+  proportions_full = NULL, proportions_null = NULL, table = NULL, 
+  plot_type = "barplot", order = TRUE, 
+  plot_full = ifelse(is.null(proportions_full), FALSE, TRUE), 
+  plot_null = ifelse(is.null(proportions_null), FALSE, TRUE), 
+  plot_main = TRUE, out_dir = NULL){
   
   gene <- gene_id
   counts_gene <- counts[[gene]]
   
   if(nrow(counts_gene) <= 1)
-    stop(paste0("!Gene has to have at least 2 features! \n"))
+    stop("!Gene has to have at least 2 features! \n")
   
   group <- samples$group
   sample_id <- samples$sample_id
   main <- NULL
-  
   
   if(plot_main){
     
@@ -37,7 +39,9 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
       
       table_tmp <- table[table$gene_id == gene, ]
       
-      main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
+      main <- paste0(main, "\n LR = ", round(table_tmp["lr"], 2) , 
+        ", P-value = ", sprintf("%.02e", table_tmp["pvalue"]), 
+        ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
       
     }
   }
@@ -50,11 +54,13 @@ dmDS_plotFit <- function(gene_id, counts, samples, dispersion = numeric(), propo
   if(plot_null)
     pi_null <- proportions_null[[gene]]
   
-  
-  ggp <- dm_plotProportions(counts = counts_gene, group = group, pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, order = order)
+  ggp <- dm_plotProportions(counts = counts_gene, group = group, 
+    pi_full = pi_full, pi_null = pi_null, main = main, plot_type = plot_type, 
+    order = order)
   
   if(!is.null(out_dir)){
-    pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , paste0(gene)), ".pdf"), width = 12, height = 7)
+    pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , paste0(gene)), ".pdf"), 
+      width = 12, height = 7)
     print(ggp)
     dev.off()
   }else{

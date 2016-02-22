@@ -4,9 +4,12 @@
 \name{data_dmSQTLdata}
 \alias{data_dmSQTLdata}
 \title{Sample data for sQTL analysis}
-\format{\code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object. See Examples.}
+\format{\code{data_dmSQTLdata} is a \code{\linkS4class{dmSQTLdata}} object.
+See Examples.}
 \source{
-Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and genome sequencing uncovers functional variation in humans. Nature. 2013;501(7468):506-11
+Lappalainen T, Sammeth M, Friedlander MR, et al. Transcriptome and
+genome sequencing uncovers functional variation in humans. Nature.
+2013;501(7468):506-11
 
 \code{GeuvadisTranscriptExpr} package
 }
@@ -17,7 +20,12 @@ data_dmSQTLdata
 \code{data_dmSQTLdata}
 }
 \description{
-A subset of data from GEUVADIS project where 462 RNA-Seq samples from lymphoblastoid cell lines were obtained. The genome sequencing data of the same individuals is provided by the 1000 Genomes Project. The samples in this project come from five populations: CEPH (CEU), Finns (FIN), British (GBR), Toscani (TSI) and Yoruba (YRI). Here, we use a subset of CEPH data from chromosome 19 available in \code{GeuvadisTranscriptExpr} package.
+A subset of data from GEUVADIS project where 462 RNA-Seq samples from
+lymphoblastoid cell lines were obtained. The genome sequencing data of the
+same individuals is provided by the 1000 Genomes Project. The samples in this
+project come from five populations: CEPH (CEU), Finns (FIN), British (GBR),
+Toscani (TSI) and Yoruba (YRI). Here, we use a subset of CEPH data from
+chromosome 19 available in \code{GeuvadisTranscriptExpr} package.
 }
 \examples{
 #############################

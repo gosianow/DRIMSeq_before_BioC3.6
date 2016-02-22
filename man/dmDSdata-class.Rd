@@ -28,7 +28,8 @@ samples(x, ...)
 \arguments{
 \item{object,x}{dmDSdata object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using
+this generic.}
 
 \item{i,j}{Parameters used for subsetting.}
 }
@@ -38,18 +39,27 @@ samples(x, ...)
  \item \code{samples(x)}: Get a data frame with the sample information.
   \item \code{names(x)}: Get the gene names.
   \item \code{length(x)}: Get the number of genes.
-  \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of counts for genes i and samples j.
+  \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of
+  counts for genes i and samples j.
 }
 }
 \description{
-dmDSdata contains expression, in counts, of genomic features such as exons or transcripts and sample information needed for the differential splicing (DS) analysis. It can be created with function \code{\link{dmDSdata}}.
+dmDSdata contains expression, in counts, of genomic features such as exons or
+transcripts and sample information needed for the differential splicing (DS)
+analysis. It can be created with function \code{\link{dmDSdata}}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{counts}}{\code{\linkS4class{MatrixList}} of expression, in counts, of genomic features. Rows correspond to genomic features, such as exons or transcripts. Columns correspond to samples. MatrixList is partitioned in a way that each of the matrices in a list contains counts for a single gene.}
+\item{\code{counts}}{\code{\linkS4class{MatrixList}} of expression, in counts,
+of genomic features. Rows correspond to genomic features, such as exons
+or transcripts. Columns correspond to samples. MatrixList is partitioned
+in a way that each of the matrices in a list contains counts for a single
+gene.}
 
-\item{\code{samples}}{Data frame with information about samples. It must contain variables: \code{sample_id} of unique sample names and \code{group} which groups samples into conditions.}
+\item{\code{samples}}{Data frame with information about samples. It must contain
+variables: \code{sample_id} of unique sample names and \code{group} which
+groups samples into conditions.}
 }}
 \examples{
 ###################################
@@ -69,6 +79,7 @@ d[1:20, 1:3]
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdispersion}}, \code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
+\code{\link{data_dmDSdata}}, \code{\linkS4class{dmDSdispersion}},
+\code{\linkS4class{dmDSfit}}, \code{\linkS4class{dmDStest}}
 }
 

@@ -5,11 +5,14 @@
 
 # nhead = 2; ntail = 2
 
+#' @importFrom utils head tail
+
 show_matrix <- function(object, nhead = 2, ntail = 2){
   nr <- nrow(object)
   nc <- ncol(object)
   
-  cat(class(object), " with ", nr, ifelse(nr == 1, " row and ", " rows and "), nc, ifelse(nc == 1, " column\n", " columns\n"), sep = "")
+  cat(class(object), " with ", nr, ifelse(nr == 1, " row and ", " rows and "), 
+    nc, ifelse(nc == 1, " column\n", " columns\n"), sep = "")
   
   if(nr > 0 && nc > 0){
     
@@ -21,7 +24,8 @@ show_matrix <- function(object, nhead = 2, ntail = 2){
       
     } else {
       
-      out <- do.call(rbind, list(head(object, nhead), matrix(rep.int("...", nc), 1, nc, dimnames = list(NULL, colnames(object))), tail(object, ntail)))
+      out <- do.call(rbind, list(head(object, nhead), matrix(rep.int("...", nc), 
+        1, nc, dimnames = list(NULL, colnames(object))), tail(object, ntail)))
       
       rownames(out) <- rownames_matrix(nms, nr, nhead, ntail)
       
@@ -29,7 +33,11 @@ show_matrix <- function(object, nhead = 2, ntail = 2){
     
     if(nc > (nhead + ntail)){
       
-      out <- do.call(cbind, list(out[, 1:nhead, drop = FALSE], matrix(rep.int("...", ifelse(nr < (nhead + ntail + 1L), min(nr, nhead + ntail), nhead + ntail + 1L)), ncol = 1, dimnames = list(NULL, "...")), out[, (nc-ntail+1):nc, drop = FALSE]))
+      out <- do.call(cbind, list(out[, 1:nhead, drop = FALSE], 
+        matrix(rep.int("...", 
+          ifelse(nr < (nhead + ntail + 1L), min(nr, nhead + ntail), 
+          nhead + ntail + 1L)), ncol = 1, dimnames = list(NULL, "...")), 
+        out[, (nc-ntail+1):nc, drop = FALSE]))
       
     }   
     

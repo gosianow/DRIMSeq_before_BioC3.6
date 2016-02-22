@@ -7,14 +7,16 @@
 dmDSdata(counts, gene_id, feature_id, sample_id, group)
 }
 \arguments{
-\item{counts}{Numeric matrix or data frame of counts. Rows represent features, for example, exons,
-exonic bins or transcripts. Columns represent samples.}
+\item{counts}{Numeric matrix or data frame of counts.
+Rows represent features, for example, exons, exonic bins or transcripts.
+Columns represent samples.}
 
 \item{gene_id}{Vector of gene IDs corresponding to \code{counts}.}
 
 \item{feature_id}{Vector of feature IDs corresponding to \code{counts}.}
 
-\item{sample_id}{Vector of unique sample IDs corresponding to the columns in \code{counts}.}
+\item{sample_id}{Vector of unique sample IDs corresponding to the columns
+in \code{counts}.}
 
 \item{group}{Vector that defines the grouping of samples.}
 }
@@ -34,14 +36,18 @@ library(PasillaTranscriptExpr)
 
 data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 
-metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE, as.is = TRUE)
+metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE,
+ as.is = TRUE)
 metadata
 
-counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE, as.is = TRUE)
+counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE,
+ as.is = TRUE)
 head(counts)
 
 # Create a dmDSdata object
-d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id, feature_id = counts$feature_id, sample_id = metadata$SampleName, group = metadata$condition)
+d <- dmDSdata(counts = counts[, metadata$SampleName],
+ gene_id = counts$gene_id, feature_id = counts$feature_id,
+ sample_id = metadata$SampleName, group = metadata$condition)
 
 plotData(d)
 
@@ -55,6 +61,7 @@ plotData(d)
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{plotData}}, \code{\link{dmFilter}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
+\code{\link{plotData}}, \code{\link{dmFilter}},
+\code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 }
 

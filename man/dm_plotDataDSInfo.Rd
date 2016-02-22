@@ -7,9 +7,11 @@
 dm_plotDataDSInfo(info, ds_info)
 }
 \arguments{
-\item{info}{Data frame with \code{gene_id} and \code{feature_id} of ALL features}
+\item{info}{Data frame with \code{gene_id} and \code{feature_id} of ALL
+features}
 
-\item{ds_info}{Data frame with \code{gene_id} and \code{feature_id} of ONLY DS features}
+\item{ds_info}{Data frame with \code{gene_id} and \code{feature_id} of ONLY
+  DS features}
 }
 \value{
 \code{ggplot} object

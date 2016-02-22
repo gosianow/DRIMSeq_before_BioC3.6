@@ -11,18 +11,15 @@ dm_devG <- function(pi, gamma0, y){
   
   pi <- c(pi, 1 - sum(pi))
   
-  ll_mod <- sum( colSums( lgamma(y + pi * gamma0) - lgamma(pi * gamma0) ) )
+  ll_mod <- sum(lgamma(y + pi * gamma0) - lgamma(pi * gamma0) , na.rm = TRUE )
   
-  pi_sat <- y/colSums(y)
+  pi_sat <- y/matrix(colSums(y), nrow(y), ncol(y), byrow = TRUE)
   
-  ll_sat <- sum( colSums( lgamma(y + pi_sat * gamma0) - lgamma(pi_sat * gamma0) ) )
+  ll_sat <- sum(lgamma(y + pi_sat * gamma0) - lgamma(pi_sat * gamma0) , 
+    na.rm = TRUE) # Inf for y = 0
   
   D <- 2 * (ll_sat - ll_mod)
   
   return(D)
   
 }
-
-
-
-

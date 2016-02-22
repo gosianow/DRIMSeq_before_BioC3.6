@@ -2,10 +2,11 @@
 # calculate common dispersion 
 ##############################################################################
 
-dm_estimateMeanExpression <- function(counts, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dm_estimateMeanExpression <- function(counts, verbose = FALSE, 
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ### calculate mean expression of genes 
-  if(verbose) cat("* Calculating mean gene expression.. \n")
+  if(verbose) message("* Calculating mean gene expression.. \n")
   
   inds <- 1:length(counts)
 
@@ -17,8 +18,8 @@ dm_estimateMeanExpression <- function(counts, verbose = FALSE, BPPARAM = BiocPar
   
   names(mean_expression) <- names(counts)
 
-  if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
-  if(verbose) cat("*** Mean gene expression: ", head(mean_expression), "... \n")
+  if(verbose) message("Took ", time["elapsed"], " seconds.\n")
+  if(verbose) message("*** Mean gene expression: ", head(mean_expression), "... \n")
   
   
   return(mean_expression)

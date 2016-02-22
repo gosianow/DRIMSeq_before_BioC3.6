@@ -7,34 +7,41 @@ NULL
 
 #' MatrixList object
 #' 
-#' A MatrixList object is a container for a list of matrices which have the same number of columns but can have varying number of rows. Additionally, one can store an extra information corresponding to each of the matrices in \code{metadata} matrix.
+#' A MatrixList object is a container for a list of matrices which have the same
+#' number of columns but can have varying number of rows. Additionally, one can
+#' store an extra information corresponding to each of the matrices in
+#' \code{metadata} matrix.
 #' 
-#' @return  
+#' @return
 #' 
-#' \itemize{
-#'   \item \code{names(x)}, \code{names(x) <- value}: Get or set names of matrices.
-#'   \item \code{rownames(x)}, \code{rownames(x) <- value}, \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or column names of unlistData slot.
-#'   \item \code{length(x)}: Get the number of matrices in a list.
-#'   \item \code{width(x)}: Get the number of rows of each of the matrices.
-#'   \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the dimensions, number of rows or number of columns of unlistData slot.
-#'   \item \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only columns j of this matrix.
-#'   \item \code{x$name}: Shortcut for \code{x[["name"]]}.
-#'   \item \code{x[i, j]}: Get a subset of MatrixList that consists of matrices i with columns j. 
-#' }
+#' \itemize{ \item \code{names(x)}, \code{names(x) <- value}: Get or set names
+#' of matrices. \item \code{rownames(x)}, \code{rownames(x) <- value},
+#' \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or
+#' column names of unlistData slot. \item \code{length(x)}: Get the number of
+#' matrices in a list. \item \code{width(x)}: Get the number of rows of each of
+#' the matrices. \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the
+#' dimensions, number of rows or number of columns of unlistData slot. \item
+#' \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only
+#' columns j of this matrix. \item \code{x$name}: Shortcut for
+#' \code{x[["name"]]}. \item \code{x[i, j]}: Get a subset of MatrixList that
+#' consists of matrices i with columns j. }
 #' 
 #' 
 #' @param x MatrixList object.
-#' @param value,i,j,name Parameters used for subsetting and assigning new attributes to x.
-#' 
+#' @param value,i,j,name Parameters used for subsetting and assigning new
+#'   attributes to x.
+#'   
 #' @slot unlistData Matrix which is a row binding of all the matrices in a list.
-#' @slot partitioning List of indexes which defines the row partitioning of unlistData matrix into the original matrices.
-#' 
-#' @slot metadata Matrix of additional information where each row corresponds to one of the matrices in a list.
+#' @slot partitioning List of indexes which defines the row partitioning of
+#'   unlistData matrix into the original matrices.
+#'   
+#' @slot metadata Matrix of additional information where each row corresponds to
+#'   one of the matrices in a list.
 #' @author Malgorzata Nowicka
 setClass("MatrixList", 
-         representation(unlistData = "matrix", 
-                        partitioning = "list", 
-                        metadata = "matrix"))
+  representation(unlistData = "matrix", 
+    partitioning = "list", 
+    metadata = "matrix"))
 
 
 ###################################
@@ -47,14 +54,16 @@ setValidity("MatrixList", function(object){
   if(length(partitioning_unlist) == nrow(object@unlistData))
     out <- TRUE
   else
-    return(paste0("Unequal lengths of partitioning indexes and rows in unlistData: ", length(partitioning_unlist), " and ", nrow(object@unlistData)))
-
+    return(paste0("Unequal lengths of partitioning indexes and rows in unlistData: ", 
+      length(partitioning_unlist), " and ", nrow(object@unlistData)))
+  
   if(nrow(object@metadata) > 0){
     
     if(nrow(object@metadata) == length(object@partitioning))
       out <- TRUE
     else
-      return(paste0("Unequal lengths of partitioning and metadata: ", length(object@partitioning), " and ", nrow(object@metadata)))
+      return(paste0("Unequal lengths of partitioning and metadata: ", 
+        length(object@partitioning), " and ", nrow(object@metadata)))
     
   }
   
@@ -97,7 +106,8 @@ MatrixList <- function(..., metadata){
       names(partitioning) <- names(listData)
     
     if(!missing(metadata))
-      return(new("MatrixList", unlistData = unlistData, partitioning = partitioning, metadata = metadata))
+      return(new("MatrixList", unlistData = unlistData, partitioning = partitioning, 
+        metadata = metadata))
     else
       return(new("MatrixList", unlistData = unlistData, partitioning = partitioning))
     
@@ -297,17 +307,29 @@ setMethod("[", signature(x = "MatrixList"), function(x, i, j){
     if(!missing(j)){
       
       if(nrow(x@metadata) != 0)
-        return(new("MatrixList", unlistData = x@unlistData[unlist(x@partitioning[i]), j, drop = FALSE], partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), metadata = x@metadata[i, , drop = FALSE]))
+        return(new("MatrixList", 
+          unlistData = x@unlistData[unlist(x@partitioning[i]), j, drop = FALSE], 
+          partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), 
+          metadata = x@metadata[i, , drop = FALSE]))
       else
-        return(new("MatrixList", unlistData = x@unlistData[unlist(x@partitioning[i]), j, drop = FALSE], partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), metadata = x@metadata))
+        return(new("MatrixList", 
+          unlistData = x@unlistData[unlist(x@partitioning[i]), j, drop = FALSE], 
+          partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), 
+          metadata = x@metadata))
       
       
     }else{
       
       if(nrow(x@metadata) != 0)
-        return(new("MatrixList", unlistData = x@unlistData[unlist(x@partitioning[i]), , drop = FALSE], partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), metadata = x@metadata[i, , drop = FALSE]))
+        return(new("MatrixList", 
+          unlistData = x@unlistData[unlist(x@partitioning[i]), , drop = FALSE], 
+          partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), 
+          metadata = x@metadata[i, , drop = FALSE]))
       else
-        return(new("MatrixList", unlistData = x@unlistData[unlist(x@partitioning[i]), , drop = FALSE], partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), metadata = x@metadata))   
+        return(new("MatrixList", 
+          unlistData = x@unlistData[unlist(x@partitioning[i]), , drop = FALSE], 
+          partitioning = relist(1:nrow(x@unlistData), x@partitioning[i]), 
+          metadata = x@metadata))   
       
     } 
     
@@ -315,7 +337,10 @@ setMethod("[", signature(x = "MatrixList"), function(x, i, j){
     
     if(!missing(j)){
       
-      return(new("MatrixList", unlistData = x@unlistData[, j, drop = FALSE], partitioning = x@partitioning, metadata = x@metadata))
+      return(new("MatrixList", 
+        unlistData = x@unlistData[, j, drop = FALSE], 
+        partitioning = x@partitioning, 
+        metadata = x@metadata))
       
     }else{
       

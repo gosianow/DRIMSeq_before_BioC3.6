@@ -1,19 +1,21 @@
 #######################################################
 #  group testing
 #######################################################
-# fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
+#' @importFrom stats pchisq p.adjust
 
-dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, 
+  BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
-  if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
+  if(verbose) message("* Calculating likelihood ratio statistics.. \n")
   time_start <- Sys.time()
   
   inds <- 1:length(fit_full)
   gene_list <- names(fit_full)
   
-  table_list <- BiocParallel::bplapply(inds, function(g){
+  table_list <- BiocParallel::bplapply(inds, function(g, fit_full, fit_null, 
+    gene_list){
     # g = 662
     
     lr <- 2*(rowSums(fit_full[[g]]@metadata, na.rm = TRUE) - fit_null[[g]]@metadata[, "lik"])
@@ -27,10 +29,12 @@ dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParal
     
     pvalue <- pchisq(lr, df = df , lower.tail = FALSE)
     
-    tt <- data.frame(gene_id = gene_list[g], snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, pvalue = pvalue, stringsAsFactors = FALSE)
+    tt <- data.frame(gene_id = gene_list[g], 
+      snp_id = rownames(fit_full[[g]]@metadata), lr = lr, df = df, 
+      pvalue = pvalue, stringsAsFactors = FALSE)
     
-    }, BPPARAM = BPPARAM)
-  
+    }, fit_full = fit_full, fit_null = fit_null, 
+    gene_list = gene_list, BPPARAM = BPPARAM)
   
   table <- do.call(rbind, table_list)
   
@@ -44,7 +48,7 @@ dmSQTL_test <- function(fit_full, fit_null, verbose = FALSE, BPPARAM = BiocParal
   rownames(table) <- NULL
   
   time_end <- Sys.time()
-  if(verbose) cat("Took ", as.numeric(time_end - time_start), " seconds.\n")
+  if(verbose) message("Took ", as.numeric(time_end - time_start), " seconds.\n")
   
   return(table)
   

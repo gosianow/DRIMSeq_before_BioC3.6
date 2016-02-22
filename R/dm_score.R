@@ -11,7 +11,9 @@ dm_scoreG <- function(pi, gamma0, y){
   y <- y[-k, , drop=FALSE]
   pik <- 1-sum(pi)
  
-  S <- gamma0 * rowSums( digamma(y + pi * gamma0) - digamma(pi * gamma0) - matrix(digamma(yk + gamma0 * pik) - digamma(gamma0 * pik), nrow = k-1, ncol = N, byrow = TRUE) ) 
+  S <- gamma0 * rowSums( digamma(y + pi * gamma0) - 
+      digamma(pi * gamma0) - matrix(digamma(yk + gamma0 * pik) - 
+          digamma(gamma0 * pik), nrow = k-1, ncol = N, byrow = TRUE) ) 
     
   return(S)
   
@@ -69,7 +71,9 @@ dm_score_regG <- function(b, x, gamma0, y){
   y <- y[, -q, drop = FALSE]
   
   
-  S <- t(x) %*% ((digamma(y + pi*gamma0) - digamma(pi*gamma0) + digamma(yq + piq*gamma0) - digamma(piq*gamma0)) * pi * (1 - pi) * gamma0)
+  S <- t(x) %*% ((digamma(y + pi*gamma0) - 
+      digamma(pi*gamma0) + digamma(yq + piq*gamma0) - 
+      digamma(piq*gamma0)) * pi * (1 - pi) * gamma0)
   
   
   return(as.numeric(S))

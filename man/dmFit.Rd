@@ -18,25 +18,36 @@ dmFit(x, ...)
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{
-\item{x}{\code{\linkS4class{dmDSdispersion}} or \code{\linkS4class{dmSQTLdispersion}} object.}
+\item{x}{\code{\linkS4class{dmDSdispersion}} or
+\code{\linkS4class{dmSQTLdispersion}} object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using this
+generic.}
 
-\item{dispersion}{Character defining which dispersion should be used for fitting. Possible values \code{"genewise_dispersion"} or \code{"common_dispersion"}.}
+\item{dispersion}{Character defining which dispersion should be used for
+fitting. Possible values \code{"genewise_dispersion"} or
+\code{"common_dispersion"}.}
 
-\item{prop_mode}{Optimization method used to estimate proportions. Possible values \code{"constrOptim"} and \code{"constrOptimG"}.}
+\item{prop_mode}{Optimization method used to estimate proportions. Possible
+values \code{"constrOptim"} and \code{"constrOptimG"}.}
 
 \item{prop_tol}{The desired accuracy when estimating proportions.}
 
-\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 - no messages, 1 - main messages, 2 - message for every gene fitting.}
+\item{verbose}{Numeric. Definie the level of progress messages displayed. 0 -
+no messages, 1 - main messages, 2 - message for every gene fitting.}
 
-\item{BPPARAM}{Parallelization method used by \code{\link[BiocParallel]{bplapply}}.}
+\item{BPPARAM}{Parallelization method used by
+  \code{\link[BiocParallel]{bplapply}}.}
 }
 \value{
-Returns a \code{\linkS4class{dmDSfit}} or \code{\linkS4class{dmSQTLfit}} object.
+Returns a \code{\linkS4class{dmDSfit}} or
+  \code{\linkS4class{dmSQTLfit}} object.
 }
 \description{
-Maximum likelihood estimates of genomic feature (for instance, transcript, exon, exonic bin) proportions in full Dirichlet-multinomial model used in differential splicing or sQTL analysis. Full model estimation means that proportions are estimated for every group/condition separately.
+Maximum likelihood estimates of genomic feature (for instance, transcript,
+exon, exonic bin) proportions in full Dirichlet-multinomial model used in
+differential splicing or sQTL analysis. Full model estimation means that
+proportions are estimated for every group/condition separately.
 }
 \examples{
 ###################################
@@ -67,6 +78,7 @@ head(statistics(d))
 Malgorzata Nowicka
 }
 \seealso{
-\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
+\code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}},
+  \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 }
 
