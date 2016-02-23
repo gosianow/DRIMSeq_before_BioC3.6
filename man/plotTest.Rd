@@ -17,7 +17,8 @@ plotTest(x, ...)
 \item{x}{\code{\linkS4class{dmDStest}} or \code{\linkS4class{dmSQTLtest}}
 object.}
 
-\item{...}{Other parameters that can be defined by methods using this generic.}
+\item{...}{Other parameters that can be defined by methods using this
+generic.}
 
 \item{out_dir}{Character string that is used to save the plot
 in \code{paste0(out_dir, plot_name, ".pdf")} file. \code{plot_name} depends

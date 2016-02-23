@@ -34,7 +34,6 @@ NULL
 #' \item \code{x[i, j]}: Get a subset of MatrixList that
 #' consists of matrices i with columns j. }
 #' 
-#' 
 #' @param x MatrixList object.
 #' @param value,i,j,name Parameters used for subsetting and assigning new
 #'   attributes to x.
@@ -177,7 +176,6 @@ setMethod("show", "MatrixList", function(object){
 ################################################################################
 ### accessing methods
 ################################################################################
-
 
 #' @rdname MatrixList-class
 #' @export

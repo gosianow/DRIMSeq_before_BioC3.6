@@ -38,7 +38,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 6,
       return(NULL)
     
     expr_features <- expr_features[features2keep, , drop = FALSE]
-
+    
     ### genes with zero expression
     samps2keep <- colSums(expr_features) > 0 & !is.na(expr_features[1, ])
     
@@ -56,7 +56,7 @@ dmDS_filter <- function(counts, samples, min_samps_gene_expr = 6,
     ### no genes with one feature
     if(sum(features2keep) <= 1)
       return(NULL)
-
+    
     if(!max_features == Inf){
       if(sum(features2keep) > max_features){
         

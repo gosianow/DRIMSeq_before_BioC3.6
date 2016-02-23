@@ -61,9 +61,9 @@ NULL
 #' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}},
 #'   \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
 setClass("dmSQTLtest", 
-         contains = "dmSQTLfit",
-         representation(fit_null = "list",
-                        results = "data.frame"))
+  contains = "dmSQTLfit",
+  representation(fit_null = "list",
+    results = "data.frame"))
 
 
 #####################################

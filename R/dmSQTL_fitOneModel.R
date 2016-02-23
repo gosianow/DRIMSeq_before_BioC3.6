@@ -143,7 +143,7 @@ dmSQTL_fitOneModel <- function(counts, genotypes, dispersion, model = "full",
       
       if(verbose) message("Took ", round(time["elapsed"], 2), " seconds.\n")
       names(fff) <- names(counts)
-
+      
       return(fff)
       
     })

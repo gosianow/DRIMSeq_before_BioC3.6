@@ -10,11 +10,11 @@ dm_scoreG <- function(pi, gamma0, y){
   yk <- y[k,]
   y <- y[-k, , drop=FALSE]
   pik <- 1-sum(pi)
- 
+  
   S <- gamma0 * rowSums( digamma(y + pi * gamma0) - 
       digamma(pi * gamma0) - matrix(digamma(yk + gamma0 * pik) - 
           digamma(gamma0 * pik), nrow = k-1, ncol = N, byrow = TRUE) ) 
-    
+  
   return(S)
   
 } 
@@ -22,7 +22,7 @@ dm_scoreG <- function(pi, gamma0, y){
 
 
 dm_score <- function(pi, gamma0, y){  
-
+  
   k <- nrow(y)
   N <- ncol(y) 
   yk <- y[k, ]

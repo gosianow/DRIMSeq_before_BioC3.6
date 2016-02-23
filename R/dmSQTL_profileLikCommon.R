@@ -12,7 +12,7 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes,
   fit_full <- dmSQTL_fitOneModel(counts = counts, genotypes = genotypes, 
     dispersion = gamma0, model = "full", prop_mode = prop_mode, 
     prop_tol = prop_tol, verbose=verbose, BPPARAM = BPPARAM)
-
+  
   lik <- sum(unlist(lapply(fit_full, function(g) 
     sum(g@metadata, na.rm = TRUE))), na.rm = TRUE)
   

@@ -19,8 +19,8 @@ dm_plotPvalues <- function(pvalues){
       aes_string(x = "x", y = "y", label = "label"), 
       hjust = 1, vjust = 3, size = 6)
   
-return(ggp)
-
+  return(ggp)
+  
 }
 
 

@@ -36,7 +36,7 @@ show_matrix <- function(object, nhead = 2, ntail = 2){
       out <- do.call(cbind, list(out[, 1:nhead, drop = FALSE], 
         matrix(rep.int("...", 
           ifelse(nr < (nhead + ntail + 1L), min(nr, nhead + ntail), 
-          nhead + ntail + 1L)), ncol = 1, dimnames = list(NULL, "...")), 
+            nhead + ntail + 1L)), ncol = 1, dimnames = list(NULL, "...")), 
         out[, (nc-ntail+1):nc, drop = FALSE]))
       
     }   

@@ -23,9 +23,9 @@ NULL
 #' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}},
 #'   \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLfit", 
-         contains = "dmSQTLdispersion",
-         representation(dispersion = "character",
-                        fit_full = "list"))
+  contains = "dmSQTLdispersion",
+  representation(dispersion = "character",
+    fit_full = "list"))
 
 ########################################
 
@@ -112,7 +112,7 @@ setMethod("plotFit", "dmSQTLfit", function(x, gene_id, snp_id,
   
   if(!snp_id %in% x@blocks[[gene_id, "snp_id"]])
     stop(paste0("gene ",gene_id, " and SNP ", snp_id, " do not match!"))
-
+  
   stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", 
     "ribbonplot"))
   stopifnot(is.logical(order))

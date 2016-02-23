@@ -16,8 +16,9 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim",
   
   ### check for 0s in rows (features)
   keep_row <- rowSums(y) > 0
+  ### must be at least two features
   if(sum(keep_row) < 2) 
-    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA))) ## must be at least two features
+    return(list(pi = rep(NA, kk), stats = c(lik = NA, df = NA))) 
   
   y <- y[keep_row, , drop=FALSE]
   

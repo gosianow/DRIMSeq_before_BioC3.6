@@ -11,7 +11,6 @@
 \alias{dm_counts,dmDSdata-method}
 \alias{dm_samples}
 \alias{dm_samples,dmDSdata-method}
-\alias{elementLengths,dmDSdata-method}
 \alias{length,dmDSdata-method}
 \alias{names,dmDSdata-method}
 \alias{samples}
@@ -36,8 +35,6 @@ samples(x, ...)
 
 \S4method{length}{dmDSdata}(x)
 
-\S4method{elementLengths}{dmDSdata}(x)
-
 \S4method{[}{dmDSdata,ANY,ANY}(x, i, j)
 }
 \arguments{
@@ -54,7 +51,6 @@ this generic.}
  \item \code{samples(x)}: Get a data frame with the sample information.
   \item \code{names(x)}: Get the gene names.
   \item \code{length(x)}: Get the number of genes.
-  \item \code{elementLengths(x)}: Get the numbers of features per gene.
   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of
   counts for genes i and samples j.
   \item \code{dm_counts(object)}: Get the \code{counts} slot.

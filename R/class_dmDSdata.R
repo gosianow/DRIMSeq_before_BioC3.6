@@ -18,7 +18,6 @@ NULL
 #'  \item \code{samples(x)}: Get a data frame with the sample information.
 #'   \item \code{names(x)}: Get the gene names.
 #'   \item \code{length(x)}: Get the number of genes.
-#'   \item \code{elementLengths(x)}: Get the numbers of features per gene.
 #'   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of 
 #'   counts for genes i and samples j. 
 #'   \item \code{dm_counts(object)}: Get the \code{counts} slot.
@@ -113,7 +112,7 @@ setMethod("dm_samples", "dmDSdata", function(x) x@samples )
 setMethod("counts", "dmDSdata", function(object){
   
   data.frame(gene_id = rep(names(object@counts), elementLengths(object@counts)), 
-    feature_id = rownames(object@counts@unlistData), 
+    feature_id = rownames(object@counts), 
     object@counts@unlistData, stringsAsFactors = FALSE, 
     row.names = NULL)
   
@@ -152,11 +151,6 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 #' @rdname dmDSdata-class
 #' @export
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
-
-
-#' @rdname dmDSdata-class
-#' @export
-setMethod("elementLengths", "dmDSdata", function(x) elementLengths(x@counts) )
 
 
 #' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
@@ -393,11 +387,14 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr,
   min_samps_feature_expr, min_samps_feature_prop, min_gene_expr = 10, 
   min_feature_expr = 10, min_feature_prop = 0, max_features = Inf){
   
-  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
+  stopifnot(min_samps_gene_expr >= 0 && 
+      min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)
-  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= ncol(x@counts))
+  stopifnot(min_samps_feature_expr >= 0 && 
+      min_samps_feature_expr <= ncol(x@counts))
   stopifnot(min_feature_expr >= 0)
-  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= ncol(x@counts))
+  stopifnot(min_samps_feature_prop >= 0 && 
+      min_samps_feature_prop <= ncol(x@counts))
   stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
   stopifnot(max_features >= 2)
   
@@ -421,13 +418,14 @@ setMethod("dmFilter", "dmDSdata", function(x, min_samps_gene_expr,
 
 #' Plot data summary
 #' 
-#' @return 
-#' Plot a histogram of the number of features per gene. Additionally, 
-#' for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number 
-#' of SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
+#' @return Plot a histogram of the number of features per gene. Additionally, 
+#' for \code{\linkS4class{dmSQTLdata}} object, plot a histogram of the number of
+#' SNPs per gene and a histogram of the number of unique SNPs (blocks) per gene.
 #' 
-#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
-#' @param ... Other parameters that can be defined by methods using this generic.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}}
+#'   object.
+#' @param ... Other parameters that can be defined by methods using this
+#'   generic.
 #' @export
 setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 
@@ -457,7 +455,7 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' @importFrom grDevices pdf dev.off
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
-  tt <- elementLengths(x@counts)
+  tt <- elementLengths(dm_counts(x))
   
   ggp <- dm_plotDataFeatures(tt = tt)
   

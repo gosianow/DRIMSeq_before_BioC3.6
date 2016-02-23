@@ -43,7 +43,7 @@ opts_chunk$set(cache = FALSE, tidy = FALSE, tidy.opts = list(blank = FALSE), hig
 
 
 %------------------------------------------------------------------------------
-%	Introduction
+% Introduction
 %------------------------------------------------------------------------------
 
 \section{Overview of Dirichlet-multinomial model}
@@ -70,7 +70,7 @@ In general, sQTL analyses are more computationally intensive than differential s
 
 
 %------------------------------------------------------------------------------
-%	Differential splicing analysis work-flow
+% Differential splicing analysis work-flow
 %------------------------------------------------------------------------------
 
 \section{Differential splicing analysis work-flow}
@@ -97,11 +97,11 @@ library(PasillaTranscriptExpr)
 data_dir  <- system.file("extdata", package = "PasillaTranscriptExpr")
 
 metadata <- read.table(file.path(data_dir, "metadata.txt"), header = TRUE,
-                       as.is = TRUE)
+  as.is = TRUE)
 metadata
 
 counts <- read.table(file.path(data_dir, "counts.txt"), header = TRUE,
-                     as.is = TRUE)
+  as.is = TRUE)
 head(counts)
 
 @
@@ -118,15 +118,15 @@ Create a \Rcode{dmDSdata} object (saved as variable \Robject{d}), which contains
 
 <<DSdmDSdata_create>>=
 d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id,
-    feature_id = counts$feature_id, sample_id = metadata$SampleName,
-    group = metadata$condition)
+  feature_id = counts$feature_id, sample_id = metadata$SampleName,
+  group = metadata$condition)
 d
 head(counts(d), 3)
 head(samples(d), 3)
 @
 
 <<DSmax_nr_isoforms, echo = FALSE>>=
-max_nr_isoforms <- max(elementLengths(d))
+max_nr_isoforms <- max(elementLengths(dm_counts(d)))
 @
 
 
@@ -265,7 +265,7 @@ plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 
 
 %------------------------------------------------------------------------------
-%	sQTL analysis work-flow
+% sQTL analysis work-flow
 %------------------------------------------------------------------------------
 
 
@@ -319,10 +319,10 @@ In the sQTL analysis, an initial data object \Robject{d} is of \Robject{dmSQTLda
 sample_id <- colnames(counts[, -(1:2)])
 
 d <- dmSQTLdataFromRanges(counts = counts[, sample_id],
-    gene_id = counts$Gene_Symbol, feature_id = counts$TargetID,
-    gene_ranges = gene_ranges, genotypes = genotypes[, sample_id],
-    snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id,
-    window = 5e3, BPPARAM = BiocParallel::SerialParam())
+  gene_id = counts$Gene_Symbol, feature_id = counts$TargetID,
+  gene_ranges = gene_ranges, genotypes = genotypes[, sample_id],
+  snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id,
+  window = 5e3, BPPARAM = BiocParallel::SerialParam())
 d
 @
 
@@ -343,36 +343,36 @@ Here, the data summary plot produces three histograms: the number of features pe
 #
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
-
+  
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
-
+  
   numPlots = length(plots)
-
+  
   # If layout is NULL, then use 'cols' to determine layout
   if (is.null(layout)) {
     # Make the panel
     # ncol: Number of columns of plots
     # nrow: Number of rows needed, calculated from # of cols
     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
+      ncol = cols, nrow = ceiling(numPlots/cols))
   }
-
- if (numPlots==1) {
+  
+  if (numPlots==1) {
     print(plots[[1]])
-
+    
   } else {
     # Set up the page
     grid.newpage()
     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
+    
     # Make each plot, in the correct location
     for (i in 1:numPlots) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
+      
       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
+        layout.pos.col = matchidx$col))
     }
   }
 }
@@ -394,8 +394,8 @@ Ideally, we would like that genes were expressed at some minimal level in all sa
 
 <<SQTLdmFilter, out.width = "16cm", fig.width = 16>>=
 d <- dmFilter(d, min_samps_gene_expr = 70, min_samps_feature_expr = 5,
-    min_samps_feature_prop = 0, minor_allele_freq = 5,
-    BPPARAM = BiocParallel::SerialParam())
+  min_samps_feature_prop = 0, minor_allele_freq = 5,
+  BPPARAM = BiocParallel::SerialParam())
 
 multiplot(plotlist = plotData(d), cols = 3)
 @

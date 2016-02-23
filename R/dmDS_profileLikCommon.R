@@ -20,7 +20,7 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE,
   
   if(!disp_adjust)
     return(lik)
-
+  
   ## Cox-Reid adjustement for common dispersion
   if(verbose >= 2) message("* Calculating adjustement.. \n")
   

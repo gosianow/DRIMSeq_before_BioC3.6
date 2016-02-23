@@ -346,7 +346,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL,
           geom_bar(data = prop_est_full_order, 
             aes_string(x = "group", y = "proportion", fill = "feature_id"), 
             stat = "identity", width = width, position="stack") + gr
-
+        
       }
     }
   )

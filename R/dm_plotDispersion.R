@@ -47,9 +47,9 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression,
         legend.title = element_text(size=16, face="bold"), 
         legend.text = element_text(size = 14), 
         legend.position = "top")
-
+    
   }
-
+  
   
   if(!is.null(common_dispersion)){
     ggp <- ggp + geom_hline(yintercept = log10(common_dispersion), 
@@ -58,6 +58,6 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression,
   
   
   return(ggp)
-
+  
 }
 

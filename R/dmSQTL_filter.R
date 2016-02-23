@@ -89,7 +89,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples,
       return(NULL)
     
     expr_features <- expr_features[features2keep, , drop = FALSE]
-
+    
     ### genes with zero expression
     samps2keep <- colSums(expr_features) > 0 & !is.na(expr_features[1, ])
     

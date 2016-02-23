@@ -183,7 +183,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression,
       },
       
       optim={
-
+        
         disp_list <- BiocParallel::bplapply(inds, dmDS_optim_dm_profileLikTagwise, 
           disp_interval = disp_interval, counts = counts,  
           ngroups = ngroups, lgroups = lgroups, igroups = igroups,
@@ -240,7 +240,7 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression,
           names(dispersion) <- names(counts)
           return(dispersion)
         }
-
+        
         if(disp_moderation != "none"){
           
           nlibs <- length(group)

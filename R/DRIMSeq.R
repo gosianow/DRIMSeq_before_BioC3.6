@@ -1,4 +1,4 @@
-#' @importFrom S4Vectors elementLengths mcols
+#' @importFrom S4Vectors elementLengths
 #' @import BiocGenerics
 #' @import methods
 #' @import BiocParallel
@@ -117,7 +117,6 @@ NULL
 #' plotFit(d, gene_id = gene_id, plot_type = "ribbonplot")
 #' 
 "data_dmDSdata"
-
 
 
 

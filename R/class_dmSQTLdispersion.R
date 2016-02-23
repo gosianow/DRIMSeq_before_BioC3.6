@@ -46,7 +46,8 @@ setValidity("dmSQTLdispersion", function(object){
   
   if(length(object@genewise_dispersion) > 0){
     if(length(object@genewise_dispersion) == length(object@counts)){
-      if(all(lapply(object@genewise_dispersion, length) == elementLengths(object@genotypes)))
+      if(all(lapply(object@genewise_dispersion, length) == 
+          elementLengths(object@genotypes)))
         out <- TRUE
       else
         return("Different numbers of blocks in 'genotypes' and in 'genewise_dispersion'")

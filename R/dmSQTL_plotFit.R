@@ -7,7 +7,7 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples,
   plot_full = ifelse(is.null(fit_full), FALSE, TRUE), 
   plot_null = ifelse(is.null(fit_null), FALSE, TRUE), 
   plot_main = TRUE, out_dir = NULL){
-
+  
   gene <- gene_id
   snp <- snp_id
   block <- blocks[[gene]][blocks[[gene]][, "snp_id"] == snp, "block_id"]
@@ -15,7 +15,7 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples,
   
   if(nrow(counts_gene) < 2)
     stop("!Gene has to have at least 2 features! \n")
-
+  
   group <- genotypes[[gene]][block, ]
   
   NAs <- !(is.na(counts_gene[1,]) | is.na(group))
@@ -53,7 +53,7 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples,
         ", FDR = ", sprintf("%.02e", table_tmp["adj_pvalue"]))    
       
     }
-
+    
   }
   
   pi_full <- fit_full[[gene]][[block]][, levels(group), drop = FALSE]
