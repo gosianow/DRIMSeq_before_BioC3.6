@@ -50,7 +50,8 @@ setValidity("dmSQTLdispersion", function(object){
           elementLengths(object@genotypes)))
         out <- TRUE
       else
-        return("Different numbers of blocks in 'genotypes' and in 'genewise_dispersion'")
+        return("Different numbers of blocks in 'genotypes' and in 
+          'genewise_dispersion'")
     }
     else 
       return("Unequal number of genes in 'counts' and in 'genewise_dispersion'")
@@ -208,8 +209,10 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE,
   
   
   return(new("dmSQTLdispersion", mean_expression = mean_expression, 
-    common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, 
-    counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
+    common_dispersion = common_dispersion, 
+    genewise_dispersion = genewise_dispersion, 
+    counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, 
+    samples = x@samples))
   
   
 })

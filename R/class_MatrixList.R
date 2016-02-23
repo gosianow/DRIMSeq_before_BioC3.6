@@ -1,9 +1,9 @@
 #' @include class_show_utils.R
 NULL
 
-################################################################################
+###############################################################################
 ### MatrixList class
-################################################################################
+###############################################################################
 
 #' MatrixList object
 #' 
@@ -61,8 +61,9 @@ setValidity("MatrixList", function(object){
   if(length(partitioning_unlist) == nrow(object@unlistData))
     out <- TRUE
   else
-    return(paste0("Unequal lengths of partitioning indexes and rows in unlistData: ", 
-      length(partitioning_unlist), " and ", nrow(object@unlistData)))
+    return(paste0("Unequal lengths of partitioning indexes and 
+      rows in unlistData: ", length(partitioning_unlist), " and ", 
+      nrow(object@unlistData)))
   
   if(nrow(object@metadata) > 0){
     
@@ -79,9 +80,9 @@ setValidity("MatrixList", function(object){
 })
 
 
-################################################################################
+###############################################################################
 ### MatrixList
-################################################################################
+###############################################################################
 
 MatrixList <- function(..., metadata){
   
@@ -113,10 +114,12 @@ MatrixList <- function(..., metadata){
       names(partitioning) <- names(listData)
     
     if(!missing(metadata))
-      return(new("MatrixList", unlistData = unlistData, partitioning = partitioning, 
+      return(new("MatrixList", unlistData = unlistData, 
+        partitioning = partitioning, 
         metadata = metadata))
     else
-      return(new("MatrixList", unlistData = unlistData, partitioning = partitioning))
+      return(new("MatrixList", unlistData = unlistData, 
+        partitioning = partitioning))
     
   }
   
@@ -173,9 +176,9 @@ setMethod("show", "MatrixList", function(object){
 })
 
 
-################################################################################
+###############################################################################
 ### accessing methods
-################################################################################
+###############################################################################
 
 #' @rdname MatrixList-class
 #' @export
@@ -274,9 +277,9 @@ setMethod("ncol", "MatrixList", function(x){
 })
 
 
-################################################################################
+###############################################################################
 ### subsetting methods
-################################################################################
+###############################################################################
 
 
 #' @aliases [[,MatrixList-method

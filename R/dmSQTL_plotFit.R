@@ -65,8 +65,8 @@ dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples,
   
   
   if(!is.null(out_dir)){
-    pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , paste0(gene, "_", snp)), ".pdf"), 
-      width = 12, height = 7)
+    pdf(paste0(out_dir, "dmfit_", gsub(pattern = "\\.", replacement = "_" , 
+      paste0(gene, "_", snp)), ".pdf"),  width = 12, height = 7)
     print(ggp)
     dev.off()
   }else{

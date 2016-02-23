@@ -110,13 +110,15 @@ setValidity("dmDSdispersion", function(object){
 
 #' @rdname dmDSdispersion-class
 #' @export
-setGeneric("mean_expression", function(x, ...) standardGeneric("mean_expression"))
+setGeneric("mean_expression", function(x, ...) 
+  standardGeneric("mean_expression"))
 
 #' @rdname dmDSdispersion-class
 #' @export
 setMethod("mean_expression", "dmDSdispersion", function(x){
   
-  data.frame(gene_id = names(x@mean_expression), mean_expression = x@mean_expression, 
+  data.frame(gene_id = names(x@mean_expression), 
+    mean_expression = x@mean_expression, 
     stringsAsFactors = FALSE, row.names = NULL)
   
 })
@@ -422,7 +424,8 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE,
   
   
   return(new("dmDSdispersion", mean_expression = mean_expression, 
-    common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, 
+    common_dispersion = common_dispersion, 
+    genewise_dispersion = genewise_dispersion, 
     counts = x@counts, samples = x@samples))
   
   

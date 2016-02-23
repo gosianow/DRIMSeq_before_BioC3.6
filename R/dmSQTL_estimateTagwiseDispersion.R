@@ -217,7 +217,8 @@ dmSQTL_constrOptim_dm_profileLikTagwise <- function(g, counts, genotypes,
 
 
 
-dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression, 
+dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, 
+  mean_expression, 
   disp_adjust = TRUE, disp_mode = "grid",
   disp_interval = c(0, 1e+5), disp_tol = 1e-08,  
   disp_init = 100, 
@@ -236,7 +237,8 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       optimize={
         
-        disp_list <- BiocParallel::bplapply(inds, dmSQTL_optimize_dm_profileLikTagwise,
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmSQTL_optimize_dm_profileLikTagwise,
           counts = counts, genotypes = genotypes, disp_interval = disp_interval, 
           disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, 
           verbose = verbose, disp_tol = disp_tol, BPPARAM = BPPARAM)
@@ -248,7 +250,8 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       optim={
         
-        disp_list <- BiocParallel::bplapply(inds, dmSQTL_optim_dm_profileLikTagwise, 
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmSQTL_optim_dm_profileLikTagwise, 
           counts = counts, genotypes = genotypes, disp_init = disp_init, 
           disp_init_weirMoM = disp_init_weirMoM, disp_adjust = disp_adjust, 
           prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, 
@@ -261,7 +264,8 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       constrOptim={
         
-        disp_list <- BiocParallel::bplapply(inds, dmSQTL_constrOptim_dm_profileLikTagwise, 
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmSQTL_constrOptim_dm_profileLikTagwise, 
           counts = counts, genotypes = genotypes, disp_init = disp_init, 
           disp_init_weirMoM = disp_init_weirMoM, disp_adjust = disp_adjust, 
           prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, 
@@ -282,7 +286,8 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         ### calculate the likelihood for each gene at the spline dispersion points
         seq_disp_grid_length <- seq(disp_grid_length)
         
-        loglikL <- BiocParallel::bplapply(inds, dmSQTL_grid_dm_profileLikTagwise, 
+        loglikL <- BiocParallel::bplapply(inds, 
+          dmSQTL_grid_dm_profileLikTagwise, 
           counts = counts, genotypes = genotypes, 
           disp_grid_length = disp_grid_length, 
           seq_disp_grid_length = seq_disp_grid_length, 

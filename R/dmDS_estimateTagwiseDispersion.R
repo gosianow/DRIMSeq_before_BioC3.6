@@ -170,7 +170,8 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression,
       
       optimize={
         
-        disp_list <- BiocParallel::bplapply(inds, dmDS_optimize_dm_profileLikTagwise,
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmDS_optimize_dm_profileLikTagwise,
           disp_interval = disp_interval, counts = counts,
           ngroups = ngroups, lgroups = lgroups, igroups = igroups,
           disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, 
@@ -184,7 +185,8 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression,
       
       optim={
         
-        disp_list <- BiocParallel::bplapply(inds, dmDS_optim_dm_profileLikTagwise, 
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmDS_optim_dm_profileLikTagwise, 
           disp_interval = disp_interval, counts = counts,  
           ngroups = ngroups, lgroups = lgroups, igroups = igroups,
           disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, 
@@ -200,7 +202,8 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression,
       
       constrOptim={
         
-        disp_list <- BiocParallel::bplapply(inds, dmDS_constrOptim_dm_profileLikTagwise, 
+        disp_list <- BiocParallel::bplapply(inds, 
+          dmDS_constrOptim_dm_profileLikTagwise, 
           disp_interval = disp_interval, counts = counts,  
           ngroups = ngroups, lgroups = lgroups, igroups = igroups,
           disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, 

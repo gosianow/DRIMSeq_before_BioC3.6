@@ -42,7 +42,8 @@ dm_fitOneGeneOneGroup <- function(y, gamma0, prop_mode = c("constrOptim",
   
   switch(prop_mode, 
     
-    ### must have constraint for SUM pi = 1 --> sum(pi) < 1 + eps & sum(pi) > 1 - eps
+    ### must have constraint for SUM pi = 1 --> 
+    ### sum(pi) < 1 + eps & sum(pi) > 1 - eps
     constrOptim = { ## for k-1 parameters
       # if(verbose) message("\n gene:", colnames(y)[1], "gamma0:", gamma0)
       

@@ -311,12 +311,13 @@ dmDSdata <- function(counts, gene_id, feature_id, sample_id, group){
 
 #' Filtering
 #' 
-#' Filtering of genes and features with low expression. 
-#' Additionally, for the dmSQTLdata object, filtering of genotypes 
-#' with low frequency.
+#' Filtering of genes and features with low expression. Additionally, for the
+#' dmSQTLdata object, filtering of genotypes with low frequency.
 #' 
-#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}} object.
-#' @param ... Other parameters that can be defined by methods using this generic.
+#' @param x \code{\linkS4class{dmDSdata}} or \code{\linkS4class{dmSQTLdata}}
+#'   object.
+#' @param ... Other parameters that can be defined by methods using this
+#'   generic.
 #' @export
 setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
@@ -324,45 +325,44 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 
 ################################
 
-#' @details 
-#' Filtering parameters should be adjusted according to the sample size of
-#'  the experiment data and the number of replicates per condition. 
-#'
+#' @details Filtering parameters should be adjusted according to the sample size
+#' of the experiment data and the number of replicates per condition.
+#' 
 #' \code{min_samps_gene_expr} defines the minimal number of samples where genes 
-#' are required to be expressed at the minimal level of \code{min_gene_expr} 
-#' in order to be included in the downstream analysis. Ideally, we would like 
-#' that genes were expressed at some minimal level in all samples because this 
-#' would lead to good estimates of feature ratios. 
+#' are required to be expressed at the minimal level of \code{min_gene_expr} in
+#' order to be included in the downstream analysis. Ideally, we would like that
+#' genes were expressed at some minimal level in all samples because this would
+#' lead to good estimates of feature ratios.
 #' 
 #' Similarly, \code{min_samps_feature_expr} and \code{min_samps_feature_prop} 
-#' defines the minimal number of samples where features are required
-#'  to be expressed at the minimal levels of counts \code{min_feature_expr} 
-#'  or proportions \code{min_feature_prop}. In differential splicing analysis, 
-#'  we suggest using \code{min_samps_feature_expr} and \code{min_samps_feature_prop} 
-#'  equal to the minimal number of replicates in any of the conditions. 
-#'  For example, in an assay with 3 versus 5 replicates, we would set
-#'  these parameters to 3, which allows a situation where a feature is expressed 
-#'  in one condition but may not be expressed at all in another one, which is 
-#'  an example of differential splicing.
+#' defines the minimal number of samples where features are required to be
+#' expressed at the minimal levels of counts \code{min_feature_expr} or
+#' proportions \code{min_feature_prop}. In differential splicing analysis, we
+#' suggest using \code{min_samps_feature_expr} and \code{min_samps_feature_prop}
+#' equal to the minimal number of replicates in any of the conditions. For
+#' example, in an assay with 3 versus 5 replicates, we would set these
+#' parameters to 3, which allows a situation where a feature is expressed in one
+#' condition but may not be expressed at all in another one, which is an example
+#' of differential splicing.
 #' 
-#' By default, we do not use filtering based on feature proportions. 
-#' Therefore, \code{min_samps_feature_prop} and \code{min_feature_prop} equals 0.
+#' By default, we do not use filtering based on feature proportions. Therefore,
+#' \code{min_samps_feature_prop} and \code{min_feature_prop} equals 0.
 #' 
-#' @param min_samps_gene_expr Minimal number of samples where genes should 
-#'   be expressed. See Details.
+#' @param min_samps_gene_expr Minimal number of samples where genes should be
+#'   expressed. See Details.
 #' @param min_gene_expr Minimal gene expression.
-#' @param min_samps_feature_expr Minimal number of samples where features should 
+#' @param min_samps_feature_expr Minimal number of samples where features should
 #'   be expressed. See Details.
 #' @param min_feature_expr Minimal feature expression.
-#' @param min_samps_feature_prop Minimal number of samples where features
-#'   should be expressed. See details.
+#' @param min_samps_feature_prop Minimal number of samples where features should
+#'   be expressed. See details.
 #' @param min_feature_prop Minimal proportion for feature expression. This value
 #'   should be between 0 and 1.
 #' @param max_features Maximum number of features, which pass the filtering 
-#' criteria, that should be kept for each gene. If equal to \code{Inf}, 
-#' all features that pass the filtering criteria are kept. 
+#'   criteria, that should be kept for each gene. If equal to \code{Inf}, all
+#'   features that pass the filtering criteria are kept.
 #' @return Returns filtered \code{\linkS4class{dmDSdata}} or 
-#' \code{\linkS4class{dmSQTLdata}} object.
+#'   \code{\linkS4class{dmSQTLdata}} object.
 #' @examples 
 #' ###################################
 #' ### Differential splicing analysis
@@ -378,8 +378,8 @@ setGeneric("dmFilter", function(x, ...) standardGeneric("dmFilter"))
 #' plotData(d)
 #' }
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, 
-#' \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, 
-#' \code{\link{dmTest}}
+#'   \code{\link{plotData}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}, 
+#'   \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
 #' @rdname dmFilter
 #' @export

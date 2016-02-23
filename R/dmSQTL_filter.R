@@ -11,8 +11,8 @@ dmSQTL_filter_genotypes_per_gene <- function(g, counts_new, genotypes,
   genotypes_gene[, is.na(counts_gene[1,])] <- NA
   genotypes_gene[genotypes_gene == -1] <- NA
   
-  ### Keep genotypes with at least minor_allele_freq number of variants per group; 
-  ### in other case replace them with NAs
+  ### Keep genotypes with at least minor_allele_freq number of 
+  ### variants per group; in other case replace them with NAs
   genotypes_gene <- apply(genotypes_gene, 1, function(x){
     # x <- genotypes_gene[6,]
     
@@ -104,21 +104,13 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples,
       return(NULL)
     
     prop <- prop.table(expr_features[, samps2keep, drop = FALSE], 2) 
-    features2keep <- rowSums(prop >= min_feature_prop) >= min_samps_feature_prop
+    features2keep <- rowSums(prop >= min_feature_prop) >= 
+      min_samps_feature_prop
     
     ### no genes with one feature
     if(sum(features2keep) <= 1)
       return(NULL)
-    
-    #### Have to think how to order the transcripts because here I do not have the same grouping 
-    # if(!max_features == Inf){
-    #   if(sum(features2keep) > max_features){
-    #     tr_order <- order(-rowQuantiles(-prop, min_samps_feature_prop/ncol(prop)), decreasing = TRUE)
-    #     features2keep <- features2keep[features2keep]
-    #     features2keep <- names(features2keep[sort(tr_order[1:max_features])])
-    #   }
-    # }
-    
+
     expr <- expr_features[features2keep, , drop = FALSE] 
     expr[, !samps2keep] <- NA
     

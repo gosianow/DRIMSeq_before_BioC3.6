@@ -71,7 +71,8 @@ setValidity("dmDSfit", function(object){
     return("'dispersion' must have length 1")
   
   if(!object@dispersion %in% c("common_dispersion", "genewise_dispersion"))
-    return("'dispersion' can have values 'common_dispersion' or 'genewise_dispersion'")
+    return("'dispersion' can have values 'common_dispersion' 
+      or 'genewise_dispersion'")
   
   if(!length(object@counts) == length(object@fit_full))
     return("Different length of 'counts' and 'fit_full'")
@@ -194,7 +195,8 @@ setGeneric("dmFit", function(x, ...) standardGeneric("dmFit"))
 #'   \code{\link{plotFit}}, \code{\link{dmDispersion}}, \code{\link{dmTest}}
 #' @rdname dmFit
 #' @export
-setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersion", 
+setMethod("dmFit", "dmDSdispersion", function(x, 
+  dispersion = "genewise_dispersion", 
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, 
   BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -211,7 +213,8 @@ setMethod("dmFit", "dmDSdispersion", function(x, dispersion = "genewise_dispersi
     prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
   return(new("dmDSfit", dispersion = dispersion, fit_full = fit_full,
-    mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, 
+    mean_expression = x@mean_expression, 
+    common_dispersion = x@common_dispersion, 
     genewise_dispersion = x@genewise_dispersion, counts = x@counts, 
     samples = x@samples))
   
@@ -304,9 +307,9 @@ setMethod("plotFit", "dmDSfit", function(x, gene_id, plot_type = "barplot",
   
   dmDS_plotFit(gene_id = gene_id, counts = x@counts, samples = x@samples, 
     dispersion = slot(x, x@dispersion), proportions_full = x@fit_full, 
-    proportions_null = NULL, table = NULL, plot_type = plot_type, order = order, 
-    plot_full = plot_full, plot_null = FALSE, plot_main = plot_main, 
-    out_dir = out_dir)
+    proportions_null = NULL, table = NULL, plot_type = plot_type, 
+    order = order, plot_full = plot_full, plot_null = FALSE, 
+    plot_main = plot_main, out_dir = out_dir)
   
   
 })
