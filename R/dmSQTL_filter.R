@@ -1,4 +1,50 @@
 
+
+dmSQTL_filter_genotypes_per_gene <- function(g, counts_new, genotypes, 
+  minor_allele_freq){ 
+  # g = 1
+  
+  counts_gene <- counts_new[[g]]
+  genotypes_gene <- genotypes[[g]]
+  
+  ## NA for samples with non expressed genes and missing genotype
+  genotypes_gene[, is.na(counts_gene[1,])] <- NA
+  genotypes_gene[genotypes_gene == -1] <- NA
+  
+  ### Keep genotypes with at least minor_allele_freq number of variants per group; 
+  ### in other case replace them with NAs
+  genotypes_gene <- apply(genotypes_gene, 1, function(x){
+    # x <- genotypes_gene[6,]
+    
+    tt <- table(x)
+    
+    if( length(tt)==1 )
+      return(NULL)
+    if( length(tt)==2 ){
+      if(any(tt <= minor_allele_freq))
+        return(NULL)
+      return(x)
+    }else{
+      if(sum(tt <= minor_allele_freq) >= 2)
+        return(NULL)
+      x[x == names(tt[tt <= minor_allele_freq])] <- NA
+      return(x)
+    }    
+  })
+  
+  if(!is.null(genotypes_gene)){
+    if(is.list(genotypes_gene))
+      genotypes_gene <- do.call(rbind, genotypes_gene)
+    else
+      genotypes_gene <- t(genotypes_gene)
+  }
+  
+  return(genotypes_gene)
+  
+}
+
+
+
 dmSQTL_filter <- function(counts, genotypes, blocks, samples, 
   min_samps_gene_expr = 70, min_gene_expr = 20, min_samps_feature_expr = 5, 
   min_feature_expr = 20, min_samps_feature_prop = 5, min_feature_prop = 0.05, 
@@ -9,7 +55,7 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples,
   # filtering on counts, put NA for samples with low gene expression
   ########################################################
   
-  inds <- which(width(counts) > 1)
+  inds <- which(elementLengths(counts) > 1)
   
   counts_new <- lapply(inds, function(g){
     # g = 1
@@ -51,7 +97,8 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples,
       return(NULL)
     
     ### consider only samples that have min gene expression, to other assign NAs
-    samps2keep <- colSums(expr_features) >= min_gene_expr & !is.na(expr_features[1, ])
+    samps2keep <- colSums(expr_features) >= min_gene_expr & 
+      !is.na(expr_features[1, ])
     
     if(sum(samps2keep) < max(1, min_samps_feature_prop))
       return(NULL)
@@ -95,47 +142,9 @@ dmSQTL_filter <- function(counts, genotypes, blocks, samples,
   genotypes <- genotypes[inds[NULLs]]
   blocks <- blocks[inds[NULLs], ]
   
-  genotypes_new <- BiocParallel::bplapply(1:length(counts_new), function(g, 
-    counts_new, genotypes, minor_allele_freq){ 
-    # g = 1
-    
-    counts_gene <- counts_new[[g]]
-    genotypes_gene <- genotypes[[g]]
-    
-    ## NA for samples with non expressed genes and missing genotype
-    genotypes_gene[, is.na(counts_gene[1,])] <- NA
-    genotypes_gene[genotypes_gene == -1] <- NA
-    
-    ##### Keep genotypes with at least minor_allele_freq number of variants per group; in other case replace them with NAs
-    genotypes_gene <- apply(genotypes_gene, 1, function(x){
-      # x <- genotypes_gene[6,]
-      
-      tt <- table(x)
-      
-      if( length(tt)==1 )
-        return(NULL)
-      if( length(tt)==2 ){
-        if(any(tt <= minor_allele_freq))
-          return(NULL)
-        return(x)
-      }else{
-        if(sum(tt <= minor_allele_freq) >= 2)
-          return(NULL)
-        x[x == names(tt[tt <= minor_allele_freq])] <- NA
-        return(x)
-      }    
-    })
-    
-    if(!is.null(genotypes_gene)){
-      if(is.list(genotypes_gene))
-        genotypes_gene <- do.call(rbind, genotypes_gene)
-      else
-        genotypes_gene <- t(genotypes_gene)
-    }
-    
-    return(genotypes_gene)
-    
-  }, counts_new = counts_new, genotypes = genotypes, 
+  genotypes_new <- BiocParallel::bplapply(1:length(counts_new), 
+    dmSQTL_filter_genotypes_per_gene, 
+    counts_new = counts_new, genotypes = genotypes, 
     minor_allele_freq = minor_allele_freq, BPPARAM = BPPARAM)
   
   names(genotypes_new) <- names(genotypes)

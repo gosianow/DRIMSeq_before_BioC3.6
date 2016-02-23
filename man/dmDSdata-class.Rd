@@ -7,12 +7,25 @@
 \alias{[,dmDSdata-method}
 \alias{counts,dmDSdata-method}
 \alias{dmDSdata-class}
+\alias{dm_counts}
+\alias{dm_counts,dmDSdata-method}
+\alias{dm_samples}
+\alias{dm_samples,dmDSdata-method}
+\alias{elementLengths,dmDSdata-method}
 \alias{length,dmDSdata-method}
 \alias{names,dmDSdata-method}
 \alias{samples}
 \alias{samples,dmDSdata-method}
 \title{dmDSdata object}
 \usage{
+dm_counts(x, ...)
+
+\S4method{dm_counts}{dmDSdata}(x)
+
+dm_samples(x, ...)
+
+\S4method{dm_samples}{dmDSdata}(x)
+
 \S4method{counts}{dmDSdata}(object)
 
 samples(x, ...)
@@ -23,13 +36,15 @@ samples(x, ...)
 
 \S4method{length}{dmDSdata}(x)
 
+\S4method{elementLengths}{dmDSdata}(x)
+
 \S4method{[}{dmDSdata,ANY,ANY}(x, i, j)
 }
 \arguments{
-\item{object,x}{dmDSdata object.}
-
 \item{...}{Other parameters that can be defined by methods using
 this generic.}
+
+\item{object,x}{dmDSdata object.}
 
 \item{i,j}{Parameters used for subsetting.}
 }
@@ -39,8 +54,11 @@ this generic.}
  \item \code{samples(x)}: Get a data frame with the sample information.
   \item \code{names(x)}: Get the gene names.
   \item \code{length(x)}: Get the number of genes.
+  \item \code{elementLengths(x)}: Get the numbers of features per gene.
   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of
   counts for genes i and samples j.
+  \item \code{dm_counts(object)}: Get the \code{counts} slot.
+  \item \code{dm_samples(object)}: Get the \code{samples} slot.
 }
 }
 \description{

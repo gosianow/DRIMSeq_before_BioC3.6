@@ -27,7 +27,7 @@ dmDS_profileLikCommon <- function(gamma0, counts, samples, disp_adjust = TRUE,
   time <- system.time(adj <- dmDS_adjustmentCommon(gamma0, counts = counts, 
     samples = samples, pi = fit_full, BPPARAM = BPPARAM))
   
-  if(verbose >= 2) message("Took ", time["elapsed"], " seconds.\n")
+  if(verbose >= 2) message("Took ", round(time["elapsed"]), " seconds.\n")
   
   adjLik <- lik - adj
   

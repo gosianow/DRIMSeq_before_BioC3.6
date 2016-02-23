@@ -18,8 +18,11 @@ NULL
 #'  \item \code{samples(x)}: Get a data frame with the sample information.
 #'   \item \code{names(x)}: Get the gene names.
 #'   \item \code{length(x)}: Get the number of genes.
+#'   \item \code{elementLengths(x)}: Get the numbers of features per gene.
 #'   \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of 
 #'   counts for genes i and samples j. 
+#'   \item \code{dm_counts(object)}: Get the \code{counts} slot.
+#'   \item \code{dm_samples(object)}: Get the \code{samples} slot.
 #' }
 #' 
 #' @param object,x dmDSdata object.
@@ -82,12 +85,34 @@ setValidity("dmDSdata", function(object){
 ### show, accessing and subsetting methods
 ###############################################################################
 
+#' @rdname dmDSdata-class
+#' @export
+setGeneric("dm_counts", function(x, ...) standardGeneric("dm_counts"))
+
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("dm_counts", "dmDSdata", function(x) x@counts )
+
+
+
+#' @rdname dmDSdata-class
+#' @export
+setGeneric("dm_samples", function(x, ...) standardGeneric("dm_samples"))
+
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("dm_samples", "dmDSdata", function(x) x@samples )
+
+
+
 
 #' @rdname dmDSdata-class
 #' @export
 setMethod("counts", "dmDSdata", function(object){
   
-  data.frame(gene_id = rep(names(object@counts), width(object@counts)), 
+  data.frame(gene_id = rep(names(object@counts), elementLengths(object@counts)), 
     feature_id = rownames(object@counts@unlistData), 
     object@counts@unlistData, stringsAsFactors = FALSE, 
     row.names = NULL)
@@ -127,6 +152,11 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 #' @rdname dmDSdata-class
 #' @export
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
+
+
+#' @rdname dmDSdata-class
+#' @export
+setMethod("elementLengths", "dmDSdata", function(x) elementLengths(x@counts) )
 
 
 #' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
@@ -427,7 +457,7 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' @importFrom grDevices pdf dev.off
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
-  tt <- width(x@counts)
+  tt <- elementLengths(x@counts)
   
   ggp <- dm_plotDataFeatures(tt = tt)
   

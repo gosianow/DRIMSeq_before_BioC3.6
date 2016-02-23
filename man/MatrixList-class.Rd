@@ -12,6 +12,7 @@
 \alias{colnames,MatrixList-method}
 \alias{colnames<-,MatrixList-method}
 \alias{dim,MatrixList-method}
+\alias{elementLengths,MatrixList-method}
 \alias{length,MatrixList-method}
 \alias{names,MatrixList-method}
 \alias{names<-,MatrixList-method}
@@ -19,7 +20,6 @@
 \alias{nrow,MatrixList-method}
 \alias{rownames,MatrixList-method}
 \alias{rownames<-,MatrixList-method}
-\alias{width,MatrixList-method}
 \title{MatrixList object}
 \usage{
 \S4method{names}{MatrixList}(x)
@@ -36,7 +36,7 @@
 
 \S4method{length}{MatrixList}(x)
 
-\S4method{width}{MatrixList}(x)
+\S4method{elementLengths}{MatrixList}(x)
 
 \S4method{dim}{MatrixList}(x)
 
@@ -57,16 +57,24 @@
   attributes to x.}
 }
 \value{
-\itemize{ \item \code{names(x)}, \code{names(x) <- value}: Get or set names
-of matrices. \item \code{rownames(x)}, \code{rownames(x) <- value},
+\itemize{
+\item \code{names(x)}, \code{names(x) <- value}: Get or set names
+of matrices.
+\item \code{rownames(x)}, \code{rownames(x) <- value},
 \code{colnames(x)}, \code{colnames(x) <- value}: Get or set row names or
-column names of unlistData slot. \item \code{length(x)}: Get the number of
-matrices in a list. \item \code{width(x)}: Get the number of rows of each of
-the matrices. \item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the
-dimensions, number of rows or number of columns of unlistData slot. \item
+column names of unlistData slot.
+\item \code{length(x)}: Get the number of
+matrices in a list.
+\item \code{elementLengths(x)}: Get the number of rows of each of
+the matrices.
+\item \code{dim(x)}, \code{nrow(x)}, \code{ncol(x)}: Get the
+dimensions, number of rows or number of columns of unlistData slot.
+\item
 \code{x[[i]]}, \code{x[[i, j]]}: Get the matrix i, and optionally, get only
-columns j of this matrix. \item \code{x$name}: Shortcut for
-\code{x[["name"]]}. \item \code{x[i, j]}: Get a subset of MatrixList that
+columns j of this matrix.
+\item \code{x$name}: Shortcut for
+\code{x[["name"]]}.
+\item \code{x[i, j]}: Get a subset of MatrixList that
 consists of matrices i with columns j. }
 }
 \description{

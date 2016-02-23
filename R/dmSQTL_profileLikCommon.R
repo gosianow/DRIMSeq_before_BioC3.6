@@ -27,7 +27,7 @@ dmSQTL_profileLikCommon <- function(gamma0, counts, genotypes,
   time <- system.time(adj <- dmSQTL_adjustmentCommon(gamma0, counts, genotypes, 
     pi = fit_full, BPPARAM = BPPARAM))
   
-  if(verbose >= 2) message("Took ", time["elapsed"], " seconds.\n")
+  if(verbose >= 2) message("Took ", round(time["elapsed"]), " seconds.\n")
   
   adjLik <- lik - adj
   

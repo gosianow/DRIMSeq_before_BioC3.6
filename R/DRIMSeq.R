@@ -1,3 +1,4 @@
+#' @importFrom S4Vectors elementLengths mcols
 #' @import BiocGenerics
 #' @import methods
 #' @import BiocParallel

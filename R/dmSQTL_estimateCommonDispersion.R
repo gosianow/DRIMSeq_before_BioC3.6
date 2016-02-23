@@ -19,8 +19,7 @@ dmSQTL_estimateCommonDispersion <- function(counts, genotypes, disp_adjust = TRU
   
   dispersion <- optimum$maximum
     
-  if(verbose) message("Took ", time["elapsed"], " seconds.\n")
-  if(verbose) message("*** Connom dispersion: ", dispersion)
+  if(verbose) message("Took ", round(time["elapsed"], 2), " seconds.\n")
   
   return(dispersion)
   

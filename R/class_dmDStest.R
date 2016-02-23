@@ -103,7 +103,7 @@ setMethod("proportions", "dmDStest", function(x){
   
   prop_null <- x@fit_null@unlistData
   
-  data.frame(gene_id = rep(names(x@counts), width(x@counts)), 
+  data.frame(gene_id = rep(names(x@counts), elementLengths(x@counts)), 
     feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, 
     prop_null, stringsAsFactors = FALSE, row.names = NULL)
   

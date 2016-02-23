@@ -20,8 +20,7 @@ dmDS_estimateCommonDispersion <- function(counts, samples, disp_adjust = TRUE,
   
   dispersion <- optimum$maximum
   
-  if(verbose) message("Took ", time["elapsed"], " seconds.\n")
-  if(verbose) message("*** Connom dispersion: ", dispersion)
+  if(verbose) message("Took ", round(time["elapsed"], 2), " seconds.\n")
   
   return(dispersion)
   

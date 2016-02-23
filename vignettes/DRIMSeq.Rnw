@@ -126,7 +126,7 @@ head(samples(d), 3)
 @
 
 <<DSmax_nr_isoforms, echo = FALSE>>=
-max_nr_isoforms <- max(width(d@counts))
+max_nr_isoforms <- max(elementLengths(d))
 @
 
 

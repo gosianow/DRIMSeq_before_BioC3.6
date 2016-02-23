@@ -1,9 +1,9 @@
 #' @include class_MatrixList.R
 NULL
 
-################################################################################
+###############################################################################
 ### dmSQTLdata class
-################################################################################
+###############################################################################
 
 #' dmSQTLdata object
 #' 
@@ -61,15 +61,15 @@ setClass("dmSQTLdata",
 
 
 setValidity("dmSQTLdata", function(object){
-  # has to return TRUE when valid object!
+  ### Has to return TRUE when valid object!
   
   if(!ncol(object@counts) == ncol(object@genotypes))
     return(paste0("Unequal number of samples in 'counts' and 'genotypes' ", 
       ncol(object@counts), " and ", ncol(object@genotypes)))
   
   ### Mystery: This does not pass
-  #   if(!all(colnames(object@blocks) %in% c("block_id", "snp_id")))
-  #     return(paste0("'blocks' must contain 'block_id' and 'snp_id' variables"))
+  # if(!all(colnames(object@blocks) %in% c("block_id", "snp_id")))
+  #   return(paste0("'blocks' must contain 'block_id' and 'snp_id' variables"))
   
   if(!all(names(object@counts) == names(object@genotypes)))
     return("'genotypes' and 'counts' do not contain the same genes")
@@ -82,9 +82,9 @@ setValidity("dmSQTLdata", function(object){
 })
 
 
-################################################################################
+###############################################################################
 ### accessing and subsetting methods
-################################################################################
+###############################################################################
 
 
 setMethod("show", "dmSQTLdata", function(object){
@@ -144,9 +144,23 @@ setMethod("[", "dmSQTLdata", function(x, i, j){
   
 })
 
-################################################################################
+###############################################################################
 ### dmSQTLdata
-################################################################################
+###############################################################################
+
+blocks_per_gene <- function(g, genotypes){
+  # g = 1
+  
+  genotypes_df <- data.frame(t(genotypes[[g]]))
+  matching_snps <- match(genotypes_df, genotypes_df)
+  oo <- order(matching_snps, decreasing = FALSE)
+  block_id <- paste0("block_", as.numeric(factor(matching_snps)))
+  snp_id <- colnames(genotypes_df)
+  blocks_tmp <- cbind(block_id, snp_id)
+  
+  return(blocks_tmp[oo, , drop = FALSE])
+  
+}
 
 #' Create dmSQTLdata object
 #' 
@@ -277,33 +291,22 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
   genotypes <- new( "MatrixList", unlistData = genotypes, 
     partitioning = partitioning_genotypes)
   
-  ### keep unique genotypes and create info about blocs
-  
+  ### Keep unique genotypes and create info about blocs
   inds <- 1:length(genotypes)
   
-  blocks <- MatrixList(BiocParallel::bplapply(inds, function(g){
-    # g = 1
-    
-    genotypes_df <- data.frame(t(genotypes[[g]]))
-    matching_snps <- match(genotypes_df, genotypes_df)
-    oo <- order(matching_snps, decreasing = FALSE)
-    block_id <- paste0("block_", as.numeric(factor(matching_snps)))
-    snp_id <- colnames(genotypes_df)
-    blocks_tmp <- cbind(block_id, snp_id)
-    
-    return(blocks_tmp[oo, , drop = FALSE])
-    
-  }, BPPARAM = BPPARAM))
+  blocks <- MatrixList(BiocParallel::bplapply(inds, blocks_per_gene, 
+    genotypes = genotypes, BPPARAM = BPPARAM))
   
   names(blocks) <- names(genotypes)
   
-  genotypes_u <- MatrixList(BiocParallel::bplapply(inds, function(g){
+  genotypes_u <- MatrixList(lapply(inds, function(g){
     # g = 1
+    
     genotypes_tmp <- unique(genotypes[[g]])
     rownames(genotypes_tmp) <- paste0("block_", 1:nrow(genotypes_tmp))
     return(genotypes_tmp)
     
-  }, BPPARAM = BPPARAM))
+  }))
   
   names(genotypes_u) <- names(genotypes)
   samples <- data.frame(sample_id = sample_id)
@@ -377,8 +380,8 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges,
   gene_id_genotypes <- names(gene_ranges)[q]
   
   data <- dmSQTLdata(counts = counts, gene_id = gene_id, feature_id = feature_id, 
-    genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, snp_id = snp_id, 
-    sample_id = sample_id, BPPARAM = BPPARAM)
+    genotypes = genotypes, gene_id_genotypes = gene_id_genotypes, 
+    snp_id = snp_id, sample_id = sample_id, BPPARAM = BPPARAM)
   
   return(data)
   
@@ -430,20 +433,26 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr,
   min_gene_expr = 10, min_feature_expr = 10, min_feature_prop = 0, 
   max_features = Inf, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
-  stopifnot(min_samps_gene_expr >= 0 && min_samps_gene_expr <= ncol(x@counts))
+  stopifnot(min_samps_gene_expr >= 0 && 
+      min_samps_gene_expr <= ncol(x@counts))
   stopifnot(min_gene_expr >= 0)
-  stopifnot(min_samps_feature_expr >= 0 && min_samps_feature_expr <= ncol(x@counts))
+  stopifnot(min_samps_feature_expr >= 0 && 
+      min_samps_feature_expr <= ncol(x@counts))
   stopifnot(min_feature_expr >= 0)
-  stopifnot(min_samps_feature_prop >= 0 && min_samps_feature_prop <= ncol(x@counts))
+  stopifnot(min_samps_feature_prop >= 0 && 
+      min_samps_feature_prop <= ncol(x@counts))
   stopifnot(min_feature_prop >= 0 && min_feature_prop <= 1)
   stopifnot(max_features >= 2)
-  stopifnot(minor_allele_freq >= 1 && minor_allele_freq <= floor(ncol(x@counts)/2))
-  
+  stopifnot(minor_allele_freq >= 1 && 
+      minor_allele_freq <= floor(ncol(x@counts)/2))
   
   data_filtered <- dmSQTL_filter(counts = x@counts, genotypes = x@genotypes, 
-    blocks = x@blocks, samples = x@samples, min_samps_gene_expr = min_samps_gene_expr, 
-    min_gene_expr = min_gene_expr, min_samps_feature_expr = min_samps_feature_expr, 
-    min_feature_expr = min_feature_expr, min_samps_feature_prop = min_samps_feature_prop, 
+    blocks = x@blocks, samples = x@samples, 
+    min_samps_gene_expr = min_samps_gene_expr, 
+    min_gene_expr = min_gene_expr, 
+    min_samps_feature_expr = min_samps_feature_expr, 
+    min_feature_expr = min_feature_expr, 
+    min_samps_feature_prop = min_samps_feature_prop, 
     min_feature_prop = min_feature_prop, max_features = max_features,
     minor_allele_freq = minor_allele_freq, BPPARAM = BPPARAM)
   
@@ -453,9 +462,9 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr,
 })
 
 
-################################################################################
+###############################################################################
 ### plotData
-################################################################################
+###############################################################################
 
 
 #' @examples 
@@ -472,15 +481,15 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr,
 #' @importFrom grDevices pdf dev.off
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
-  tt <- width(x@counts)
+  tt <- elementLengths(x@counts)
   ggp1 <- dm_plotDataFeatures(tt)
   
   
-  tt <- width(x@blocks)
+  tt <- elementLengths(x@blocks)
   ggp2 <- dm_plotDataSnps(tt)
   
   
-  tt <- width(x@genotypes)
+  tt <- elementLengths(x@genotypes)
   ggp3 <- dm_plotDataBlocks(tt)
   
   
