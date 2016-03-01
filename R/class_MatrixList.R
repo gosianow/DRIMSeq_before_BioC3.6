@@ -244,6 +244,7 @@ setMethod("length", "MatrixList", function(x){
 
 #' @rdname MatrixList-class
 #' @export
+#' @importFrom S4Vectors elementLengths
 setMethod("elementLengths", "MatrixList", function(x){
   
   sapply(x@partitioning, length)

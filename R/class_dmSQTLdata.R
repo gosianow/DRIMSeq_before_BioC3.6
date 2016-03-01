@@ -331,6 +331,8 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 #'   surrounding are considered in the sQTL analysis.
 #' @rdname dmSQTLdata
 #' @export
+#' @importFrom IRanges width
+#' @importFrom S4Vectors queryHits subjectHits
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, 
   genotypes, snp_id, snp_ranges, sample_id, window = 5e3, 
   BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -366,14 +368,14 @@ dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges,
   
   rownames(genotypes) <- snp_id
   gene_ranges <- GenomicRanges::resize(gene_ranges, 
-    GenomicRanges::width(gene_ranges) + 2 * window, fix = "center")
+    width(gene_ranges) + 2 * window, fix = "center")
   
   ## Match genes and SNPs
   variantMatch <- GenomicRanges::findOverlaps(gene_ranges, snp_ranges, 
     select = "all")
   
-  q <- GenomicRanges::queryHits(variantMatch)
-  s <- GenomicRanges::subjectHits(variantMatch)
+  q <- queryHits(variantMatch)
+  s <- subjectHits(variantMatch)
   
   genotypes <- genotypes[s, ]
   snp_id <- snp_id[s]

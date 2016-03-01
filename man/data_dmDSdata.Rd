@@ -41,9 +41,9 @@ counts <- read.table(file.path(data_dir, "counts.txt"),
 head(counts)
 
 # Create a dmDSdata object
-d <- dmDSdata(counts = counts[, metadata$SampleName], gene_id = counts$gene_id,
- feature_id = counts$feature_id, sample_id = metadata$SampleName,
- group = metadata$condition)
+d <- dmDSdata(counts = counts[, metadata$SampleName],
+ gene_id = counts$gene_id, feature_id = counts$feature_id,
+ sample_id = metadata$SampleName, group = metadata$condition)
 
 plotData(d)
 
