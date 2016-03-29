@@ -226,7 +226,7 @@ setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$g
   fit_null <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
 
   
-  results <- dmDS_test(stats_full = x@fit_full@metadata[, c(paste0("lik_" , compared_groups), paste0("dev_", compared_groups))], stats_null = fit_null@metadata, test = test, n = nrow(samples), verbose = verbose)
+  results <- dmDS_test(stats_full = x@fit_full@metadata[, c(paste0("lik_" , compared_groups), paste0("dev_", compared_groups)), drop = FALSE], stats_null = fit_null@metadata, test = test, n = nrow(samples), verbose = verbose)
   
   
   return(new("dmDStest", compared_groups = compared_groups, fit_null = fit_null, results = results, dispersion = x@dispersion, fit_full = x@fit_full,  mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, samples = x@samples))

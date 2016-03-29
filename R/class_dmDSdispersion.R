@@ -65,6 +65,8 @@ setClass("dmDSdispersion",
 setValidity("dmDSdispersion", function(object){
   # has to return TRUE when valid object!
   
+  out <- TRUE
+  
   if(length(object@mean_expression) > 0){
     if(length(object@mean_expression) == length(object@counts)){
       if(all(names(object@mean_expression) == names(object@counts)))

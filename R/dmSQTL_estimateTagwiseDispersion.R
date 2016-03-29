@@ -1,11 +1,11 @@
 ##############################################################################
 # calculate tagwise dispersions 
 ##############################################################################
-# counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; disp_mode = c("optimize", "optim", "constrOptim", "grid")[4]; disp_interval = c(0, 1e+5); disp_tol = 1e-08; disp_init = 100; disp_init_weirMoM = TRUE; disp_grid_length = 21; disp_grid_range = c(-10, 10); disp_moderation = c("none", "common", "trended")[1]; disp_prior_df = 10; disp_span = 0.3; prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
+# counts = x@counts; genotypes = x@genotypes; disp_adjust = TRUE; disp_mode = c("optimize", "optim", "constrOptim", "grid")[4]; disp_interval = c(0, 1e+5); disp_tol = 1e-08; disp_init = 100; disp_init_weirMoM = TRUE; disp_grid_length = 11; disp_grid_range = c(-10, 10); disp_moderation = c("none", "common", "trended")[1]; disp_prior_df = 0.1; disp_span = 0.2; prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 #' @importFrom stats optimize optim constrOptim complete.cases
 
-dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08,  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 10, disp_span = 0.3, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08,  disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 11, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 0.1, disp_span = 0.2, prop_mode = c("constrOptim", "constrOptimG", "FisherScoring")[2], prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
   if(verbose) cat("* Estimating genewise dispersion.. \n")
@@ -42,9 +42,9 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
               next
             
             optimum <- optimize(f = dm_profileLikTagwise, interval = disp_interval,
-                                y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
-                                maximum = TRUE, tol = disp_tol)
+              y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+              disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
+              maximum = TRUE, tol = disp_tol)
             
             disp[i] <- optimum$maximum       
             
@@ -93,9 +93,9 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             }
             
             try( optimum <- optim(par = disp_init_tmp, fn = dm_profileLikTagwise, gr = NULL, 
-                                  y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
-                                  disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
-                                  method = "L-BFGS-B", lower = 1e-2, upper = 1e+10, control = list(fnscale = -1, factr = disp_tol)), silent = TRUE )
+              y = yg, ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+              disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose,
+              method = "L-BFGS-B", lower = 1e-2, upper = 1e+10, control = list(fnscale = -1, factr = disp_tol)), silent = TRUE )
             
             disp[i] <- optimum$par       
             
@@ -147,7 +147,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
             }
             
             optimum <- constrOptim(theta = disp_init_tmp, dm_profileLikTagwise, grad = NULL, method = "Nelder-Mead", ui=ui, ci=ci, control = list(fnscale = -1, reltol = disp_tol),  y = yg, ngroups=ngroups, lgroups=lgroups, igroups=igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose )
-
+            
             disp[i] <- optimum$par
             
           }
@@ -161,8 +161,35 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
       
       grid={
         
-        ### genrate spline dispersion
-        splinePts <- seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)
+        ### Standard grid from edgeR
+        # splinePts <- seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)
+        
+        ### More dense grid toward the common dispersion 
+        splinePts_uni <- sort(unique(c(0, seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length))))
+        
+        nr_positive_splitting <- sum(sign(splinePts_uni) == 1)
+        nr_negative_splitting <- sum(sign(splinePts_uni) == -1)
+        
+        max_splitting <- max(nr_positive_splitting, nr_negative_splitting)
+        min_splitting <- min(nr_positive_splitting, nr_negative_splitting)
+        
+        if(nr_positive_splitting == max_splitting)
+          nr_splitting <- c((max_splitting - min_splitting + 1):max_splitting, max_splitting:1) + 2
+        
+        if(nr_negative_splitting == max_splitting)
+          nr_splitting <- c(1:max_splitting, max_splitting:(max_splitting - min_splitting + 1)) + 2
+        
+        splinePts <- lapply(1:(length(splinePts_uni) - 1), function(i){
+          
+          seq(from = splinePts_uni[i], to = splinePts_uni[i + 1], length = nr_splitting[i])
+          
+        })
+        
+        splinePts <- sort(unique(unlist(splinePts)))
+        
+        disp_grid_length <- length(splinePts)
+        
+        
         splineDisp <- disp_init * 2^splinePts
         
         ### calculate the likelihood for each gene at the spline dispersion points
@@ -210,9 +237,18 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         }, BPPARAM = BPPARAM)
         
         loglik <- do.call(rbind, loglikL)
-        NAs <- complete.cases(loglik)        
         
-        loglik <- loglik[NAs, , drop = FALSE]
+        not_nas <- complete.cases(loglik)        
+        
+        loglik <- loglik[not_nas, , drop = FALSE]
+        
+        
+        ### Check where the grid is maximized 
+        grid_max <- apply(loglik, 1, which.max)
+        
+        ### In the calculation of moderation, do not take into account genes that have dispersion on the top boundry of the grid (3 last grid points)
+        not_boundry <- grid_max < (disp_grid_length - 3)
+        
         
         if(disp_moderation != "none"){
           
@@ -223,25 +259,74 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
           
           priorN <- disp_prior_df
           
-          switch(
-            disp_moderation, 
+          switch(disp_moderation, 
             
-            common={
+            common = {
               
-              moderation <- colMeans(loglik)
+              if(sum(not_boundry) == length(not_boundry)){
+                moderation <- colMeans(loglik)
+              }else{
+                moderation <- colMeans(loglik[not_boundry, , drop = FALSE])
+              }
               
               loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
               
             },
             
-            trended={
+            trended = {
               
-              mean_expression <- rep(mean_expression, width(genotypes))[NAs]
-              o <- order(mean_expression)
-              oo <- order(o)
-              width <- floor(disp_span * nrow(loglik))
+              mean_expression <- rep(mean_expression, width(genotypes))[not_nas]
               
-              moderation <- edgeR::movingAverageByCol(loglik[o,], width = width)[oo,]
+              if(sum(not_boundry) == length(not_boundry)){
+                
+                o <- order(mean_expression)
+                oo <- order(o)
+                width <- floor(disp_span * nrow(loglik))
+                
+                moderation <- edgeR::movingAverageByCol(loglik[o,], width = width)[oo,]
+                
+              }else{
+                
+                ### Use non boundry genes for calculating the moderation
+                mean_expression_not_boundry <- mean_expression[not_boundry]
+                loglik_not_boundry <- loglik[not_boundry, , drop = FALSE]
+                
+                o <- order(mean_expression_not_boundry)
+                oo <- order(o)
+                
+                width <- floor(disp_span * nrow(loglik_not_boundry))
+                
+                moderation_not_boundry <- edgeR::movingAverageByCol(loglik_not_boundry[o, , drop = FALSE], width = width)[oo, , drop = FALSE]
+                
+                ### Fill in moderation values for the boundy genes
+                moderation <- matrix(NA, nrow = nrow(loglik), ncol = ncol(loglik))
+                
+                moderation[not_boundry, ] <- moderation_not_boundry
+                
+                o <- order(mean_expression)
+                oo <- order(o)
+                
+                moderation <- moderation[o, , drop = FALSE]
+                not_boundry <- not_boundry[o]
+                
+                not_boundry_diff <- diff(not_boundry, lag = 1)
+                
+                not_boundry_cumsum <- cumsum(not_boundry)
+                
+                ### Values used for filling in the boundry NAs - swith from FALSE to TRUE
+                replacement_indx <- which(not_boundry_diff == 1) + 1
+                
+                replaced_indx <- duplicated(not_boundry_cumsum) | c(not_boundry_diff, NA) == 1
+                
+                replaced_freq <- as.numeric(table(not_boundry_cumsum[replaced_indx]))
+                
+                moderation_boundry  <- moderation[rep(replacement_indx, times = replaced_freq), , drop = FALSE]
+                
+                moderation[!not_boundry, ] <- moderation_boundry
+                
+                moderation <- moderation[oo, , drop = FALSE]
+                
+              }
               
               loglik <- loglik + priorN * moderation ### like in edgeR estimateTagwiseDisp
               # loglik <- (loglik + priorN * moderation)/(1 + priorN) ### like in edgeR dispCoxReidInterpolateTagwise
@@ -254,9 +339,9 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         out <- edgeR::maximizeInterpolant(splinePts, loglik)
         
         #### set NA for genes that tagwise disp could not be calculated            
-        dispersion <- rep(NA, length(NAs))
+        dispersion <- rep(NA, length(not_nas))
         names(dispersion) <- rownames(genotypes@unlistData)
-        dispersion[NAs] <- disp_init * 2^out
+        dispersion[not_nas] <- disp_init * 2^out
         dispersion <- relist(dispersion, genotypes@partitioning)
         
       }))
