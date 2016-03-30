@@ -13,12 +13,10 @@ NULL
 #' 
 #' @return
 #' 
-#' \itemize{ 
-#' \item \code{names(x)}: Get the gene names. 
-#' \item \code{length(x)}: Get the number of genes. 
-#' \item \code{x[i, j]}: Get a subset of dmDSdata object that consists of 
-#' counts, genotypes and blocks corresponding to genes i and samples j. 
-#' }
+#' \itemize{ \item \code{names(x)}: Get the gene names. \item \code{length(x)}:
+#' Get the number of genes. \item \code{x[i, j]}: Get a subset of dmDSdata
+#' object that consists of counts, genotypes and blocks corresponding to genes i
+#' and samples j. }
 #' 
 #' @param x dmSQTLdata object.
 #' @param i,j Parameters used for subsetting.
@@ -50,8 +48,7 @@ NULL
 #' 
 #' @author Malgorzata Nowicka
 #' @seealso \code{\link{data_dmSQTLdata}},
-#'   \code{\linkS4class{dmSQTLdispersion}}, 
-#'   \code{\linkS4class{dmSQTLfit}},
+#'   \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}},
 #'   \code{\linkS4class{dmSQTLtest}}
 setClass("dmSQTLdata", 
   representation(counts = "MatrixList", 
@@ -194,6 +191,31 @@ blocks_per_gene <- function(g, genotypes){
 #'   
 #' @return Returns a \code{\linkS4class{dmSQTLdata}} object.
 #'   
+#'  @examples 
+#'  
+#' #############################
+#' ### Create dmSQTLdata object
+#' #############################
+#' 
+#' # Use subsets of data defined in GeuvadisTranscriptExpr package
+#' library(GeuvadisTranscriptExpr)
+#' 
+#' counts <- GeuvadisTranscriptExpr::counts
+#' genotypes <- GeuvadisTranscriptExpr::genotypes
+#' gene_ranges <- GeuvadisTranscriptExpr::gene_ranges
+#' snp_ranges <- GeuvadisTranscriptExpr::snp_ranges
+#' 
+#' # Make sure that samples in counts and genotypes are in the same order
+#' sample_id <- colnames(counts[, -(1:2)])
+#' 
+#' d <- dmSQTLdataFromRanges(counts = counts[, sample_id], 
+#'    gene_id = counts$Gene_Symbol, feature_id = counts$TargetID, 
+#'    gene_ranges = gene_ranges, genotypes = genotypes[, sample_id], 
+#'    snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, 
+#'    window = 5e3, BPPARAM = BiocParallel::SerialParam())
+#' 
+#' plotData(d)
+#' 
 #' @seealso \code{\link{data_dmSQTLdata}}, \code{\link{dmFilter}},
 #'   \code{\link{dmDispersion}}, \code{\link{dmFit}}, \code{\link{dmTest}}
 #' @author Malgorzata Nowicka
@@ -311,31 +333,6 @@ dmSQTLdata <- function(counts, gene_id, feature_id, genotypes, gene_id_genotypes
 #' @export
 #' @importFrom IRanges width
 #' @importFrom S4Vectors queryHits subjectHits
-#' @examples 
-#'  
-#' #############################
-#' ### Create dmSQTLdata object
-#' #############################
-#' 
-#' # Use subsets of data defined in GeuvadisTranscriptExpr package
-#' library(GeuvadisTranscriptExpr)
-#' 
-#' counts <- GeuvadisTranscriptExpr::counts
-#' genotypes <- GeuvadisTranscriptExpr::genotypes
-#' gene_ranges <- GeuvadisTranscriptExpr::gene_ranges
-#' snp_ranges <- GeuvadisTranscriptExpr::snp_ranges
-#' 
-#' # Make sure that samples in counts and genotypes are in the same order
-#' sample_id <- colnames(counts[, -(1:2)])
-#' 
-#' d <- dmSQTLdataFromRanges(counts = counts[, sample_id], 
-#'    gene_id = counts$Gene_Symbol, feature_id = counts$TargetID, 
-#'    gene_ranges = gene_ranges, genotypes = genotypes[, sample_id], 
-#'    snp_id = genotypes$snpId, snp_ranges = snp_ranges, sample_id = sample_id, 
-#'    window = 5e3, BPPARAM = BiocParallel::SerialParam())
-#' 
-#' plotData(d)
-#' 
 dmSQTLdataFromRanges <- function(counts, gene_id, feature_id, gene_ranges, 
   genotypes, snp_id, snp_ranges, sample_id, window = 5e3, 
   BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -486,15 +483,15 @@ setMethod("dmFilter", "dmSQTLdata", function(x, min_samps_gene_expr,
 #' @importFrom grDevices pdf dev.off
 setMethod("plotData", "dmSQTLdata", function(x, out_dir = NULL){
   
-  tt <- elementNROWS(x@counts)
+  tt <- elementLengths(x@counts)
   ggp1 <- dm_plotDataFeatures(tt)
   
   
-  tt <- elementNROWS(x@blocks)
+  tt <- elementLengths(x@blocks)
   ggp2 <- dm_plotDataSnps(tt)
   
   
-  tt <- elementNROWS(x@genotypes)
+  tt <- elementLengths(x@genotypes)
   ggp3 <- dm_plotDataBlocks(tt)
   
   

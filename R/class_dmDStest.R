@@ -1,9 +1,9 @@
 #' @include class_dmDSfit.R
 NULL
 
-###############################################################################
+################################################################################
 ### dmDStest class
-###############################################################################
+################################################################################
 
 #' dmDStest object
 #' 
@@ -93,9 +93,9 @@ setValidity("dmDStest", function(object){
   
 })
 
-###############################################################################
+################################################################################
 ### accessing methods
-###############################################################################
+################################################################################
 
 #' @rdname dmDStest-class
 #' @export
@@ -103,7 +103,7 @@ setMethod("proportions", "dmDStest", function(x){
   
   prop_null <- x@fit_null@unlistData
   
-  data.frame(gene_id = rep(names(x@counts), elementNROWS(x@counts)), 
+  data.frame(gene_id = rep(names(x@counts), elementLengths(x@counts)), 
     feature_id = rownames(x@counts@unlistData), x@fit_full@unlistData, 
     prop_null, stringsAsFactors = FALSE, row.names = NULL)
   
@@ -147,9 +147,9 @@ setMethod("show", "dmDStest", function(object){
   
 })
 
-###############################################################################
+################################################################################
 ### dmTest
-###############################################################################
+################################################################################
 
 #' Likelihood ratio test
 #' 
@@ -215,8 +215,7 @@ setGeneric("dmTest", function(x, ...) standardGeneric("dmTest"))
 #'   \code{\link{plotTest}}, \code{\link{dmDispersion}}, \code{\link{dmFit}}
 #' @rdname dmTest
 #' @export
-setMethod("dmTest", "dmDSfit", function(x, 
-  compared_groups = levels(samples(x)$group), 
+setMethod("dmTest", "dmDSfit", function(x, compared_groups = levels(samples(x)$group), 
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, 
   BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
@@ -246,7 +245,7 @@ setMethod("dmTest", "dmDSfit", function(x,
   
   samps <- x@samples$group %in% compared_groups
   
-  samples = x@samples[samps, , drop = FALSE]
+  samples = x@samples[samps, ]
   samples$sample_id <- factor(samples$sample_id)
   samples$group <- factor(samples$group)
   
@@ -254,13 +253,11 @@ setMethod("dmTest", "dmDSfit", function(x,
   message("Running comparison between groups: ", paste0(levels(samples$group), 
     collapse = ", "))
   
-  fit_null <- dmDS_fitOneModel(counts = x@counts[, samps, drop = FALSE], 
-    samples = samples, 
+  fit_null <- dmDS_fitOneModel(counts = x@counts[, samps], samples = samples, 
     dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, 
     prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
-  results <- dmDS_test(stats_full = 
-      x@fit_full@metadata[, compared_groups, drop = FALSE], 
+  results <- dmDS_test(stats_full = x@fit_full@metadata[, compared_groups], 
     stats_null = fit_null@metadata, verbose = verbose)
   
   
@@ -274,9 +271,9 @@ setMethod("dmTest", "dmDSfit", function(x,
 })
 
 
-###############################################################################
+################################################################################
 ### plotTest
-###############################################################################
+################################################################################
 
 #' Plot p-values distribution
 #' 
@@ -341,9 +338,9 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
 })
 
 
-###############################################################################
+################################################################################
 ### plotFit
-###############################################################################
+################################################################################
 
 #' @param plot_null Logical. Whether to plot the proportions estimated by the
 #'   null model.
@@ -366,16 +363,15 @@ setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot",
   
   samps <- x@samples$group %in% compared_groups
   
-  samples = x@samples[samps, , drop = FALSE]
+  samples = x@samples[samps, ]
   samples$sample_id <- factor(samples$sample_id)
   samples$group <- factor(samples$group)
   
   results <- x@results
   
-  dmDS_plotFit(gene_id = gene_id, counts = x@counts[, samps, drop = FALSE], 
-    samples = samples, 
+  dmDS_plotFit(gene_id = gene_id, counts = x@counts[, samps], samples = samples, 
     dispersion = slot(x, x@dispersion), 
-    proportions_full = x@fit_full[, compared_groups, drop = FALSE], 
+    proportions_full = x@fit_full[, compared_groups], 
     proportions_null = x@fit_null, table = results, plot_type = plot_type, 
     order = order, plot_full = plot_full, plot_null = plot_null, 
     plot_main = plot_main, out_dir = out_dir)
