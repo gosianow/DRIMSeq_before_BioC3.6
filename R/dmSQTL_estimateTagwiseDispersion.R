@@ -309,6 +309,16 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
                 moderation <- moderation[o, , drop = FALSE]
                 not_boundry <- not_boundry[o]
                 
+                ### Last value in not_boundry must be TRUE
+                if(not_boundry[length(not_boundry)] == FALSE){
+                  
+                  last_true <- max(which(not_boundry))
+                  moderation[length(not_boundry), ] <- moderation[last_true, ]
+                  
+                  not_boundry[length(not_boundry)] <- TRUE
+                  
+                }
+                
                 not_boundry_diff <- diff(not_boundry, lag = 1)
                 
                 not_boundry_cumsum <- cumsum(not_boundry)
@@ -316,7 +326,7 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
                 ### Values used for filling in the boundry NAs - swith from FALSE to TRUE
                 replacement_indx <- which(not_boundry_diff == 1) + 1
                 
-                replaced_indx <- duplicated(not_boundry_cumsum) | c(not_boundry_diff, NA) == 1
+                replaced_indx <- which(!not_boundry)
                 
                 replaced_freq <- as.numeric(table(not_boundry_cumsum[replaced_indx]))
                 
