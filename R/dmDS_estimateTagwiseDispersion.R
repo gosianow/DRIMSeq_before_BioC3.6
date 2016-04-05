@@ -127,30 +127,32 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
       grid={
         
         ### Standard grid from edgeR
-        # splinePts <- seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)
+        splinePts <- seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length)
         
         ### More dense grid toward the common dispersion 
-        splinePts_uni <- sort(unique(c(0, seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length))))
+        # splinePts_uni <- sort(unique(c(0, seq(from = disp_grid_range[1], to = disp_grid_range[2], length = disp_grid_length))))
         
-        nr_positive_splitting <- sum(sign(splinePts_uni) == 1)
-        nr_negative_splitting <- sum(sign(splinePts_uni) == -1)
+        # nr_positive_splitting <- sum(sign(splinePts_uni) == 1)
+        # nr_negative_splitting <- sum(sign(splinePts_uni) == -1)
         
-        max_splitting <- max(nr_positive_splitting, nr_negative_splitting)
-        min_splitting <- min(nr_positive_splitting, nr_negative_splitting)
+        # max_splitting <- max(nr_positive_splitting, nr_negative_splitting)
+        # min_splitting <- min(nr_positive_splitting, nr_negative_splitting)
         
-        if(nr_positive_splitting == max_splitting)
-          nr_splitting <- c((max_splitting - min_splitting + 1):max_splitting, max_splitting:1) + 2
+        # if(nr_positive_splitting == max_splitting)
+        #   nr_splitting <- c((max_splitting - min_splitting + 1):max_splitting, max_splitting:1) + 2
         
-        if(nr_negative_splitting == max_splitting)
-          nr_splitting <- c(1:max_splitting, max_splitting:(max_splitting - min_splitting + 1)) + 2
+        # if(nr_negative_splitting == max_splitting)
+        #   nr_splitting <- c(1:max_splitting, max_splitting:(max_splitting - min_splitting + 1)) + 2
         
-        splinePts <- lapply(1:(length(splinePts_uni) - 1), function(i){
+        # splinePts <- lapply(1:(length(splinePts_uni) - 1), function(i){
           
-          seq(from = splinePts_uni[i], to = splinePts_uni[i + 1], length = nr_splitting[i])
+        #   seq(from = splinePts_uni[i], to = splinePts_uni[i + 1], length = nr_splitting[i])
           
-        })
+        # })
         
-        splinePts <- sort(unique(unlist(splinePts)))
+        # splinePts <- sort(unique(unlist(splinePts)))
+        
+        
         
         disp_grid_length <- length(splinePts)
         
