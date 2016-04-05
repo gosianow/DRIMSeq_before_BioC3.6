@@ -248,8 +248,8 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         ### Check where the grid is maximized 
         grid_max <- apply(loglik, 1, which.max)
         
-        ### In the calculation of moderation, do not take into account genes that have dispersion on the top boundry of the grid (3 last grid points)
-        not_boundry <- grid_max < (disp_grid_length - 3)
+        ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
+        not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
         
         
         if(disp_moderation != "none"){
