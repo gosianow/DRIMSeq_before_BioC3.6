@@ -4,7 +4,7 @@
 # fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 
-dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, return_list = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
   if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
@@ -105,6 +105,8 @@ dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, BPP
     
     )
   
+  if(return_list)
+    return(table_list)
 
   table <- do.call(rbind, table_list)
   
@@ -149,6 +151,9 @@ dmSQTL_permutations_all_genes <- function(x, fit_null, results, max_nr_perm_cycl
   # ds_genes <- results$adj_pvalue < 0.1
   
   while(nr_perm_cycles < max_nr_perm_cycles && min_nr_sign_pval < max_nr_min_nr_sign_pval){
+    
+    if(verbose)
+        message(paste0("Running ", nr_perm_cycles + 1, " cycle...\n"))
 
     permutation <- sample(n, n)
     
@@ -192,6 +197,112 @@ dmSQTL_permutations_all_genes <- function(x, fit_null, results, max_nr_perm_cycl
 }
 
 
+
+dmSQTL_permutations_per_gene <- function(x, fit_null, results, max_nr_perm = 1e6, max_nr_sign_pval = 1e2, prop_mode, prop_tol, n, test, verbose = TRUE, BPPARAM){
+  
+  fit_full <- x@fit_full
+  n <- ncol(x@counts)
+  
+  pval <- lapply(results, function(x){
+    pval_tmp <- x$pvalue
+    pval_tmp <- pval_tmp[!is.na(pval_tmp)]
+    pval_tmp <- factor(pval_tmp)
+    return(pval_tmp)
+  })
+  
+  results_width <- unlist(lapply(pval, length))
+  nas <- results_width == 0
+  genes2permute <- which(!nas)
+  
+  sum_sign_pval <- vector("list", length(pval))
+  sum_sign_pval[!nas] <- split(rep(0, sum(results_width)), factor(rep(1:length(results_width), times = results_width)))
+  
+  nr_perm_tot <- rep(0, length(x@counts))
+  nr_perm_tot[nas] <- NA
+  
+  min_nr_sign_pval <- rep(0, length(x@counts))
+  min_nr_sign_pval[nas] <- NA
+  
+  
+  while(length(genes2permute) > 0){
+    
+    if(verbose)
+    message(paste0(length(genes2permute), " genes left for permutation..\n"))
+    
+    permutation <- sample(n, n)
+    
+    ### Permute counts for all genes that need additional permutations
+    counts <- x@counts[genes2permute, permutation]
+    genotypes <- x@genotypes[genes2permute, ]
+    dispersion <- slot(x, x@dispersion)
+    if(is.list(dispersion))
+      dispersion <- dispersion[genes2permute]
+    
+    fit_full_perm <- dmSQTL_fitOneModel(counts = counts, genotypes = genotypes, dispersion = dispersion, model = "full", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    
+    fit_null_perm <- dmSQTL_fitOneModel(counts = counts, genotypes = genotypes, dispersion = dispersion, model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
+    
+    results_perm <- dmSQTL_test(fit_full = fit_full_perm, fit_null = fit_null_perm, test = test, n = n, return_list = TRUE, verbose = verbose, BPPARAM = BPPARAM)
+    
+    
+    ### Count how many pval_permuted is lower than pval from the model
+    update_nr_sign_pval <- lapply(1:length(results_perm), function(i, results_perm, pval, genes2permute){
+      # i = 1
+      
+      pval_perm <- results_perm[[i]]$pvalue
+      pval_perm <- pval_perm[!is.na(pval_perm)]
+      
+      pval_perm_cut <- cut(pval_perm, c(-1, levels(pval[[genes2permute[i]]]), 2), right=FALSE)
+      pval_perm_sum <- table(pval_perm_cut)
+      
+      pval_perm_cumsum <- cumsum(pval_perm_sum)[-length(pval_perm_sum)]
+      names(pval_perm_cumsum) <- levels(pval[[genes2permute[i]]])
+      nr_sign_pval <- pval_perm_cumsum[pval[[genes2permute[i]]]]
+      
+      return(nr_sign_pval)
+      
+    }, results_perm = results_perm, pval = pval, genes2permute = genes2permute)
+    
+    
+    ### Update values in sum_sign_pval
+    for(i in 1:length(update_nr_sign_pval)){
+      sum_sign_pval[[genes2permute[i]]] <- sum_sign_pval[[genes2permute[i]]] + update_nr_sign_pval[[i]]
+    }
+    
+    
+    nr_perm <- unlist(lapply(results_perm, nrow))
+    nr_perm_tot[genes2permute] <- nr_perm_tot[genes2permute] + nr_perm
+    
+    min_nr_sign_pval[genes2permute] <- unlist(lapply(sum_sign_pval[genes2permute], min))
+    
+    ### Update genes2permute
+    genes2permute <- which(nr_perm_tot < max_nr_perm & min_nr_sign_pval < max_nr_sign_pval)
+    
+  }
+  
+  
+  ### Calculate permutation adjusted p-values
+  pval_adj <- lapply(1:length(results), function(i, results, sum_sign_pval, nr_perm_tot){
+    
+    pval_tmp <- results[[i]]$pvalue
+    nas <- is.na(pval_tmp)
+    
+    if(sum(!nas) == 0)
+      return(pval_tmp)
+    
+    pval_tmp[!nas] <- (sum_sign_pval[[i]] + 1) / (nr_perm_tot[i] + 1)
+    
+    return(pval_tmp)
+    
+    }, results = results, sum_sign_pval = sum_sign_pval, nr_perm_tot = nr_perm_tot)
+  
+  
+  pval_out <- unlist(pval_adj)
+  
+  ### It does not return pvalues_permutations
+  return(list(pvalues_adjusted = pval_out, pvalues_permutations = matrix(nrow = length(pval_out))))
+
+}
 
 
 

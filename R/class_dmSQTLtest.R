@@ -109,13 +109,15 @@ setMethod("show", "dmSQTLtest", function(object){
 
 #' @rdname dmTest
 #' @export
-setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", permutations = "all_genes", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   stopifnot(length(prop_mode) == 1)
   stopifnot(prop_mode %in% c("constrOptimG", "constrOptim"))
   stopifnot(length(prop_tol) == 1)
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
+  stopifnot(permutations %in% c("all_genes", "per_gene"))
+  
   
   fit_null <- dmSQTL_fitOneModel(counts = x@counts, genotypes = x@genotypes, dispersion = slot(x, x@dispersion), model = "null", prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
   
@@ -128,8 +130,17 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
   
   if(verbose)
     cat("\n** Running permutations..\n")
+  
   ### Calculate adjusted p-values using permutations
-  pval_adj_perm <- dmSQTL_permutations_all_genes(x, fit_null, results, max_nr_perm_cycles = 10, max_nr_min_nr_sign_pval = 1e3, prop_mode = prop_mode, prop_tol = prop_tol, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  
+  # P-value for a gene computed using all the permutations
+  if(permutations == "all_genes")
+  pval_adj_perm <- dmSQTL_permutations_all_genes(x = x, fit_null = fit_null, results = results, max_nr_perm_cycles = 10, max_nr_min_nr_sign_pval = 1e3, prop_mode = prop_mode, prop_tol = prop_tol, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  
+  # P-value for a gene computed using permutations of that gene 
+  if(permutations == "per_gene")
+  pval_adj_perm <- dmSQTL_permutations_per_gene(x = x, fit_null = fit_null, results = results, max_nr_perm = 1e6, max_nr_sign_pval = 1e2, prop_mode = prop_mode, prop_tol = prop_tol, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  
   
   results$pvalue_perm <- pval_adj_perm[["pvalues_adjusted"]]
   results$adj_pvalue_perm <- p.adjust(pval_adj_perm[["pvalues_adjusted"]], method="BH")
