@@ -20,6 +20,7 @@ NULL
 #' 
 #' @slot fit_null List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.
 #' @slot results Data frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.
+#' @slot pvalues_permutations Matrix with p-values obtained in the permutation analysis.
 #' 
 #' @examples 
 #' 
@@ -51,9 +52,10 @@ NULL
 #' @author Malgorzata Nowicka
 #' @seealso \code{\link{data_dmSQTLdata}}, \code{\linkS4class{dmSQTLdata}}, \code{\linkS4class{dmSQTLdispersion}}, \code{\linkS4class{dmSQTLfit}}
 setClass("dmSQTLtest", 
-         contains = "dmSQTLfit",
-         representation(fit_null = "list",
-                        results = "data.frame"))
+  contains = "dmSQTLfit",
+  representation(fit_null = "list",
+    results = "data.frame",
+    pvalues_permutations = "matrix"))
 
 
 #####################################
@@ -70,6 +72,9 @@ setValidity("dmSQTLtest", function(object){
   
   if(!nrow(object@results) == nrow(object@blocks))
     return(paste0("Different number of gene-SNP pairs in 'results' and in 'blocks'"))
+  
+  if(!nrow(object@results) == nrow(object@pvalues_permutations))
+    return(paste0("Different number of gene-SNP pairs in 'results' and in 'pvalues_permutations'"))
   
   return(TRUE)
   
@@ -117,14 +122,23 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
   ### Number of samples used for the analysis
   n <- unlist(lapply(1:length(x@counts), function(g){
     sum(!is.na(x@counts[[g]][1, ]))
-    }))
+  }))
   
   results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  
+  if(verbose)
+    cat("\n** Running permutations..\n")
+  ### Calculate adjusted p-values using permutations
+  pval_adj_perm <- dmSQTL_permutations_all_genes(x, fit_null, results, max_nr_perm_cycles = 10, max_nr_min_nr_sign_pval = 1e3, prop_mode = prop_mode, prop_tol = prop_tol, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  
+  results$pvalue <- pval_adj_perm[["pvalues_adjusted"]]
+  results$adj_pvalue <- p.adjust(pval_adj_perm, method="BH")
+  
+  
+  ### Repeat results for blocks with multiple SNPs 
   colnames(results)[colnames(results) == "snp_id"] <- "block_id" 
   results_spl <- split(results, factor(results$gene_id, levels = names(x@blocks)))
-  
   inds <- 1:length(results_spl)
-  
   
   switch(test, 
     lr = {
@@ -142,7 +156,7 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
         
       })
       
-      },
+    },
     
     fql = {
       
@@ -178,12 +192,12 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
       
     }
     
-    )
-
+  )
+  
   
   results_new <- do.call(rbind, results_new)
   
-  return(new("dmSQTLtest", fit_null = fit_null, results = results_new, dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
+  return(new("dmSQTLtest", fit_null = fit_null, results = results_new, pvalues_permutations = pval_adj_perm[["pvalues_permutations"]], dispersion = x@dispersion, fit_full = x@fit_full, mean_expression = x@mean_expression, common_dispersion = x@common_dispersion, genewise_dispersion = x@genewise_dispersion, counts = x@counts, genotypes = x@genotypes, blocks = x@blocks, samples = x@samples))
   
   
 })
