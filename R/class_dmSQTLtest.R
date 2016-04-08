@@ -131,8 +131,8 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
   ### Calculate adjusted p-values using permutations
   pval_adj_perm <- dmSQTL_permutations_all_genes(x, fit_null, results, max_nr_perm_cycles = 10, max_nr_min_nr_sign_pval = 1e3, prop_mode = prop_mode, prop_tol = prop_tol, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
   
-  results$pvalue <- pval_adj_perm[["pvalues_adjusted"]]
-  results$adj_pvalue <- p.adjust(pval_adj_perm, method="BH")
+  results$pvalue_perm <- pval_adj_perm[["pvalues_adjusted"]]
+  results$adj_pvalue_perm <- p.adjust(pval_adj_perm[["pvalues_adjusted"]], method="BH")
   
   
   ### Repeat results for blocks with multiple SNPs 
@@ -150,7 +150,7 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
         blo <- x@blocks[[i]]
         matching <- match(blo[, "block_id"], res[, "block_id"])
         snp_id <- blo[, "snp_id"]
-        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue")])
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("lr", "df", "pvalue", "adj_pvalue", "pvalue_perm", "adj_pvalue_perm")])
         
         return(res_new)
         
@@ -167,7 +167,7 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
         blo <- x@blocks[[i]]
         matching <- match(blo[, "block_id"], res[, "block_id"])
         snp_id <- blo[, "snp_id"]
-        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue")])
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue", "pvalue_perm", "adj_pvalue_perm")])
         
         return(res_new)
         
@@ -184,7 +184,7 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", prop_mode = "constrOpt
         blo <- x@blocks[[i]]
         matching <- match(blo[, "block_id"], res[, "block_id"])
         snp_id <- blo[, "snp_id"]
-        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue")])
+        res_new <- cbind(res[matching, c("gene_id", "block_id")], snp_id, res[matching, c("f", "df1", "df2", "pvalue", "adj_pvalue", "pvalue_perm", "adj_pvalue_perm")])
         
         return(res_new)
         
