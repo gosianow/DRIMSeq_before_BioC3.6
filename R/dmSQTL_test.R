@@ -4,7 +4,7 @@
 # fit_full = dt@fit_full; fit_null = dt@fit_null; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 
-dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, verbose = FALSE, return_list = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmSQTL_test <- function(fit_full, fit_null, test = "lr", n, return_list = FALSE, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   ## calculate lr
   if(verbose) cat("* Calculating likelihood ratio statistics.. \n")
@@ -153,7 +153,7 @@ dmSQTL_permutations_all_genes <- function(x, fit_null, results, max_nr_perm_cycl
   while(nr_perm_cycles < max_nr_perm_cycles && min_nr_sign_pval < max_nr_min_nr_sign_pval){
     
     if(verbose)
-        message(paste0("Running ", nr_perm_cycles + 1, " cycle...\n"))
+        message(paste0("** Running cycle number ", nr_perm_cycles + 1 , ".."))
 
     permutation <- sample(n, n)
     
@@ -227,7 +227,7 @@ dmSQTL_permutations_per_gene <- function(x, fit_null, results, max_nr_perm = 1e6
   while(length(genes2permute) > 0){
     
     if(verbose)
-    message(paste0(length(genes2permute), " genes left for permutation..\n"))
+    message(paste0("** ", length(genes2permute), " genes left for permutation.."))
     
     permutation <- sample(n, n)
     

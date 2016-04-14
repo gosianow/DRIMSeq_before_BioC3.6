@@ -65,16 +65,16 @@ setValidity("dmSQTLtest", function(object){
   # has to return TRUE when valid object!
   
   if(!length(object@counts) == length(object@fit_null))
-    return(paste0("Different number of genes in 'counts' and 'fit_null'"))
+    return(paste0("Different number of genes in 'counts' and 'fit_null'!"))
   
   if(!all(lapply(object@fit_null, class) == "MatrixList"))
-    return(paste0("'fit_null' must be a list of MatrixLists"))
+    return(paste0("'fit_null' must be a list of MatrixLists!"))
   
   if(!nrow(object@results) == nrow(object@blocks))
-    return(paste0("Different number of gene-SNP pairs in 'results' and in 'blocks'"))
+    return(paste0("Different number of gene-SNP pairs in 'results' and in 'blocks'!"))
   
-  if(!nrow(object@results) == nrow(object@pvalues_permutations))
-    return(paste0("Different number of gene-SNP pairs in 'results' and in 'pvalues_permutations'"))
+  if(!nrow(object@genotypes) == nrow(object@pvalues_permutations))
+    return(paste0("Different number of gene-block pairs in 'genotypes' (", nrow(object@genotypes), ") and in 'pvalues_permutations' (", nrow(object@pvalues_permutations),")!"))
   
   return(TRUE)
   
@@ -126,7 +126,12 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", permutations = "all_ge
     sum(!is.na(x@counts[[g]][1, ]))
   }))
   
-  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, test = test, n = n, verbose = verbose, BPPARAM = BPPARAM)
+  if(permutations == "all_genes")
+    return_list <- FALSE
+  if(permutations == "per_gene")
+    return_list <- TRUE
+  
+  results <- dmSQTL_test(fit_full = x@fit_full, fit_null = fit_null, test = test, n = n, return_list = return_list, verbose = verbose, BPPARAM = BPPARAM)
   
   if(verbose)
     cat("\n** Running permutations..\n")
