@@ -201,20 +201,22 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         }
         
         
-        ### Check where the grid is maximized 
-        grid_max <- apply(loglik, 1, which.max)
-        
-        ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
-        not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
-        boundry_last <- grid_max >= disp_grid_length - 3
-        
-        ### Calculate the span of loglikelihoods
-        if(sum(boundry_last) > 1){
-          lik_span <- apply(loglik, 1, function(x){max(x) - min(x)})
-        }
-        
-        
         if(disp_moderation != "none"){
+          
+          mean_expression <- mean_expression[not_nas]
+          
+          ### Check where the grid is maximized 
+          grid_max <- apply(loglik, 1, which.max)
+          
+          ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
+          not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
+          boundry_last <- grid_max == disp_grid_length
+          
+          ### Calculate the span of the boundry loglikelihoods
+          if(sum(boundry_last) > 1){
+            loglik_span_boundry <- apply(loglik[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
+          }
+          
           
           switch(
             disp_moderation, 
@@ -232,32 +234,46 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
               ### Estimate priorN
               ### Calculate the ratio between moderation lik span and lik span of boundry genes
               if(sum(boundry_last) > 1){
-                
-                mean_expression <- mean_expression[not_nas]
-                
+
                 moderation_span <- max(moderation) - min(moderation)
                 
-                df_lik_span_mean <- data.frame(loglik_span = lik_span, mean_expression = mean_expression, boundry = boundry_last)
-                
-                loglik_span_boundry <- df_lik_span_mean[boundry_last, "loglik_span"]
-                
                 span_ratio <- moderation_span / loglik_span_boundry
+
+                # if(length(loglik_span_boundry) > 100){
+                #   ### Do loess fitting if there is enough points
+                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
+
+                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
+                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
+                  
+                #   priorN <- 10 ^ priorN_predict_loglog
+
+                # }else{
+                #   ### Otherwise, use median
+                #   priorN <- quantile(1/span_ratio, 0.5)
+                  
+                # }
                 
                 priorN <- quantile(1/span_ratio, 0.5)
-                
+
               }else{
                 priorN <- disp_prior_df
               }
               
-              message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+              if(length(priorN) == 1){
+                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+                loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
+                }else{
+                  message(paste0("! Using loess fit as a shrinkage factor !"))
+                  loglik <- loglik + priorN * matrix(moderation, nrow = length(priorN), ncol = length(moderation), byrow = TRUE)
+                }
               
-              loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
+              
               
             },
             
             trended={
               
-              mean_expression <- mean_expression[not_nas]
               
               if(sum(not_boundry) == length(not_boundry)){
                 
@@ -325,16 +341,24 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
               ### Calculate the ratio between moderation lik span and lik span of boundry genes
               if(sum(boundry_last) > 1){
                 
-                moderation_span <- apply(moderation, 1, function(x){max(x) - min(x)})
-                
-                df_lik_span_mean <- data.frame(loglik_span = lik_span, mean_expression = mean_expression, boundry = boundry_last)
-                
-                df_moderation_span <- data.frame(moderation_span = moderation_span, mean_expression = mean_expression, boundry = boundry_last)
-                
-                loglik_span_boundry <- df_lik_span_mean[boundry_last, "loglik_span"]
-                moderation_span_boundry <- df_moderation_span[boundry_last, "moderation_span"]
+                moderation_span_boundry <- apply(moderation[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
                 
                 span_ratio <- moderation_span_boundry / loglik_span_boundry
+                
+                # if(length(loglik_span_boundry) > 100){
+                #   ### Do loess fitting if there is enough points
+                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
+
+                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
+                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
+                  
+                #   priorN <- 10 ^ priorN_predict_loglog
+
+                # }else{
+                #   ### Otherwise, use median
+                #   priorN <- quantile(1/span_ratio, 0.5)
+                  
+                # }
                 
                 priorN <- quantile(1/span_ratio, 0.5)
                 
@@ -342,11 +366,13 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
                 priorN <- disp_prior_df
               }
               
-              
-              message(paste0("! Using ", round(priorN, 2), " as a shrinkage factor !"))
-              
-              loglik <- loglik + priorN * moderation 
-              
+              if(length(priorN) == 1){
+                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+                loglik <- loglik + priorN * moderation
+                }else{
+                  message(paste0("! Using loess fit as a shrinkage factor !"))
+                  loglik <- loglik + priorN * moderation
+                }
               
             }
           )

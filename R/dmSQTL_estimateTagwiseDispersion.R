@@ -245,21 +245,23 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
         loglik <- loglik[not_nas, , drop = FALSE]
         
         
-        ### Check where the grid is maximized 
-        grid_max <- apply(loglik, 1, which.max)
-        
-        ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
-        not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
-        
-        
+ 
         if(disp_moderation != "none"){
           
-          # ### FIX IT!
-          # nlibs <- ncol(snps)
-          # ngroups <- 2
-          # priorN <- disp_prior_df/(nlibs - ngroups) ### analogy to edgeR
+          mean_expression <- rep(mean_expression, width(genotypes))[not_nas]
           
-          priorN <- disp_prior_df
+          ### Check where the grid is maximized 
+          grid_max <- apply(loglik, 1, which.max)
+          
+          ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
+          not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
+          boundry_last <- grid_max == disp_grid_length
+          
+          ### Calculate the span of the boundry loglikelihoods
+          if(sum(boundry_last) > 1){
+            loglik_span_boundry <- apply(loglik[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
+          }
+          
           
           switch(disp_moderation, 
             
@@ -271,13 +273,49 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
                 moderation <- colMeans(loglik[not_boundry, , drop = FALSE])
               }
               
-              loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
+              ### Estimate priorN
+              ### Calculate the ratio between moderation lik span and lik span of boundry genes
+              if(sum(boundry_last) > 1){
+
+                moderation_span <- max(moderation) - min(moderation)
+                
+                span_ratio <- moderation_span / loglik_span_boundry
+
+                # if(length(loglik_span_boundry) > 100){
+                #   ### Do loess fitting if there is enough points
+                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
+
+                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
+                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
+                  
+                #   priorN <- 10 ^ priorN_predict_loglog
+
+                # }else{
+                #   ### Otherwise, use median
+                #   priorN <- quantile(1/span_ratio, 0.5)
+                  
+                # }
+                
+                priorN <- quantile(1/span_ratio, 0.5)
+
+              }else{
+                priorN <- disp_prior_df
+              }
+              
+              if(length(priorN) == 1){
+                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+                loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
+                }else{
+                  message(paste0("! Using loess fit as a shrinkage factor !"))
+                  loglik <- loglik + priorN * matrix(moderation, nrow = length(priorN), ncol = length(moderation), byrow = TRUE)
+                }
+              
               
             },
             
             trended = {
               
-              mean_expression <- rep(mean_expression, width(genotypes))[not_nas]
+              
               
               if(sum(not_boundry) == length(not_boundry)){
                 
@@ -340,8 +378,42 @@ dmSQTL_estimateTagwiseDispersion <- function(counts, genotypes, mean_expression,
                 
               }
               
-              loglik <- loglik + priorN * moderation ### like in edgeR estimateTagwiseDisp
-              # loglik <- (loglik + priorN * moderation)/(1 + priorN) ### like in edgeR dispCoxReidInterpolateTagwise
+              ### Estimate priorN
+              ### Calculate the ratio between moderation lik span and lik span of boundry genes
+              if(sum(boundry_last) > 1){
+                
+                moderation_span_boundry <- apply(moderation[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
+                
+                span_ratio <- moderation_span_boundry / loglik_span_boundry
+                
+                # if(length(loglik_span_boundry) > 100){
+                #   ### Do loess fitting if there is enough points
+                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
+
+                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
+                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
+                  
+                #   priorN <- 10 ^ priorN_predict_loglog
+
+                # }else{
+                #   ### Otherwise, use median
+                #   priorN <- quantile(1/span_ratio, 0.5)
+                  
+                # }
+                
+                priorN <- quantile(1/span_ratio, 0.5)
+                
+              }else{
+                priorN <- disp_prior_df
+              }
+              
+              if(length(priorN) == 1){
+                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+                loglik <- loglik + priorN * moderation
+                }else{
+                  message(paste0("! Using loess fit as a shrinkage factor !"))
+                  loglik <- loglik + priorN * moderation
+                }
               
             }
           )
