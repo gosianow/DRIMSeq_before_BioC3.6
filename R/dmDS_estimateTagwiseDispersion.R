@@ -345,20 +345,20 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
                 
                 span_ratio <- moderation_span_boundry / loglik_span_boundry
                 
-                # if(length(loglik_span_boundry) > 100){
-                #   ### Do loess fitting if there is enough points
-                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
+                if(length(loglik_span_boundry) > 100){
+                  ### Do loess fitting if there is enough points
+                  df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
 
-                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
-                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
+                  priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
+                  priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
                   
-                #   priorN <- 10 ^ priorN_predict_loglog
+                  priorN <- 10 ^ priorN_predict_loglog
 
-                # }else{
-                #   ### Otherwise, use median
-                #   priorN <- quantile(1/span_ratio, 0.5)
+                }else{
+                  ### Otherwise, use median
+                  priorN <- quantile(1/span_ratio, 0.5)
                   
-                # }
+                }
                 
                 priorN <- quantile(1/span_ratio, 0.5)
                 
@@ -390,11 +390,12 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
         
       }))
+
   
   if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
   if(verbose) cat("*** Genewise dispersion: ", head(dispersion), "... \n")
   
-  return(dispersion)
+  return(list(dispersion = dispersion, priorN = priorN))
   
 }
 

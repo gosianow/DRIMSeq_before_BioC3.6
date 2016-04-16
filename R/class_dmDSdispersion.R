@@ -57,7 +57,8 @@ setClass("dmDSdispersion",
          contains = "dmDSdata",
          representation(mean_expression = "numeric", 
                         common_dispersion = "numeric",
-                        genewise_dispersion = "numeric"))
+                        genewise_dispersion = "numeric",
+                        priorn = "numeric"))
 
 
 ####################################
@@ -318,6 +319,7 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
   stopifnot(is.numeric(prop_tol) && prop_tol > 0)
   stopifnot(verbose %in% 0:2)
   
+  priorn <- 0
   
   if(mean_expression || (genewise_dispersion && disp_mode == "grid" && disp_moderation == "trended")){
     mean_expression <- dm_estimateMeanExpression(counts = x@counts, verbose = verbose, BPPARAM = BPPARAM)
@@ -341,12 +343,16 @@ setMethod("dmDispersion", "dmDSdata", function(x, mean_expression = TRUE, common
     
     genewise_dispersion <- dmDS_estimateTagwiseDispersion(counts = x@counts, samples = x@samples, mean_expression = mean_expression, disp_adjust = disp_adjust, disp_mode = disp_mode, disp_interval = disp_interval, disp_tol = disp_tol, disp_init = disp_init, disp_init_weirMoM = disp_init_weirMoM, disp_grid_length = disp_grid_length, disp_grid_range = disp_grid_range, disp_moderation = disp_moderation, disp_prior_df = disp_prior_df, disp_span = disp_span, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose, BPPARAM = BPPARAM)
     
+    priorn <- genewise_dispersion$priorN
+    genewise_dispersion <- genewise_dispersion$dispersion
+    
+    
   }else{
     genewise_dispersion <- numeric()
   }
   
   
-  return(new("dmDSdispersion", mean_expression = mean_expression, common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, counts = x@counts, samples = x@samples))
+  return(new("dmDSdispersion", mean_expression = mean_expression, common_dispersion = common_dispersion, genewise_dispersion = genewise_dispersion, priorn = priorn, counts = x@counts, samples = x@samples))
   
   
 })
