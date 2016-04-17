@@ -13,8 +13,8 @@ dmTest(x, ...)
   test = "lr", prop_mode = "constrOptimG", prop_tol = 1e-12,
   verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
-\S4method{dmTest}{dmSQTLfit}(x, test = "lr", prop_mode = "constrOptimG",
-  prop_tol = 1e-12, verbose = 0,
+\S4method{dmTest}{dmSQTLfit}(x, test = "lr", permutations = "all_genes",
+  prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }
 \arguments{

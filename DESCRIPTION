@@ -79,6 +79,7 @@ Collate:
     'dm_plotDispersion.R'
     'dm_plotProportions.R'
     'dm_plotPvalues.R'
+    'dm_profileLikModeration.R'
     'dm_profileLikTagwise.R'
     'dm_rdirichlet.R'
     'dm_score.R'

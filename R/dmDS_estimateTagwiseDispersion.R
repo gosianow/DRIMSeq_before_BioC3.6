@@ -2,11 +2,43 @@
 # calculate tagwise dispersions 
 ##############################################################################
 
+### Functions for bplapply
+
+dmDS_grid_dm_profileLikTagwise <- function(g, seq_disp_grid_length, splineDisp, counts, ngroups, lgroups, igroups,  disp_adjust, prop_mode, prop_tol, verbose, disp_grid_length){
+  # g = 1237
+  
+  ll <- numeric(disp_grid_length)
+  
+  for(i in seq_disp_grid_length){
+    # i = 1
+    
+    out <- dm_profileLikTagwise(gamma0 = splineDisp[i], y = counts[[g]], 
+      ngroups = ngroups, lgroups = lgroups, igroups = igroups, 
+      disp_adjust = disp_adjust, prop_mode = prop_mode, 
+      prop_tol = prop_tol, verbose = verbose)
+    
+    if(is.na(out)){
+      ll <- rep(NA, disp_grid_length)
+      break
+    }
+    
+    ll[i] <- out
+    
+  }
+  
+  return(ll)
+  
+}
+
+
+
+
+
 # counts = x@counts; samples = x@samples; mean_expression = x@mean_expression; disp_adjust = TRUE; disp_mode = c("optimize", "optim", "constrOptim", "grid")[4]; disp_interval = c(0, 1e+5); disp_tol = 1e-08; disp_init = 100; disp_init_weirMoM = TRUE; disp_grid_length = 21; disp_grid_range = c(-10, 10); disp_moderation = c("none", "common", "trended")[1]; disp_prior_df = 0.1; disp_span = 0.2; prop_mode = c( "constrOptim", "constrOptimG", "FisherScoring")[2]; prop_tol = 1e-12; verbose = FALSE; BPPARAM = BiocParallel::MulticoreParam(workers = 10)
 
 #' @importFrom stats optimize optim constrOptim complete.cases
 
-dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 0.01, disp_span = 0.2, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
+dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, disp_adjust = TRUE, disp_mode = c("optimize", "optim", "constrOptim", "grid")[4], disp_interval = c(0, 1e+5), disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE, disp_grid_length = 21, disp_grid_range = c(-10, 10), disp_moderation = c("none", "common", "trended")[1], disp_prior_df = 0, disp_span = 0.1, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
   
   inds <- 1:length(counts)
   
@@ -155,42 +187,23 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
         
         disp_grid_length <- length(splinePts)
-        
-        
         splineDisp <- disp_init * 2^splinePts
         
-        ### calculate the likelihood for each gene at the spline dispersion points
+        
+        ### Calculate the likelihood for each gene at the spline dispersion points
         seq_disp_grid_length <- seq(disp_grid_length)
         
-        loglikL <- BiocParallel::bplapply(inds, function(g){
-          # g = 1237
-          # print(g)
-          
-          ll <- numeric(disp_grid_length)
-          
-          for(i in seq_disp_grid_length){
-            # i = 1
-            
-            out <- dm_profileLikTagwise(gamma0 = splineDisp[i], y = counts[[g]], ngroups = ngroups, lgroups = lgroups, igroups = igroups, disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, verbose = verbose)
-            
-            if(is.na(out)){
-              ll <- rep(NA, disp_grid_length)
-              break
-            }
-            
-            ll[i] <- out
-            
-          }
-          
-          return(ll)
-          
-        }, BPPARAM = BPPARAM)
+        loglikL <- BiocParallel::bplapply(inds, dmDS_grid_dm_profileLikTagwise, 
+          seq_disp_grid_length = seq_disp_grid_length, splineDisp = splineDisp,
+          counts = counts, 
+          ngroups = ngroups, lgroups = lgroups, igroups = igroups,
+          disp_adjust = disp_adjust, prop_mode = prop_mode, prop_tol = prop_tol, 
+          verbose = verbose, disp_grid_length = disp_grid_length, 
+          BPPARAM = BPPARAM)
         
         
         loglik <- do.call(rbind, loglikL)
-        
         not_nas <- complete.cases(loglik)        
-        
         loglik <- loglik[not_nas, , drop = FALSE]
         
         if(nrow(loglik) == 0){
@@ -205,177 +218,8 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
           
           mean_expression <- mean_expression[not_nas]
           
-          ### Check where the grid is maximized 
-          grid_max <- apply(loglik, 1, which.max)
+          loglik <- dm_profileLikModeration(loglik = loglik, mean_expression, disp_moderation = disp_moderation, disp_prior_df, disp_span)
           
-          ### In the calculation of moderation, do not take into account genes that have dispersion on the top and bottom boundry of the grid (skipp 4 last grid points and 1 first grid point)
-          not_boundry <- grid_max < (disp_grid_length - 3) & grid_max > 1
-          boundry_last <- grid_max == disp_grid_length
-          
-          ### Calculate the span of the boundry loglikelihoods
-          if(sum(boundry_last) > 1){
-            loglik_span_boundry <- apply(loglik[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
-          }
-          
-          
-          switch(
-            disp_moderation, 
-            
-            common={
-              
-              ### Calculate the moderating likelihood
-              if(sum(not_boundry) == length(not_boundry)){
-                moderation <- colMeans(loglik)
-              }else{
-                moderation <- colMeans(loglik[not_boundry, , drop = FALSE])
-              }
-              
-              
-              ### Estimate priorN
-              ### Calculate the ratio between moderation lik span and lik span of boundry genes
-              if(sum(boundry_last) > 1){
-
-                moderation_span <- max(moderation) - min(moderation)
-                
-                span_ratio <- moderation_span / loglik_span_boundry
-
-                # if(length(loglik_span_boundry) > 100){
-                #   ### Do loess fitting if there is enough points
-                #   df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
-
-                #   priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
-                #   priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
-                  
-                #   priorN <- 10 ^ priorN_predict_loglog
-
-                # }else{
-                #   ### Otherwise, use median
-                #   priorN <- quantile(1/span_ratio, 0.5)
-                  
-                # }
-                
-                priorN <- quantile(1/span_ratio, 0.5)
-
-              }else{
-                priorN <- disp_prior_df
-              }
-              
-              if(length(priorN) == 1){
-                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
-                loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
-                }else{
-                  message(paste0("! Using loess fit as a shrinkage factor !"))
-                  loglik <- loglik + priorN * matrix(moderation, nrow = length(priorN), ncol = length(moderation), byrow = TRUE)
-                }
-              
-              
-              
-            },
-            
-            trended={
-              
-              
-              if(sum(not_boundry) == length(not_boundry)){
-                
-                o <- order(mean_expression)
-                oo <- order(o)
-                width <- floor(disp_span * nrow(loglik))
-                
-                moderation <- edgeR::movingAverageByCol(loglik[o,], width = width)[oo,]
-                
-              }else{
-                
-                ### Use non boundry genes for calculating the moderation
-                mean_expression_not_boundry <- mean_expression[not_boundry]
-                loglik_not_boundry <- loglik[not_boundry, , drop = FALSE]
-                
-                o <- order(mean_expression_not_boundry)
-                oo <- order(o)
-                
-                width <- floor(disp_span * nrow(loglik_not_boundry))
-                
-                moderation_not_boundry <- edgeR::movingAverageByCol(loglik_not_boundry[o, , drop = FALSE], width = width)[oo, , drop = FALSE]
-                
-                ### Fill in moderation values for the boundy genes
-                moderation <- matrix(NA, nrow = nrow(loglik), ncol = ncol(loglik))
-                
-                moderation[not_boundry, ] <- moderation_not_boundry
-                
-                o <- order(mean_expression)
-                oo <- order(o)
-                
-                moderation <- moderation[o, , drop = FALSE]
-                not_boundry <- not_boundry[o]
-                
-                ### Last value in not_boundry must be TRUE
-                if(not_boundry[length(not_boundry)] == FALSE){
-                  
-                  last_true <- max(which(not_boundry))
-                  moderation[length(not_boundry), ] <- moderation[last_true, ]
-                  
-                  not_boundry[length(not_boundry)] <- TRUE
-                  
-                }
-                
-                not_boundry_diff <- diff(not_boundry, lag = 1)
-                
-                not_boundry_cumsum <- cumsum(not_boundry)
-                
-                ### Values used for filling in the boundry NAs - swith from FALSE to TRUE
-                replacement_indx <- which(not_boundry_diff == 1) + 1
-                
-                replaced_indx <- which(!not_boundry)
-                
-                replaced_freq <- as.numeric(table(not_boundry_cumsum[replaced_indx]))
-                
-                moderation_boundry  <- moderation[rep(replacement_indx, times = replaced_freq), , drop = FALSE]
-                
-                moderation[!not_boundry, ] <- moderation_boundry
-                
-                moderation <- moderation[oo, , drop = FALSE]
-                
-              }
-              
-              
-              ### Estimate priorN
-              ### Calculate the ratio between moderation lik span and lik span of boundry genes
-              if(sum(boundry_last) > 1){
-                
-                moderation_span_boundry <- apply(moderation[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
-                
-                span_ratio <- moderation_span_boundry / loglik_span_boundry
-                
-                if(length(loglik_span_boundry) > 100){
-                  ### Do loess fitting if there is enough points
-                  df_priorN_loglog <- data.frame(priorN = log10(1/span_ratio), mean_expression = log10(mean_expression[boundry_last]))
-
-                  priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
-                  priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
-                  
-                  priorN <- 10 ^ priorN_predict_loglog
-
-                }else{
-                  ### Otherwise, use median
-                  priorN <- quantile(1/span_ratio, 0.5)
-                  
-                }
-                
-                priorN <- quantile(1/span_ratio, 0.5)
-                
-              }else{
-                priorN <- disp_prior_df
-              }
-              
-              if(length(priorN) == 1){
-                message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
-                loglik <- loglik + priorN * moderation
-                }else{
-                  message(paste0("! Using loess fit as a shrinkage factor !"))
-                  loglik <- loglik + priorN * moderation
-                }
-              
-            }
-          )
           
         }
         
@@ -390,14 +234,21 @@ dmDS_estimateTagwiseDispersion <- function(counts, samples, mean_expression, dis
         
         
       }))
-
+  
   
   if(verbose) cat("Took ", time["elapsed"], " seconds.\n")
   if(verbose) cat("*** Genewise dispersion: ", head(dispersion), "... \n")
   
-  return(list(dispersion = dispersion, priorN = priorN))
+  return(dispersion)
   
 }
+
+
+
+
+
+
+
 
 
 

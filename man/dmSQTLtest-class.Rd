@@ -27,6 +27,8 @@ dmSQTLtest extends the \code{\linkS4class{dmSQTLfit}} class by adding the null m
 \item{\code{fit_null}}{List of \code{\linkS4class{MatrixList}}. Each of them contains null proportions, likelihoods and degrees of freedom for all the blocks (unique SNPs) assigned to a given gene.}
 
 \item{\code{results}}{Data frame with \code{gene_id} - gene IDs, \code{block_id} - block IDs, \code{snp_id} - SNP IDs, \code{lr} - likelihood ratio statistics, \code{df} - degrees of freedom, \code{pvalue} - p-values and \code{adj_pvalue} - Benjamini & Hochberg adjusted p-values.}
+
+\item{\code{pvalues_permutations}}{Matrix with p-values obtained in the permutation analysis.}
 }}
 \examples{
 #############################

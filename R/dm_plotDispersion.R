@@ -1,5 +1,5 @@
 #' @importFrom ggplot2 ggplot aes_string theme_bw xlab ylab theme element_text guides guide_colorbar scale_colour_gradient geom_point geom_hline
-#' @importFrom stats min quantile na.omit
+#' @importFrom stats quantile na.omit
 
 dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features = NULL, common_dispersion = NULL){
   
