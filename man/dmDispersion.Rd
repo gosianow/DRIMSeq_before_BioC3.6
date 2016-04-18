@@ -14,7 +14,7 @@ dmDispersion(x, ...)
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 1e+05),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
   disp_grid_length = 21, disp_grid_range = c(-10, 10),
-  disp_moderation = "common", disp_prior_df = 0, disp_span = 0.1,
+  disp_moderation = "trended", disp_prior_df = 0, disp_span = 0.1,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 
@@ -22,8 +22,8 @@ dmDispersion(x, ...)
   common_dispersion = TRUE, genewise_dispersion = TRUE,
   disp_adjust = TRUE, disp_mode = "grid", disp_interval = c(0, 10000),
   disp_tol = 1e-08, disp_init = 100, disp_init_weirMoM = TRUE,
-  disp_grid_length = 11, disp_grid_range = c(-10, 10),
-  disp_moderation = "none", disp_prior_df = 1, disp_span = 0.2,
+  disp_grid_length = 21, disp_grid_range = c(-10, 10),
+  disp_moderation = "none", disp_prior_df = 0, disp_span = 0.1,
   prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0,
   speed = TRUE, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
 }

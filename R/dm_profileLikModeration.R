@@ -33,43 +33,25 @@ dm_profileLikModeration <- function(loglik, mean_expression, disp_moderation = c
       }
       
       
-      ### Estimate priorN
-      ### Calculate the ratio between moderation lik span and lik span of boundry genes
-      if(sum(boundry_last) > 1){
+      ### Estimate priorN - calculate the ratio between moderation lik span and lik span of boundry genes
+      if(sum(boundry_last) > 10){
         
         moderation_span <- max(moderation) - min(moderation)
         span_ratio <- moderation_span / loglik_span_boundry
         priorN <- 1/span_ratio
         
-        if(length(loglik_span_boundry) > 100){
-          ### Do loess fitting if there is enough points
-
-          df_priorN_loglog <- data.frame(priorN = log10(priorN), mean_expression = log10(mean_expression[boundry_last]))
-          
-          priorN_loess_loglog <- loess(priorN ~ mean_expression, df_priorN_loglog, control = loess.control(surface = "direct"))
-          priorN_predict_loglog <- predict(priorN_loess_loglog, data.frame(mean_expression = log10(mean_expression)), se = FALSE)
-          
-          priorN <- 10 ^ priorN_predict_loglog
-          
-        }else{
-          ### Otherwise, use median
-          priorN <- quantile(priorN, 0.5)
-          
-        }
+        ### Use median 
+        priorN <- quantile(priorN, 0.5)
         
       }else{
         priorN <- disp_prior_df
       }
       
-      
-      if(length(priorN) == 1){
+
         message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
+        
         loglik <- sweep(loglik, 2, priorN * moderation, FUN = "+")
-      }else{
-        message(paste0("! Using loess fit as a shrinkage factor !"))
-        loglik <- loglik + priorN * matrix(moderation, nrow = length(priorN), ncol = length(moderation), byrow = TRUE)
-      }
-      
+
       
     },
     
@@ -78,16 +60,16 @@ dm_profileLikModeration <- function(loglik, mean_expression, disp_moderation = c
       moderation <- dm_movingAverageByCol(loglik = loglik, mean_expression = mean_expression, not_boundry = not_boundry, disp_span = disp_span)
       
       
-      ### Estimate priorN
-      ### Calculate the ratio between moderation lik span and lik span of boundry genes
-      if(sum(boundry_last) > 1){
+      ### Estimate priorN - calculate the ratio between moderation lik span and lik span of boundry genes
+      if(sum(boundry_last) > 10){
         
         moderation_span_boundry <- apply(moderation[boundry_last, , drop = FALSE], 1, function(x){max(x) - min(x)})
         span_ratio <- moderation_span_boundry / loglik_span_boundry
         priorN <- 1/span_ratio
         
+        
+        ### Do loess fitting if there is enough points. Otherwise, use median
         if(length(loglik_span_boundry) > 100){
-          ### Do loess fitting if there is enough points
 
           df_priorN_loglog <- data.frame(priorN = log10(priorN), mean_expression = log10(mean_expression[boundry_last]))
           
@@ -97,11 +79,10 @@ dm_profileLikModeration <- function(loglik, mean_expression, disp_moderation = c
           priorN <- 10 ^ priorN_predict_loglog
           
         }else{
-          ### Otherwise, use median
+
           priorN <- quantile(priorN, 0.5)
           
         }
-        
         
       }else{
         priorN <- disp_prior_df
@@ -109,11 +90,11 @@ dm_profileLikModeration <- function(loglik, mean_expression, disp_moderation = c
       
       if(length(priorN) == 1){
         message(paste0("! Using ", round(priorN, 4), " as a shrinkage factor !"))
-        loglik <- loglik + priorN * moderation
       }else{
         message(paste0("! Using loess fit as a shrinkage factor !"))
-        loglik <- loglik + priorN * moderation
       }
+      
+      loglik <- loglik + priorN * moderation
       
     }
   )
