@@ -100,7 +100,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
   
   
   if(plot_type == "boxplot1"){
-    ### box plots with points
+    ### box plots per transcript with points
     
     values <- c(colorb(nlevels(group)), "grey65")
     names(values) <- c(levels(group), "null")
@@ -109,8 +109,8 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       theme_bw() + 
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +     
-      geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(dodge.width = 0.75), alpha = 0.5, size = 2, show_guide = FALSE, na.rm = TRUE) +
-      geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.2, lwd = 0.5) +
+      geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(jitter.width = 0.75), alpha = 0.5, size = 1, show.legend = FALSE, na.rm = TRUE) +
+      geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.25, lwd = 0.5) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
@@ -142,7 +142,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), panel.grid.major = element_blank(), legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
       ggtitle(main) +     
-      geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id"), width = 1) + 
+      geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id"), width = 1, outlier.size = 0.5) + 
       scale_fill_manual(name = "Features", values = values) +
       scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
       guides(fill = guide_legend(nrow = 20)) +
@@ -158,7 +158,33 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
   }
   
- 
+ if(plot_type == "boxplot3"){
+   ### box plots per group
+   values <- colorb(length(labels_org))
+   names(values) <- labels_org
+   
+   ggp <- ggplot() +
+     theme_bw() +
+     theme(axis.text.x = element_text(angle = 0, vjust = 0.5), axis.text=element_text(size=14), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=14), panel.grid.major = element_blank(), legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
+     geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
+     ggtitle(main) +     
+     geom_jitter(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id", colour = "feature_id"), position = position_jitterdodge(jitter.width = 0.75), alpha = 0.5, size = 1, show.legend = FALSE, na.rm = TRUE) +
+     geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", colour = "feature_id", fill = "feature_id"), outlier.size = 0, alpha = 0.25, lwd = 0.5) +
+     scale_fill_manual(name = "Features", values = values) +
+     scale_colour_manual(name = "Features", values = values) +
+     scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
+     guides(fill = guide_legend(nrow = 20)) +
+     xlab("Groups") +
+     ylab("Proportions")
+   
+   if(!is.null(pi_full)){
+     ggp <- ggp + 
+       geom_point(data = prop_est_full, aes_string(x = "group", y = "proportion", fill = "feature_id"), position = position_jitterdodge(jitter.width = 0, jitter.height = 0), size = 3, shape = 23, colour = "black")
+   }
+   
+   return(ggp)
+   
+ }
 
   
   if(plot_type == "lineplot"){
@@ -178,7 +204,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
     
     if(!is.null(pi_null)){
       ggp <- ggp +
-        geom_point(data = prop_est_null, aes_string(x = "feature_id", y = "proportion", fill = "group"), size = 3.5, shape = 22, show_guide = FALSE) +
+        geom_point(data = prop_est_null, aes_string(x = "feature_id", y = "proportion", fill = "group"), size = 3.5, shape = 22, show.legend = FALSE) +
         guides(colour=FALSE)
     }
     

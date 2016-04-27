@@ -253,7 +253,7 @@ setMethod("plotFit", "dmSQTLtest", function(x, gene_id, snp_id, plot_type = "box
   if(!snp_id %in% x@blocks[[gene_id, "snp_id"]])
     stop(paste0("gene ",gene_id, " and SNP ", snp_id, " do not match!"))
   
-  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
+  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "boxplot3", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
   stopifnot(is.logical(plot_null))

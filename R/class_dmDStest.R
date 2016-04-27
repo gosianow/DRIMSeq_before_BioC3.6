@@ -310,7 +310,7 @@ setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
 setMethod("plotFit", "dmDStest", function(x, gene_id, plot_type = "barplot", order = TRUE, plot_full = TRUE, plot_null = TRUE, plot_main = TRUE, out_dir = NULL){
   
   stopifnot(all(gene_id %in% names(x@counts)))
-  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot"))
+  stopifnot(plot_type %in% c("barplot", "boxplot1", "boxplot2", "boxplot3", "lineplot", "ribbonplot"))
   stopifnot(is.logical(order))
   stopifnot(is.logical(plot_full))
   stopifnot(is.logical(plot_null))
