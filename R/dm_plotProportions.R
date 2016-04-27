@@ -21,6 +21,11 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
   
   stopifnot(ncol(counts) == length(group))
   
+  if(all(is.na(pi_full)))
+  pi_full <- NULL
+  if(all(is.na(pi_null)))
+  pi_null <- NULL
+  
   labels <- labels_org <- factor(rownames(counts), levels = rownames(counts))
   group_counts <- table(group)
   
