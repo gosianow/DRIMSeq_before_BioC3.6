@@ -115,7 +115,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5), axis.text=element_text(size=16), axis.title=element_text(size=14, face="bold"), plot.title = element_text(size=16), legend.position = "right", legend.title = element_text(size = 14), legend.text = element_text(size = 14)) +
       ggtitle(main) +     
       geom_jitter(data = prop_samp, aes_string(x = "feature_id", y = "proportion", fill = "group", colour = "group"), position = position_jitterdodge(jitter.width = 0.75), alpha = 0.5, size = 1, show.legend = FALSE, na.rm = TRUE) +
-      geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = 0, alpha = 0.25, lwd = 0.5) +
+      geom_boxplot(data = prop_samp, aes_string(x = "feature_id", y = "proportion", colour = "group", fill = "group"), outlier.size = NA, alpha = 0.25, lwd = 0.5) +
       scale_fill_manual(name = "Groups", values = values, breaks = names(values)) +
       scale_colour_manual(name = "Groups", values = values, breaks = names(values)) +
       xlab("Features") +
@@ -174,7 +174,7 @@ dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, ma
      geom_vline(xintercept = seq(1, nlevels(group) - 1, 1) + 0.5, color = "gray90") +
      ggtitle(main) +     
      geom_jitter(data = prop_samp, aes_string(x = "group", y = "proportion", fill = "feature_id", colour = "feature_id"), position = position_jitterdodge(jitter.width = 0.75), alpha = 0.5, size = 1, show.legend = FALSE, na.rm = TRUE) +
-     geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", colour = "feature_id", fill = "feature_id"), outlier.size = 0, alpha = 0.25, lwd = 0.5) +
+     geom_boxplot(data = prop_samp, aes_string(x = "group", y = "proportion", colour = "feature_id", fill = "feature_id"), outlier.size = NA, alpha = 0.25, lwd = 0.5) +
      scale_fill_manual(name = "Features", values = values) +
      scale_colour_manual(name = "Features", values = values) +
      scale_x_discrete(labels = paste0(names(group_counts), " (", group_counts, ")" ), name="") +
