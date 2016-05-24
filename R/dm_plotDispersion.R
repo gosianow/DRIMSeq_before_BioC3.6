@@ -8,16 +8,18 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features 
     df <- data.frame(mean_expression = log10(mean_expression + 1), dispersion = log10(genewise_dispersion), nr_features = nr_features)
     
     df_quant <- min(quantile(na.omit(df$nr_features), probs = 0.95), 30)
-    breaks <- seq(2, df_quant, ceiling(df_quant/10))
+    # breaks <- seq(2, df_quant, ceiling(df_quant/10))
+    
+    breaks <- unique(c(2, round(df_quant/2) + 1, df_quant))
     
     
     ggp <- ggplot(df, aes_string(x = "mean_expression", y = "dispersion", colour = "nr_features" )) +
       theme_bw() +
       xlab("Log10 of mean expression") +
       ylab("Log10 of gamma_+") +
-      geom_point(alpha = 0.7, na.rm = TRUE) +
-      theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top") +
-      guides(colour = guide_colorbar(barwidth = 20, barheight = 0.5)) +
+      geom_point(alpha = 1, na.rm = TRUE, size = 0.5) +
+      theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "bottom") +
+      guides(colour = guide_colorbar(barwidth = 10, barheight = 0.5)) +
       scale_colour_gradient(limits = c(2, max(breaks)), breaks = breaks, low = "royalblue2", high="red2", name = "Number of features", na.value = "red2")
     
     
@@ -29,8 +31,8 @@ dm_plotDispersion <- function(genewise_dispersion, mean_expression, nr_features 
       theme_bw() +
       xlab("Log10 of mean expression") +
       ylab("Log10 of gamma_+") +
-      geom_point(alpha = 0.4, na.rm = TRUE) +
-      theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "top")
+      geom_point(alpha = 1, na.rm = TRUE, size = 0.5, color = "gray40") +
+      theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), legend.title = element_text(size=16, face="bold"), legend.text = element_text(size = 14), legend.position = "bottom")
 
   }
 

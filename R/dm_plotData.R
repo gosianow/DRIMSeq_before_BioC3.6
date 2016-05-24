@@ -12,7 +12,7 @@ dm_plotDataFeatures <- function(tt){
     theme_bw() +
     xlab("Number of features per gene") +
     ylab("Frequency") +
-    geom_histogram(fill = "seagreen4", binwidth = binwidth) +
+    geom_histogram(fill = "gray40", binwidth = binwidth) +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
     geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n ", sum(tt) , " features   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
@@ -35,7 +35,7 @@ dm_plotDataBlocks <- function(tt){
     theme_bw() +
     xlab("Number of blocks per gene") +
     ylab("Frequency") +
-    geom_histogram(fill = "mediumpurple4", binwidth = binwidth) +
+    geom_histogram(fill = "gray40", binwidth = binwidth) +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
     geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n", sum(tt) , " blocks   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
@@ -56,7 +56,7 @@ dm_plotDataSnps <- function(tt){
     theme_bw() +
     xlab("Number of SNPs per gene") +
     ylab("Frequency") +
-    geom_histogram(fill = "royalblue4", binwidth = binwidth) +
+    geom_histogram(fill = "gray40", binwidth = binwidth) +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=18, face="bold"), plot.title = element_text(size=18, face="bold")) +
     coord_cartesian(xlim = c(0, max(tt) + 2)) +
     geom_text(data = data.frame(x = Inf, y = Inf, label = paste0(length(tt), " genes   \n", sum(tt) , " SNPs   ")), aes_string(x = "x", y = "y", label = "label"), hjust = 1, vjust = 2, size = 6)
