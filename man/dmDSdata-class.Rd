@@ -3,6 +3,7 @@
 \docType{class}
 \name{dmDSdata-class}
 \alias{[,dmDSdata,ANY,ANY-method}
+\alias{[,dmDSdata,ANY-method}
 \alias{[,dmDSdata-method}
 \alias{counts,dmDSdata-method}
 \alias{dmDSdata-class}

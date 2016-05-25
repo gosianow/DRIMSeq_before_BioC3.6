@@ -2,7 +2,7 @@
 # calculate the moderated profile likelihood
 ##############################################################################
 
-
+#' @importFrom stats loess predict loess.control
 
 dm_profileLikModeration <- function(loglik, mean_expression, disp_moderation = c("common", "trended")[1], disp_prior_df, disp_span){
   

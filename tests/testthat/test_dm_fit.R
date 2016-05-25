@@ -8,13 +8,13 @@ gamma0 = 10
 y = matrix(c(30, 70, 60, 140), nrow = 2)
 
 
-test_that("dm_fitOneGeneOneGroup returns list(pi = pi, stats = c(lik = lik, df = df))", {
+test_that("dm_fitOneGeneOneGroup returns list(pi = pi, stats = c(lik = lik, df = df, dev = dev))", {
   
   dm_fitOneGeneOneGroup_out <- dm_fitOneGeneOneGroup(y, gamma0, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE)
   
   expect_is(dm_fitOneGeneOneGroup_out, "list")
   expect_true(all(names(dm_fitOneGeneOneGroup_out) == c("pi", "stats")))
-  expect_true(all(names(dm_fitOneGeneOneGroup_out$stats) == c("lik", "df")))
+  expect_true(all(names(dm_fitOneGeneOneGroup_out$stats) == c("lik", "df", "dev")))
   
 })
 
@@ -57,15 +57,14 @@ igroups = list(C1 = 1:2, C2 = 3:4)
 
 
 
-test_that("dm_fitOneGeneOneGroup returns list(pi = pi, stats = stats)", {
+test_that("dm_fitOneGeneManyGroups returns list(pi = pi, stats = c(lik, dev))", {
   
   dm_fitOneGeneManyGroups_out <- dm_fitOneGeneManyGroups(y, ngroups, lgroups, igroups, gamma0, prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = FALSE)
   
   expect_is(dm_fitOneGeneManyGroups_out, "list")
   expect_true(all(names(dm_fitOneGeneManyGroups_out) == c("pi", "stats")))
-  expect_true(all(names(dm_fitOneGeneManyGroups_out$stats) == c("C1", "C2")))
   expect_true(all(colnames(dm_fitOneGeneManyGroups_out$pi) == c("C1", "C2")))
-  
+  expect_true(all(names(dm_fitOneGeneManyGroups_out$stats) == paste0(rep(c("lik_", "dev_"), each = 2), c("C1", "C2"))))
   
 })
 

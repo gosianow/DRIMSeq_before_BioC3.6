@@ -1,10 +1,6 @@
 ### Functions that are used in show methods
 
-
-################################################################################
-
-# nhead = 2; ntail = 2
-
+#' @importFrom utils head tail
 show_matrix <- function(object, nhead = 2, ntail = 2){
   nr <- nrow(object)
   nc <- ncol(object)

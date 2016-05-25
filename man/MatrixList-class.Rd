@@ -5,6 +5,7 @@
 \alias{$,MatrixList-method}
 \alias{MatrixList-class}
 \alias{[,MatrixList,ANY,ANY-method}
+\alias{[,MatrixList,ANY-method}
 \alias{[,MatrixList-method}
 \alias{[[,MatrixList,ANY,ANY-method}
 \alias{[[,MatrixList-method}

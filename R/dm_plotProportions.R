@@ -13,10 +13,8 @@
 #' @return 
 #' ggplot object with the observed and/or estimated with Dirichlet-multinomial model feature ratios. Estimated proportions are marked with diamond shapes.
 #' @importFrom reshape2 melt
-#' @importFrom ggplot2 ggplot aes_string theme_bw xlab ylab theme element_text coord_cartesian geom_text   ggtitle geom_bar scale_fill_manual geom_point geom_jitter position_jitterdodge geom_boxplot scale_colour_manual scale_colour_manual guides element_blank geom_vline scale_x_discrete guide_legend geom_line geom_ribbon
+#' @importFrom ggplot2 ggplot aes_string theme_bw xlab ylab theme element_text coord_cartesian geom_text   ggtitle geom_bar scale_fill_manual geom_point geom_jitter position_jitterdodge geom_boxplot scale_colour_manual scale_colour_manual guides element_blank geom_vline scale_x_discrete guide_legend geom_line geom_ribbon position_dodge
 #' @importFrom stats aggregate median 
-#' 
-#' 
 dm_plotProportions <- function(counts, group, pi_full = NULL, pi_null = NULL, main = NULL, plot_type = "boxplot1", order = TRUE){
   
   stopifnot(ncol(counts) == length(group))

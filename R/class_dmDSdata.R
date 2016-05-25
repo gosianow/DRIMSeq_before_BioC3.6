@@ -115,7 +115,7 @@ setMethod("names", "dmDSdata", function(x) names(x@counts) )
 setMethod("length", "dmDSdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmDSdata-method
+#' @aliases [,dmDSdata-method [,dmDSdata,ANY-method
 #' @rdname dmDSdata-class
 #' @export
 setMethod("[", "dmDSdata", function(x, i, j){
@@ -374,6 +374,7 @@ setGeneric("plotData", function(x, ...) standardGeneric("plotData"))
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}, \code{\link{plotTest}}
 #' @rdname plotData
 #' @export
+#' @importFrom grDevices pdf dev.off
 setMethod("plotData", "dmDSdata", function(x, out_dir = NULL){
   
   tt <- width(x@counts)

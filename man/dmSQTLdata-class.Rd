@@ -3,6 +3,7 @@
 \docType{class}
 \name{dmSQTLdata-class}
 \alias{[,dmSQTLdata,ANY,ANY-method}
+\alias{[,dmSQTLdata,ANY-method}
 \alias{[,dmSQTLdata-method}
 \alias{dmSQTLdata-class}
 \alias{length,dmSQTLdata-method}

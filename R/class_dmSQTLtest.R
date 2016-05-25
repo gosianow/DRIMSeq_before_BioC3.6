@@ -107,6 +107,7 @@ setMethod("show", "dmSQTLtest", function(object){
 ### dmTest
 ################################################################################
 
+#' @param permutations Character specifying which permutation scheme to apply for p-value calculation. When equal to \code{"all_genes"}, null distribution of p-values is calculated from all genes and the maximum number of permutation cycles is 10. When  \code{permutations = "per_gene"}, null distribution of p-values is calculated for each gene separately based on permutations of this individual gene. The latter approach may take a lot of computational time. We suggest using the first option.
 #' @rdname dmTest
 #' @export
 setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", permutations = "all_genes", prop_mode = "constrOptimG", prop_tol = 1e-12, verbose = 0, BPPARAM = BiocParallel::MulticoreParam(workers = 1)){
@@ -225,6 +226,7 @@ setMethod("dmTest", "dmSQTLfit", function(x, test = "lr", permutations = "all_ge
 
 #' @rdname plotTest
 #' @export
+#' @importFrom grDevices pdf dev.off
 setMethod("plotTest", "dmSQTLtest", function(x, out_dir = NULL){
   
   ggp <- dm_plotPvalues(pvalues = unique(x@results[, c("gene_id", "block_id", "pvalue")])[, "pvalue"])

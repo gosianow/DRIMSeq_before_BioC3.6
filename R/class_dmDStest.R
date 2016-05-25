@@ -285,6 +285,7 @@ setGeneric("plotTest", function(x, ...) standardGeneric("plotTest"))
 #' @seealso \code{\link{data_dmDSdata}}, \code{\link{data_dmSQTLdata}}, \code{\link{plotData}}, \code{\link{plotDispersion}}, \code{\link{plotFit}}
 #' @rdname plotTest
 #' @export
+#' @importFrom grDevices pdf dev.off
 setMethod("plotTest", "dmDStest", function(x, out_dir = NULL){
   
   ggp <- dm_plotPvalues(pvalues = x@results[, "pvalue"])

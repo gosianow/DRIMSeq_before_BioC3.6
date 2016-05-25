@@ -176,6 +176,7 @@ setMethod("dmDispersion", "dmSQTLdata", function(x, mean_expression = TRUE, comm
 
 #' @rdname plotDispersion
 #' @export
+#' @importFrom grDevices pdf dev.off
 setMethod("plotDispersion", "dmSQTLdispersion", function(x, out_dir = NULL){
   
   w <- sapply(x@genewise_dispersion, length)

@@ -3,9 +3,6 @@
 #' @import BiocParallel
 #' @import edgeR
 #' @import GenomicRanges
-#' @import S4Vectors
-#' @import grid
-#' @importFrom utils head tail
 NULL
 
 

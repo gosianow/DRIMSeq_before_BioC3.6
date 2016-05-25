@@ -56,7 +56,7 @@ dmDispersion(x, ...)
 
 \item{disp_moderation}{Dispersion moderation method. One can choose to shrink the dispersion estimates toward the common dispersion (\code{"common"}) or toward the (dispersion versus mean expression) trend (\code{"trended"})}
 
-\item{disp_prior_df}{Degree of moderation (shrinkage).}
+\item{disp_prior_df}{Degree of moderation (shrinkage) in case when it can not be calculated automaticaly (number of genes on the upper boundary of grid is smaller than 10). By default it is equal to 0.}
 
 \item{disp_span}{Value from 0 to 1 defining the percentage of genes used in smoothing sliding window when calculating the dispersion versus mean expression trend.}
 

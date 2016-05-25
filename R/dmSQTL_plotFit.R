@@ -1,6 +1,7 @@
 
 # counts = x@counts; genotypes = x@genotypes; blocks = x@blocks; samples = x@samples; dispersion = slot(x, x@dispersion); fit_full = x@fit_full; fit_null = x@fit_null; table = NULL; plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3]; order = TRUE; plot_full = TRUE; plot_null = TRUE; out_dir = "~/"
 
+#' @importFrom grDevices pdf dev.off
 dmSQTL_plotFit <- function(gene_id, snp_id, counts, genotypes, blocks, samples, dispersion = numeric(), fit_full = NULL, fit_null = NULL, table = NULL, plot_type = c("barplot", "boxplot1", "boxplot2", "lineplot", "ribbonplot")[3], order = TRUE, plot_full = ifelse(is.null(fit_full), FALSE, TRUE), plot_null = ifelse(is.null(fit_null), FALSE, TRUE), plot_main = TRUE, out_dir = NULL){
   
   

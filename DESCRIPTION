@@ -12,26 +12,29 @@ Description: The package provides two frameworks. One for the differential
     exons or exonic bins) with Dirichlet-multinomial distribution. The package also
     makes available functions for visualization and exploration of the data and
     results.
-biocViews: SNP, AlternativeSplicing, DifferentialSplicing, Genetics, RNASeq,
-    MultipleComparison
+biocViews: SNP, AlternativeSplicing, DifferentialSplicing, Genetics,
+    RNASeq, Sequencing, WorkflowStep, MultipleComparison, GeneExpression,
+    DifferentialExpression
 License: GPL (>= 3)
 Depends:
-    R (>= 3.2),
-    BiocGenerics
+    R (>= 3.2)
 Imports:
+    BiocGenerics,
     methods,
     BiocParallel,
     edgeR,
     GenomicRanges,
-    S4Vectors,
+    utils,
+    stats,
+    grDevices,
     ggplot2,
-    reshape2,
-    grid
+    reshape2
 LazyData: true
 ByteCompile: false
 VignetteBuilder: knitr
 Suggests:
     pasilla,
+    grid,
     limma,
     rtracklayer,
     BiocStyle,
@@ -62,6 +65,7 @@ Collate:
     'dmSQTL_estimateTagwiseDispersion.R'
     'dmSQTL_filter.R'
     'dmSQTL_fitOneModel.R'
+    'dmSQTL_permutations.R'
     'dmSQTL_plotFit.R'
     'dmSQTL_profileLikCommon.R'
     'dmSQTL_test.R'

@@ -96,7 +96,7 @@ setMethod("names", "dmSQTLdata", function(x) names(x@counts) )
 setMethod("length", "dmSQTLdata", function(x) length(x@counts) )
 
 
-#' @aliases [,dmSQTLdata-method
+#' @aliases [,dmSQTLdata-method [,dmSQTLdata,ANY-method
 #' @rdname dmSQTLdata-class
 #' @export
 setMethod("[", "dmSQTLdata", function(x, i, j){
