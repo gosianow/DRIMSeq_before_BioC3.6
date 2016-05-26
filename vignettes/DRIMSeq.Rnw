@@ -296,7 +296,7 @@ This step of our pipeline is the most time consuming. Thus consider using
 \Rcode{BPPARAM = BiocParallel::MulticoreParam()} with more than one worker.
 
 <<DSdmDispersion>>=
-d <- dmDispersion(d, verbose = 1, BPPARAM = BiocParallel::SerialParam())
+d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 d
 head(mean_expression(d), 3)
 common_dispersion(d)
@@ -358,7 +358,7 @@ Now, if you call \Rfunction{proportions} or \Rfunction{statistics} function,
 results of null estimation are added to the previous data frames.
 
 <<DSdmTest>>=
-d <- dmTest(d, verbose = 1, BPPARAM = BiocParallel::SerialParam())
+d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 d
 
 head(proportions(d), 3)
@@ -622,7 +622,7 @@ worker when performing real data analysis.
 
 
 <<SQTLdmDispersion>>=
-d <- dmDispersion(d, verbose = 1, BPPARAM = BiocParallel::SerialParam())
+d <- dmDispersion(d, BPPARAM = BiocParallel::SerialParam())
 d
 @
 
@@ -655,7 +655,7 @@ p-values for each gene-block/SNP pair.
 
 
 <<SQTLdmTest>>=
-d <- dmTest(d, verbose = 1, BPPARAM = BiocParallel::SerialParam())
+d <- dmTest(d, BPPARAM = BiocParallel::SerialParam())
 d
 head(results(d), 3)
 plotTest(d)

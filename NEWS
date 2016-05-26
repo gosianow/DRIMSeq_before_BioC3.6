@@ -1,2 +1,3 @@
-v0.3.4: - Adapted package for Bioconductor submission
 v0.99.0: - Bioconductor submission
+v1.1.2: - Bioconductor accepted devel version
+v1.1.3: - New features: i) the level of moderation is calculated automatically; ii) permutation approach to adjust p-values in sQTL analyses
